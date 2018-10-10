@@ -6,12 +6,15 @@ Created on Wed Oct 10 10:22:53 2018
 @author: Niccolo' Dal Santo
 @email : niccolo.dalsanto@epfl.ch
 
-This is the module for handling RB methods in python.
+This module allows to handle RB methods in python starting from a set of FE arrays imported from another library.
 """
 
 
 
 import numpy as np
+
+import affine_decomposition as ad
+
 
 class RbManager( ):
     
@@ -78,6 +81,27 @@ class RbManager( ):
             
         return
 
+    def print_rb_summary( self ):
+        
+        print( "\n\n ------------  RB SUMMARY  ------------\n\n" )
+        print( "Number of snapshots                    %d" % self.M_ns )
+        print( "Number of selected RB functions        %d" % self.M_N )
+        
+        self.M_affineDecomposition.print_ad_summary( )
+        
+        return
+
+    def set_affine_decomposition_handler( self, _affineDecomposition ):
+        self.M_affineDecomposition = _affineDecomposition
+        return
+
+    def build_rb_approximation( self, _tol = 10**(-5) ):
+        self.perform_pod( _tol )
+        
+        self.M_affineDecomposition.build_rb_affine_decompositions( )
+        
+        return
+
     M_ns = 0
     M_snapshots_matrix = np.zeros( 0 )
     M_ns_test = 0
@@ -86,10 +110,7 @@ class RbManager( ):
     M_N = 0
     M_basis = np.zeros( 0 )
 
-
-
-
-
+    M_affineDecomposition = ad.AffineDecompositionHandler( )
 
 
 
