@@ -9,6 +9,22 @@ Created on Wed Oct 10 14:41:45 2018
 
 import numpy as np
 
+# mat is a matrix in COO format, vec is a vector, such that the results is Av = mat * vec
+
+def sparse_matrix_vector_mul( mat, vec ):
+
+    Av = np.zeros( vec.shape  )
+
+    nnz = mat.shape[0]
+    
+    for i in range( nnz ):
+        Av[ int(mat[i, 0])-1, :] = Av[ int(mat[i, 0])-1, :] + mat[i, 2] * vec[ int(mat[i, 1])-1, : ]
+    
+    return Av
+
+
+
+
 class AffineDecomposition( ):
 
     def __init__( self ):
@@ -43,10 +59,10 @@ class AffineDecompositionHandler( ):
         return
     
     def get_Qa( self ):
-        return self.M_qa
+        return self.M_affineDecomposition.get_Qa( )
 
     def get_Qf( self ):
-        return self.M_qf
+        return self.M_affineDecomposition.get_Qf( )
 
     def set_Q( self, _qa, _qf ):
         self.M_affineDecomposition.set_Q( _qa, _qf )
@@ -83,15 +99,15 @@ class AffineDecompositionHandler( ):
         
         return
         
-    def resize_rb_arrays( self, _N ):
-        
-        for iQf in range( self.M_qf ):
-            self.M_rbAffineFq.append( np.zeros( _N ) )
-        
-        for iQa in range( self.M_qa ):
-            self.M_rbAffineAq.append( np.zeros( (_N, _N) ) )   # importing matrix in sparse format
-        
-        return
+#    def resize_rb_arrays( self, _N ):
+#        
+#        for iQf in range( self.M_qf ):
+#            self.M_rbAffineFq.append(  )
+#        
+#        for iQa in range( self.M_qa ):
+#            self.M_rbAffineAq.append( np.zeros( (_N, _N) ) )   # importing matrix in sparse format
+#        
+#        return
     
     def print_ad_summary( self ):
         
@@ -99,9 +115,26 @@ class AffineDecompositionHandler( ):
         
         return 
     
-    def build_rb_affine_decompositions( self ):
+    def build_rb_affine_decompositions( self, _basis ):
         
+        N = _basis.shape[1]
         
+        Qf = self.get_Qf( )
+        
+        for iQf in range( Qf ):
+            
+            self.M_rbAffineFq.append( np.zeros( N ) )
+            self.M_rbAffineFq[iQf] = _basis.T.dot( self.M_feAffineFq[iQf] )
+        
+        Qa = self.get_Qa( )
+
+        for iQa in range( Qa ):
+            Av = sparse_matrix_vector_mul( self.M_feAffineAq[iQa], _basis )
+            self.M_rbAffineAq.append( np.zeros( (N, N) ) )
+            self.M_rbAffineAq[iQa] = _basis.T.dot( Av )
+            
+            print( "\n\n Affine component %d " % iQa )
+            print( self.M_rbAffineAq[iQa] )
         
         return
 

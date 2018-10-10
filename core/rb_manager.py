@@ -56,6 +56,10 @@ class RbManager( ):
         
         return 
     
+    def set_save_basis_functions( self, _save, _file ):
+        self.M_save_basis_functions = _save
+        self.M_save_file_basis_functions = _file
+    
     def perform_pod( self, _tol = 10**(-5) ):
         
         U, s, V = np.linalg.svd( self.M_snapshots_matrix, full_matrices=False )
@@ -74,11 +78,24 @@ class RbManager( ):
             record_cumulative_energy[ self.M_N ] = cumulative_energy
             cumulative_energy = cumulative_energy + s[ self.M_N ]*s[ self.M_N ]  # add the energy of next basis
             self.M_N = self.M_N + 1                                       # add a basis in the count
-        
-        print( "The number of selected RB functions is %d" % self.M_N )
 
         self.M_basis = U[:, 0:self.M_N]
-            
+    
+        if self.M_save_basis_functions == True:
+            output_file = open( "basis_functions", 'w+' )
+                
+            for iNs in range( self.M_basis.shape[0] ):
+                for iP in range( self.M_basis.shape[1] ):
+                    output_file.write( "%.10g" % self.M_basis[iNs, iP] )
+    
+                    if iP < self.M_basis.shape[1] - 1:
+                        output_file.write( " " % self.M_basis[iNs, iP] )
+                    else:
+                        output_file.write( "; ... \n" % self.M_basis[iNs, iP] )
+        
+            output_file.close( )
+
+        
         return
 
     def print_rb_summary( self ):
@@ -96,9 +113,10 @@ class RbManager( ):
         return
 
     def build_rb_approximation( self, _tol = 10**(-5) ):
+        
         self.perform_pod( _tol )
         
-        self.M_affineDecomposition.build_rb_affine_decompositions( )
+        self.M_affineDecomposition.build_rb_affine_decompositions( self.M_basis )
         
         return
 
@@ -109,7 +127,8 @@ class RbManager( ):
 
     M_N = 0
     M_basis = np.zeros( 0 )
-
+    M_save_basis_functions = False
+    M_save_file_basis_functions = "basis.txt"
     M_affineDecomposition = ad.AffineDecompositionHandler( )
 
 
