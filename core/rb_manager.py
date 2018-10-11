@@ -16,6 +16,18 @@ import numpy as np
 import affine_decomposition as ad
 
 
+class RbHandler( ):
+    
+    def __init__( self ):
+        return
+
+    
+    
+    
+    
+
+
+
 class RbManager( ):
     
     def __init__( self ):
@@ -82,7 +94,7 @@ class RbManager( ):
         self.M_basis = U[:, 0:self.M_N]
     
         if self.M_save_basis_functions == True:
-            output_file = open( "basis_functions", 'w+' )
+            output_file = open( self.M_save_file_basis_functions, 'w+' )
                 
             for iNs in range( self.M_basis.shape[0] ):
                 for iP in range( self.M_basis.shape[1] ):
