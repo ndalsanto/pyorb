@@ -14,6 +14,7 @@ This module allows to handle RB methods in python starting from a set of FE arra
 import numpy as np
 
 import affine_decomposition as ad
+import fem_problem as fm
 
 
 class RbHandler( ):
@@ -30,7 +31,10 @@ class RbHandler( ):
 
 class RbManager( ):
     
-    def __init__( self ):
+    def __init__( self, _affine_decomposition, _fem_problem ):
+        
+        self.set_affine_decomposition_handler( _affine_decomposition )
+        self.set_fem_problem( _fem_problem )
         return
 
     def import_snapshots_matrix( self, _input_file ):
@@ -124,6 +128,11 @@ class RbManager( ):
         self.M_affineDecomposition = _affineDecomposition
         return
 
+    def set_fem_problem( self, _fem_problem ):
+        self.M_fem_problem = _fem_problem
+        return
+
+
     def build_rb_approximation( self, _tol = 10**(-5) ):
         
         self.perform_pod( _tol )
@@ -142,7 +151,7 @@ class RbManager( ):
     M_save_basis_functions = False
     M_save_file_basis_functions = "basis.txt"
     M_affineDecomposition = ad.AffineDecompositionHandler( )
-
+    M_fem_problem = fm.fem_problem
 
 
 

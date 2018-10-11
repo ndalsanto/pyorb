@@ -33,34 +33,46 @@ param_max = np.array([mu0_max, mu1_max, mu2_max])
 num_parameters = param_min.shape[0]
 
 
-
+# preparing the parameter handler
 my_parameter_handler = ph.Parameter_handler( )
 my_parameter_handler.assign_parameters_bounds( param_min, param_max )
 
 my_parameter_handler.generate_parameter( )
 my_parameter_handler.print_parameters( )
 
+# define the fem problem 
 my_tbp = tbp.thermal_block_problem( )
 
-
+# defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )                   # number of affine terms
 my_affine_decomposition.import_affine_matrices( 'affine_matrix_A' )
 my_affine_decomposition.import_affine_vectors(  'affine_vector_f' )
 
+# building the RB manager
+my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 
-my_rb_manager = rm.RbManager( )
-my_rb_manager.set_affine_decomposition_handler( my_affine_decomposition )
-
+# importing snapshots and building RB space
 snapshots_file = 'train_snapshots_matrix_20_50.txt'
 my_rb_manager.import_snapshots_matrix( snapshots_file )
-
 #my_rb_manager.set_save_basis_functions( True, "basis.txt" )
 my_rb_manager.build_rb_approximation( 10**(-4) )
 
 
 
-
+# printing summary
 my_rb_manager.print_rb_summary( )
+
+
+
+
+
+
+
+
+
+
+
+
 
 
