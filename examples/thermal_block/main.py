@@ -52,10 +52,11 @@ my_affine_decomposition.import_affine_vectors(  'affine_vector_f' )
 # building the RB manager
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 
-# importing snapshots and building RB space
+# importing snapshots, offline parameters and building RB space
+my_rb_manager.import_snapshots_parameters( 'train_parameters.data' )
 snapshots_file = 'train_snapshots_matrix_20_50.txt'
 my_rb_manager.import_snapshots_matrix( snapshots_file )
-#my_rb_manager.set_save_basis_functions( True, "basis.txt" )
+my_rb_manager.set_save_basis_functions( True, "basis.txt" )
 my_rb_manager.build_rb_approximation( 10**(-4) )
 
 
@@ -63,14 +64,12 @@ my_rb_manager.build_rb_approximation( 10**(-4) )
 # printing summary
 my_rb_manager.print_rb_summary( )
 
-my_rb_manager.import_snapshots_parameters( 'train_parameters.data' )
-
-my_rb_manager.solve_reduced_problem( my_rb_manager.get_offline_parameter( 0 ) )
+#my_rb_manager.solve_reduced_problem( my_rb_manager.get_offline_parameter( 0 ) )
 #my_rb_manager.print_rb_solution( )
 
-
-
-
+for snapshot_number in range(20):
+    my_rb_manager.compute_rb_snapshots_error( snapshot_number )
+    
 
 
 

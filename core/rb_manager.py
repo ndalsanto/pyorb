@@ -183,14 +183,39 @@ class RbManager( ):
         
         return
     
+    def reconstruct_fem_solution( self, _un ):
+    
+        self.M_utildeh = np.zeros( (self.M_snapshots_matrix.shape[0], 1) )
+        N = self.M_N
+        
+        assert _un.shape[0] == N
+        
+        self.M_utildeh = self.M_basis.dot( _un )
+        
+        return
+        
     def print_rb_solution( self ):
-        print( "The RB solution is: " )
+        print( "\nThe RB solution is: " )
         print( self.M_un )
     
+    def compute_rb_snapshots_error( self, _snapshot_number ):
+        
+        self.solve_reduced_problem( self.M_offline_ns_parameters[_snapshot_number, :] )
+        self.reconstruct_fem_solution( self.M_un )
+        
+        error = self.M_utildeh
+        error = error - self.M_snapshots_matrix[:, _snapshot_number]
+        
+        norm_of_error = np.linalg.norm( error ) / np.linalg.norm( self.M_snapshots_matrix[:, _snapshot_number] )
+        
+        print( "The norm of the error for snapshot %d is %g" % (_snapshot_number, norm_of_error) )
+        
+        return
+
     M_An = np.zeros( (0, 0) )
     M_fn = np.zeros( 0 )
     M_un = np.zeros( 0 )
-
+    M_utildeh = np.zeros( 0 )
 
 
 
