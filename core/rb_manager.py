@@ -42,6 +42,10 @@ class RbManager( ):
         self.M_ns = self.M_snapshots_matrix.shape[1]
         return 
 
+    def import_test_parameters( self, _input_file ):
+        self.M_test_parameters = np.loadtxt( _input_file )
+        return
+
     def import_test_snapshots_matrix( self, _input_file ):
         self.M_test_snapshots_matrix = np.loadtxt( _input_file )
         self.M_ns_test = self.M_test_snapshots_matrix.shape[1]
@@ -110,13 +114,13 @@ class RbManager( ):
                     if iP < self.M_basis.shape[1] - 1:
                         output_file.write( " " % self.M_basis[iNs, iP] )
                     else:
-                        output_file.write( "; ... \n" % self.M_basis[iNs, iP] )
+                        output_file.write( "\n" % self.M_basis[iNs, iP] )
         
             output_file.close( )
 
         return
 
-    def print_rb_summary( self ):
+    def print_rb_offline_summary( self ):
         
         print( "\n\n ------------  RB SUMMARY  ------------\n\n" )
         print( "Number of snapshots                    %d" % self.M_ns )
@@ -148,6 +152,7 @@ class RbManager( ):
     M_offline_ns_parameters = np.zeros( 0 )
     M_ns_test = 0
     M_test_snapshots_matrix = np.zeros( 0 )
+    M_test_parameters = np.zeros( 0 )
 
     M_N = 0
     M_basis = np.zeros( 0 )
@@ -209,6 +214,20 @@ class RbManager( ):
         norm_of_error = np.linalg.norm( error ) / np.linalg.norm( self.M_snapshots_matrix[:, _snapshot_number] )
         
         print( "The norm of the error for snapshot %d is %g" % (_snapshot_number, norm_of_error) )
+        
+        return
+    
+    def compute_rb_test_snapshots_error( self, _snapshot_number ):
+        
+        self.solve_reduced_problem( self.M_test_parameters[_snapshot_number, :] )
+        self.reconstruct_fem_solution( self.M_un )
+        
+        error = self.M_utildeh
+        error = error - self.M_test_snapshots_matrix[:, _snapshot_number]
+        
+        norm_of_error = np.linalg.norm( error ) / np.linalg.norm( self.M_test_snapshots_matrix[:, _snapshot_number] )
+        
+        print( "The norm of the error for TEST snapshot %d is %g" % (_snapshot_number, norm_of_error) )
         
         return
 

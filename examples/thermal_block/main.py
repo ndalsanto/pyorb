@@ -46,8 +46,8 @@ my_tbp = tbp.thermal_block_problem( )
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )                   # number of affine terms
-my_affine_decomposition.import_affine_matrices( 'affine_matrix_A' )
-my_affine_decomposition.import_affine_vectors(  'affine_vector_f' )
+my_affine_decomposition.import_affine_matrices( 'affine_matrix_20 A' )
+my_affine_decomposition.import_affine_vectors(  'affine_vector_20_f' )
 
 # building the RB manager
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
@@ -58,17 +58,16 @@ snapshots_file = 'train_snapshots_matrix_20_50.txt'
 my_rb_manager.import_snapshots_matrix( snapshots_file )
 my_rb_manager.set_save_basis_functions( True, "basis.txt" )
 my_rb_manager.build_rb_approximation( 10**(-4) )
-
-
-
 # printing summary
-my_rb_manager.print_rb_summary( )
+my_rb_manager.print_rb_offline_summary( )
 
-#my_rb_manager.solve_reduced_problem( my_rb_manager.get_offline_parameter( 0 ) )
-#my_rb_manager.print_rb_solution( )
+
+my_rb_manager.import_test_parameters( 'test_parameters.data' )
+my_rb_manager.import_test_snapshots_matrix( 'test_snapshots_matrix_20_20.txt' )
+
 
 for snapshot_number in range(20):
-    my_rb_manager.compute_rb_snapshots_error( snapshot_number )
+    my_rb_manager.compute_rb_test_snapshots_error( snapshot_number )
     
 
 
