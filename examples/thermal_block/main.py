@@ -17,6 +17,9 @@ sys.path.insert(0, '../../core')
 import rb_manager as rm
 import affine_decomposition as ad
 import parameter_handler as ph
+import fem_problem as fm
+
+import thermal_block_problem as tbp
 
 print( rm.__doc__ )
 
@@ -30,8 +33,22 @@ param_max = np.array([mu0_max, mu1_max, mu2_max])
 num_parameters = param_min.shape[0]
 
 
+
 my_parameter_handler = ph.Parameter_handler( )
 my_parameter_handler.assign_parameters_bounds( param_min, param_max )
+
+my_parameter_handler.generate_parameter( )
+my_parameter_handler.print_parameters( )
+
+my_tbp = tbp.thermal_block_problem( )
+
+print( "The current theta with q = 1 is " )
+print( my_tbp.get_theta_a( np.array([1.1, 1.2, 1.3]), 4 ) )
+
+
+
+#%% 
+
 
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )                   # number of affine terms
