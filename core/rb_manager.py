@@ -33,6 +33,10 @@ class RbManager( ):
         self.set_fem_problem( _fem_problem )
         return
 
+    def import_snapshots_parameters( self, _input_file ):
+        self.M_offline_ns_parameters = np.loadtxt( _input_file )
+        return 
+
     def import_snapshots_matrix( self, _input_file ):
         self.M_snapshots_matrix = np.loadtxt( _input_file )
         self.M_ns = self.M_snapshots_matrix.shape[1]
@@ -42,6 +46,9 @@ class RbManager( ):
         self.M_test_snapshots_matrix = np.loadtxt( _input_file )
         self.M_ns_test = self.M_test_snapshots_matrix.shape[1]
         return 
+
+    def get_offline_parameter( self, _iP ):
+        return self.M_offline_ns_parameters[_iP, :]
     
     def get_snapshots_matrix( self ):
         return self.M_snapshots_matrix
@@ -138,6 +145,7 @@ class RbManager( ):
 
     M_ns = 0
     M_snapshots_matrix = np.zeros( 0 )
+    M_offline_ns_parameters = np.zeros( 0 )
     M_ns_test = 0
     M_test_snapshots_matrix = np.zeros( 0 )
 
@@ -151,6 +159,9 @@ class RbManager( ):
     M_rb_handler = RbHandler( )
 
     def solve_reduced_problem( self, _param ):
+        
+        print( "Solving RB problem for parameter: " )
+        print( _param )
         
         self.build_reduced_problem( _param )
         self.M_un = np.linalg.solve( self.M_An, self.M_fn )
@@ -166,8 +177,6 @@ class RbManager( ):
         
         for iQa in range( self.M_affineDecomposition.get_Qa( ) ):
             self.M_An = self.M_An + self.M_fem_problem.get_theta_a( _param, iQa ) * self.M_affineDecomposition.get_rb_affine_matrix( iQa )
-
-        print( "AFFINITIES RB RHS %d "  % self.M_affineDecomposition.get_Qf( ) )
 
         for iQf in range( self.M_affineDecomposition.get_Qf( ) ):
             self.M_fn = self.M_fn + self.M_fem_problem.get_theta_f( _param, iQf ) * self.M_affineDecomposition.get_rb_affine_vector( iQf )
