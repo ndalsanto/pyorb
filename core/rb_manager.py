@@ -16,15 +16,6 @@ import numpy as np
 import affine_decomposition as ad
 import fem_problem as fm
 
-
-class RbHandler( ):
-    
-    def __init__( self ):
-        return
-
-
-
-
 class RbManager( ):
     
     def __init__( self, _affine_decomposition, _fem_problem ):

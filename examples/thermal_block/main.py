@@ -17,7 +17,6 @@ sys.path.insert(0, '../../core')
 import rb_manager as rm
 import affine_decomposition as ad
 import parameter_handler as ph
-import fem_problem as fm
 
 import thermal_block_problem as tbp
 
