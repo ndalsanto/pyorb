@@ -42,13 +42,6 @@ my_parameter_handler.print_parameters( )
 
 my_tbp = tbp.thermal_block_problem( )
 
-print( "The current theta with q = 1 is " )
-print( my_tbp.get_theta_a( np.array([1.1, 1.2, 1.3]), 4 ) )
-
-
-
-#%% 
-
 
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )                   # number of affine terms
