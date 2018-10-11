@@ -8,6 +8,8 @@ Created on Thu Oct 11 11:49:46 2018
 """
 
 import numpy as np
+import random
+
 
 class Parameter_handler:
     """a class for handling the parameters."""
