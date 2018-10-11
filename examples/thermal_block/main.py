@@ -63,8 +63,8 @@ my_rb_manager.build_rb_approximation( 10**(-4) )
 # printing summary
 my_rb_manager.print_rb_summary( )
 
-
-
+my_rb_manager.solve_reduced_problem( my_parameter_handler.get_parameter( ) )
+my_rb_manager.print_rb_solution( )
 
 
 

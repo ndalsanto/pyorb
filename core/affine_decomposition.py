@@ -74,6 +74,12 @@ class AffineDecompositionHandler( ):
 
     def get_affine_vector( self, _q ):
         return self.M_feAffineFq[_q]
+    
+    def get_rb_affine_matrix( self, _q ):
+        return self.M_rbAffineAq[_q]
+
+    def get_rb_affine_vector( self, _q ):
+        return self.M_rbAffineFq[_q]
 
     # _input_file should be the string that have in common the affine matrices
     def import_affine_matrices( self, _input_file ):
@@ -99,16 +105,6 @@ class AffineDecompositionHandler( ):
         
         return
         
-#    def resize_rb_arrays( self, _N ):
-#        
-#        for iQf in range( self.M_qf ):
-#            self.M_rbAffineFq.append(  )
-#        
-#        for iQa in range( self.M_qa ):
-#            self.M_rbAffineAq.append( np.zeros( (_N, _N) ) )   # importing matrix in sparse format
-#        
-#        return
-    
     def print_ad_summary( self ):
         
         self.M_affineDecomposition.print_ad_summary( )
@@ -125,7 +121,9 @@ class AffineDecompositionHandler( ):
             
             self.M_rbAffineFq.append( np.zeros( N ) )
             self.M_rbAffineFq[iQf] = _basis.T.dot( self.M_feAffineFq[iQf] )
-        
+            print( "\n\n Affine component %d " % iQf )
+            print( self.M_rbAffineFq[iQf] )
+      
         Qa = self.get_Qa( )
 
         for iQa in range( Qa ):

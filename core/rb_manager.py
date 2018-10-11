@@ -22,10 +22,6 @@ class RbHandler( ):
     def __init__( self ):
         return
 
-    
-    
-    
-    
 
 
 
@@ -111,7 +107,6 @@ class RbManager( ):
         
             output_file.close( )
 
-        
         return
 
     def print_rb_summary( self ):
@@ -153,9 +148,39 @@ class RbManager( ):
     M_affineDecomposition = ad.AffineDecompositionHandler( )
     M_fem_problem = fm.fem_problem
 
+    M_rb_handler = RbHandler( )
 
+    def solve_reduced_problem( self, _param ):
+        
+        self.build_reduced_problem( _param )
+        self.M_un = np.linalg.solve( self.M_An, self.M_fn )
+        
+        return
+    
+    def build_reduced_problem( self, _param ):
+        
+        N = self.M_N
+        self.M_An = np.zeros( (N, N) )
+        self.M_fn = np.zeros( N )
+        self.M_un = np.zeros( N )
+        
+        for iQa in range( self.M_affineDecomposition.get_Qa( ) ):
+            self.M_An = self.M_An + self.M_fem_problem.get_theta_a( _param, iQa ) * self.M_affineDecomposition.get_rb_affine_matrix( iQa )
 
+        print( "AFFINITIES RB RHS %d "  % self.M_affineDecomposition.get_Qf( ) )
 
+        for iQf in range( self.M_affineDecomposition.get_Qf( ) ):
+            self.M_fn = self.M_fn + self.M_fem_problem.get_theta_f( _param, iQf ) * self.M_affineDecomposition.get_rb_affine_vector( iQf )
+        
+        return
+    
+    def print_rb_solution( self ):
+        print( "The RB solution is: " )
+        print( self.M_un )
+    
+    M_An = np.zeros( (0, 0) )
+    M_fn = np.zeros( 0 )
+    M_un = np.zeros( 0 )
 
 
 
