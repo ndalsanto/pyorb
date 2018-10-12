@@ -14,6 +14,10 @@ import numpy as np
 import sys
 sys.path.insert(0, '../../core')
 
+#import rb_manager as rm
+#import affine_decomposition as ad
+#import parameter_handler as ph
+
 import rb_manager as rm
 import affine_decomposition as ad
 import parameter_handler as ph
@@ -45,7 +49,7 @@ my_tbp = tbp.thermal_block_problem( )
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )                   # number of affine terms
-my_affine_decomposition.import_affine_matrices( 'affine_matrix_20 A' )
+my_affine_decomposition.import_affine_matrices( 'affine_matrix_20_A' )
 my_affine_decomposition.import_affine_vectors(  'affine_vector_20_f' )
 
 # building the RB manager
@@ -56,7 +60,7 @@ my_rb_manager.import_snapshots_parameters( 'train_parameters.data' )
 snapshots_file = 'train_snapshots_matrix_20_50.txt'
 my_rb_manager.import_snapshots_matrix( snapshots_file )
 my_rb_manager.set_save_basis_functions( True, "basis.txt" )
-my_rb_manager.build_rb_approximation( 10**(-4) )
+my_rb_manager.build_rb_approximation( 10**(-6) )
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 

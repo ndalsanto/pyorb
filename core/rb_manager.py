@@ -100,7 +100,7 @@ class RbManager( ):
                 
             for iNs in range( self.M_basis.shape[0] ):
                 for iP in range( self.M_basis.shape[1] ):
-                    output_file.write( "%.10g" % self.M_basis[iNs, iP] )
+                    output_file.write( "%g" % self.M_basis[iNs, iP] )
     
                     if iP < self.M_basis.shape[1] - 1:
                         output_file.write( " " % self.M_basis[iNs, iP] )
@@ -151,8 +151,6 @@ class RbManager( ):
     M_save_file_basis_functions = "basis.txt"
     M_affineDecomposition = ad.AffineDecompositionHandler( )
     M_fem_problem = fm.fem_problem
-
-    M_rb_handler = RbHandler( )
 
     def solve_reduced_problem( self, _param ):
         

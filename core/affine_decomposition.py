@@ -131,8 +131,8 @@ class AffineDecompositionHandler( ):
             self.M_rbAffineAq.append( np.zeros( (N, N) ) )
             self.M_rbAffineAq[iQa] = _basis.T.dot( Av )
             
-#            print( "\n\n Affine component %d " % iQa )
-#            print( self.M_rbAffineAq[iQa] )
+            print( "\n\n Affine component %d " % iQa )
+            print( self.M_rbAffineAq[iQa] )
         
         return
 
