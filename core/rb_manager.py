@@ -45,17 +45,46 @@ class RbManager( ):
     def get_offline_parameter( self, _iP ):
         return self.M_offline_ns_parameters[_iP, :]
     
-    def get_snapshots_matrix( self ):
-        return self.M_snapshots_matrix
+    def get_snapshots_matrix( self, _fom_coordinates=np.array([]) ):
+        if _fom_coordinates.shape[0]==0:
+            return self.M_snapshots_matrix[:, :]
+        else:
+            return self.M_snapshots_matrix[_fom_coordinates.astype(int), :]
     
+    def get_snapshot_function( self, _snapshot_number, _fom_coordinates=np.array([]) ):
+        if self.M_get_test:
+            return self.get_test_snapshot( _snapshot_number, _fom_coordinates )
+        else:
+            return self.get_snapshot( _snapshot_number, _fom_coordinates )   
+        
+    def get_snapshot( self, _snapshot_number, _fom_coordinates=np.array([]) ):
+        
+        if _fom_coordinates.shape[0]==0:
+            return self.M_snapshots_matrix[:, _snapshot_number]
+        else:
+            return self.M_snapshots_matrix[_fom_coordinates.astype(int), _snapshot_number]
+    
+    def get_test_snapshot( self, _snapshot_number, _fom_coordinates=np.array([]) ):
+    
+        if _fom_coordinates.shape[0]==0:
+            return self.M_test_snapshots_matrix[:, _snapshot_number]
+        else:
+            return self.M_test_snapshots_matrix[_fom_coordinates.astype(int), _snapshot_number]
+
     def get_number_of_snapshots( self ):
         return self.M_ns
     
-    def get_basis( self ):
-        return self.M_basis
+    def get_basis( self, _fom_coordinates=np.array([]) ):
+        if _fom_coordinates.shape[0]==0:
+            return self.M_basis[:, :]
+        else:
+            return self.M_basis[_fom_coordinates.astype(int), :]
     
     def get_number_of_basis( self ):
         return self.M_N
+    
+    def get_fom_dimension( self ):
+        return self.M_snapshots_matrix.shape[0]
     
     def print_snapshots_matrix( self ):
         
@@ -138,6 +167,8 @@ class RbManager( ):
         
         return
 
+    M_get_test = False 
+    
     M_ns = 0
     M_snapshots_matrix = np.zeros( 0 )
     M_offline_ns_parameters = np.zeros( 0 )
@@ -151,6 +182,12 @@ class RbManager( ):
     M_save_file_basis_functions = "basis.txt"
     M_affineDecomposition = ad.AffineDecompositionHandler( )
     M_fem_problem = fm.fem_problem
+
+    def get_rb_affine_matrix( self, _q ):
+        return self.M_affineDecomposition.get_rb_affine_matrix( _q )
+
+    def get_rb_affine_vector( self, _q ):
+        return self.M_affineDecomposition.get_rb_affine_vector( _q )
 
     def solve_reduced_problem( self, _param ):
         
@@ -170,10 +207,10 @@ class RbManager( ):
         self.M_un = np.zeros( N )
         
         for iQa in range( self.M_affineDecomposition.get_Qa( ) ):
-            self.M_An = self.M_An + self.M_fem_problem.get_theta_a( _param, iQa ) * self.M_affineDecomposition.get_rb_affine_matrix( iQa )
+            self.M_An = self.M_An + self.M_fem_problem.get_theta_a( _param, iQa ) * self.get_rb_affine_matrix( iQa )
 
         for iQf in range( self.M_affineDecomposition.get_Qf( ) ):
-            self.M_fn = self.M_fn + self.M_fem_problem.get_theta_f( _param, iQf ) * self.M_affineDecomposition.get_rb_affine_vector( iQf )
+            self.M_fn = self.M_fn + self.M_fem_problem.get_theta_f( _param, iQf ) * self.get_rb_affine_vector( iQf )
         
         return
     
