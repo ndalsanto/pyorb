@@ -45,6 +45,9 @@ class RbManager( ):
     def get_offline_parameter( self, _iP ):
         return self.M_offline_ns_parameters[_iP, :]
     
+    def get_test_parameter( self, _iP ):
+        return self.M_test_parameters[_iP, :]
+    
     def get_snapshots_matrix( self, _fom_coordinates=np.array([]) ):
         if _fom_coordinates.shape[0]==0:
             return self.M_snapshots_matrix[:, :]
@@ -197,7 +200,7 @@ class RbManager( ):
         self.build_reduced_problem( _param )
         self.M_un = np.linalg.solve( self.M_An, self.M_fn )
         
-        return
+        return self.M_un
     
     def build_reduced_problem( self, _param ):
         
@@ -217,14 +220,16 @@ class RbManager( ):
     def reconstruct_fem_solution( self, _un ):
     
         self.M_utildeh = np.zeros( (self.M_snapshots_matrix.shape[0], 1) )
-        N = self.M_N
         
-        assert _un.shape[0] == N
+        assert _un.shape[0] == self.M_N
         
         self.M_utildeh = self.M_basis.dot( _un )
         
         return
         
+    def get_utildeh( self ):
+        return self.M_utildeh
+    
     def print_rb_solution( self ):
         print( "\nThe RB solution is: " )
         print( self.M_un )
@@ -251,11 +256,13 @@ class RbManager( ):
         error = self.M_utildeh
         error = error - self.M_test_snapshots_matrix[:, _snapshot_number]
         
-        norm_of_error = np.linalg.norm( error ) / np.linalg.norm( self.M_test_snapshots_matrix[:, _snapshot_number] )
+#        norm_of_error = np.linalg.norm( error ) / np.linalg.norm( self.M_test_snapshots_matrix[:, _snapshot_number] )
+        norm_of_error = np.sqrt( np.sum( error * error ) / \
+            np.sum( self.M_test_snapshots_matrix[:, _snapshot_number] * self.M_test_snapshots_matrix[:, _snapshot_number] ) )
         
         print( "The norm of the error for TEST snapshot %d is %g" % (_snapshot_number, norm_of_error) )
         
-        return
+        return 
 
     M_An = np.zeros( (0, 0) )
     M_fn = np.zeros( 0 )
