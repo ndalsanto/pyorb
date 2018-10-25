@@ -161,8 +161,17 @@ class RbManager( ):
         self.M_fem_problem = _fem_problem
         return
 
+    def reset_rb_approximation( self ):
+        
+        print( "Resetting RB approximation" )
+        
+        self.M_N = 0
+        self.M_basis = np.zeros( 0 )
+        self.M_affineDecomposition.reset_rb_approximation( )
 
     def build_rb_approximation( self, _tol = 10**(-5) ):
+        
+        self.reset_rb_approximation( )
         
         self.perform_pod( _tol )
         
@@ -170,6 +179,7 @@ class RbManager( ):
         
         return
 
+    M_verbose = False
     M_get_test = False 
     
     M_ns = 0
@@ -194,8 +204,9 @@ class RbManager( ):
 
     def solve_reduced_problem( self, _param ):
         
-        print( "Solving RB problem for parameter: " )
-        print( _param )
+        if self.M_verbose == True:
+            print( "Solving RB problem for parameter: " )
+            print( _param )
         
         self.build_reduced_problem( _param )
         self.M_un = np.linalg.solve( self.M_An, self.M_fn )
@@ -262,7 +273,7 @@ class RbManager( ):
         
         print( "The norm of the error for TEST snapshot %d is %g" % (_snapshot_number, norm_of_error) )
         
-        return 
+        return norm_of_error
 
     M_An = np.zeros( (0, 0) )
     M_fn = np.zeros( 0 )

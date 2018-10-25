@@ -68,7 +68,6 @@ class AffineDecompositionHandler( ):
         self.M_affineDecomposition.set_Q( _qa, _qf )
         return
  
-    
     def get_affine_matrix( self, _q ):
         return self.M_feAffineAq[_q]
 
@@ -111,6 +110,11 @@ class AffineDecompositionHandler( ):
         
         return 
     
+    def reset_rb_approximation( self ):
+        self.M_rbAffineFq = []
+        self.M_rbAffineAq = []
+
+    
     def build_rb_affine_decompositions( self, _basis ):
         
         N = _basis.shape[1]
@@ -121,8 +125,6 @@ class AffineDecompositionHandler( ):
             
             self.M_rbAffineFq.append( np.zeros( N ) )
             self.M_rbAffineFq[iQf] = _basis.T.dot( self.M_feAffineFq[iQf] )
-#            print( "\n\n Affine component %d " % iQf )
-#            print( self.M_rbAffineFq[iQf] )
       
         Qa = self.get_Qa( )
 
@@ -131,9 +133,6 @@ class AffineDecompositionHandler( ):
             self.M_rbAffineAq.append( np.zeros( (N, N) ) )
             self.M_rbAffineAq[iQa] = _basis.T.dot( Av )
             
-#            print( "\n\n Affine component %d " % iQa )
-#            print( self.M_rbAffineAq[iQa] )
-        
         return
 
     M_feAffineAq = []
