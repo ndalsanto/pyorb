@@ -25,12 +25,21 @@ class RbManager( ):
         return
 
     def import_snapshots_parameters( self, _input_file ):
+        
         self.M_offline_ns_parameters = np.loadtxt( _input_file )
+        
         return 
 
     def import_snapshots_matrix( self, _input_file ):
         self.M_snapshots_matrix = np.loadtxt( _input_file )
         self.M_ns = self.M_snapshots_matrix.shape[1]
+        return 
+
+    def import_snapshots( self, _input_file_snapshots, _input_file_snapshots_parameters ):
+
+        self.import_snapshots_matrix( _input_file_snapshots )
+        self.import_snapshots_parameters( _input_file_snapshots_parameters )
+        
         return 
 
     def import_test_parameters( self, _input_file ):
@@ -169,9 +178,14 @@ class RbManager( ):
         self.M_basis = np.zeros( 0 )
         self.M_affineDecomposition.reset_rb_approximation( )
 
-    def build_rb_approximation( self, _tol = 10**(-5) ):
+    def build_rb_approximation( self, _tol = 10**(-5), _ns ):
         
         self.reset_rb_approximation( )
+        
+        if self.M_ns < _ns :
+            print( 'We miss some snalshots! I have only %d in memoory and I need to compute %d more.' % (self.M_ns, _ns-self.M_ns) )
+        
+        
         
         self.perform_pod( _tol )
         

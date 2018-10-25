@@ -47,11 +47,9 @@ my_parameter_handler.print_parameters( )
 # define the fem problem 
 my_tbp = tbp.thermal_block_problem( )
 
-
 fom_specifics = { 
         'number_of_elements': 20, 
         'polynomial_degree' : 'P1' }
-
 
 my_tbp.initialize_fom_problem( fom_specifics )
 
@@ -64,19 +62,23 @@ my_affine_decomposition.set_Q( 4, 1 )                   # number of affine terms
 my_affine_decomposition.import_affine_matrices( 'affine_matrix_20_A' )
 my_affine_decomposition.import_affine_vectors(  'affine_vector_20_f' )
 
+
+
 # building the RB manager
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 
+
+
+
 # importing snapshots, offline parameters and building RB space
-my_rb_manager.import_snapshots_parameters( 'train_parameters.data' )
+#my_rb_manager.import_snapshots_parameters( 'train_parameters.data' )
+#snapshots_file = 'train_snapshots_matrix_20_50.txt'
+#my_rb_manager.import_snapshots_matrix( snapshots_file )
 
-snapshots_file = 'train_snapshots_matrix_20_50.txt'
 
-my_rb_manager.import_snapshots_matrix( snapshots_file )
 
 my_rb_manager.set_save_basis_functions( True, "basis.txt" )
-
-my_rb_manager.build_rb_approximation( 10**(-6) )
+my_rb_manager.build_rb_approximation( 10**(-5) )
 
 
 
