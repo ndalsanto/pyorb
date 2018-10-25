@@ -7,7 +7,7 @@ Created on Thu Oct 11 11:58:02 2018
 @email : niccolo.dalsanto@epfl.ch
 """
 
-import fem_problem as fp
+import fom_problem as fp
 
 def tb_theta_a( _param, _q ):
     
@@ -23,10 +23,10 @@ def tb_theta_f( _param, _q ):
 
 
 
-class thermal_block_problem( fp.fem_problem ):
+class thermal_block_problem( fp.fom_problem ):
 
     def __init__( self ):
-        fp.fem_problem.__init__( self )
+        fp.fom_problem.__init__( self )
         
         return
    

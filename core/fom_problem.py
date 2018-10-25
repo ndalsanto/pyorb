@@ -13,7 +13,7 @@ def default_theta_function( _param, _q ):
     
     pass
 
-class fem_problem( ):
+class fom_problem( ):
     
     def __init__( self ):
     
@@ -33,6 +33,10 @@ class fem_problem( ):
         
         return
     
+    def start_fom_configuration( self ):
+    
+        return
+        
     M_theta_a = default_theta_function
     M_theta_f = default_theta_function   
     

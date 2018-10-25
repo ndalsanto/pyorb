@@ -14,14 +14,14 @@ This module allows to handle RB methods in python starting from a set of FE arra
 import numpy as np
 
 import affine_decomposition as ad
-import fem_problem as fm
+import fom_problem as fm
 
 class RbManager( ):
     
-    def __init__( self, _affine_decomposition, _fem_problem ):
+    def __init__( self, _affine_decomposition, _fom_problem ):
         
         self.set_affine_decomposition_handler( _affine_decomposition )
-        self.set_fem_problem( _fem_problem )
+        self.set_fom_problem( _fom_problem )
         return
 
     def import_snapshots_parameters( self, _input_file ):
@@ -157,8 +157,8 @@ class RbManager( ):
         self.M_affineDecomposition = _affineDecomposition
         return
 
-    def set_fem_problem( self, _fem_problem ):
-        self.M_fem_problem = _fem_problem
+    def set_fom_problem( self, _fom_problem ):
+        self.M_fom_problem = _fom_problem
         return
 
     def reset_rb_approximation( self ):
@@ -194,7 +194,7 @@ class RbManager( ):
     M_save_basis_functions = False
     M_save_file_basis_functions = "basis.txt"
     M_affineDecomposition = ad.AffineDecompositionHandler( )
-    M_fem_problem = fm.fem_problem
+    M_fom_problem = fm.fom_problem
 
     def get_rb_affine_matrix( self, _q ):
         return self.M_affineDecomposition.get_rb_affine_matrix( _q )
@@ -221,10 +221,10 @@ class RbManager( ):
         self.M_un = np.zeros( N )
         
         for iQa in range( self.M_affineDecomposition.get_Qa( ) ):
-            self.M_An = self.M_An + self.M_fem_problem.get_theta_a( _param, iQa ) * self.get_rb_affine_matrix( iQa )
+            self.M_An = self.M_An + self.M_fom_problem.get_theta_a( _param, iQa ) * self.get_rb_affine_matrix( iQa )
 
         for iQf in range( self.M_affineDecomposition.get_Qf( ) ):
-            self.M_fn = self.M_fn + self.M_fem_problem.get_theta_f( _param, iQf ) * self.get_rb_affine_vector( iQf )
+            self.M_fn = self.M_fn + self.M_fom_problem.get_theta_f( _param, iQf ) * self.get_rb_affine_vector( iQf )
         
         return
     

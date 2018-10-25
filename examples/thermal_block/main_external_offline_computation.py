@@ -59,10 +59,17 @@ my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 
 # importing snapshots, offline parameters and building RB space
 my_rb_manager.import_snapshots_parameters( 'train_parameters.data' )
+
 snapshots_file = 'train_snapshots_matrix_20_50.txt'
+
 my_rb_manager.import_snapshots_matrix( snapshots_file )
+
 my_rb_manager.set_save_basis_functions( True, "basis.txt" )
+
 my_rb_manager.build_rb_approximation( 10**(-6) )
+
+
+
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 
