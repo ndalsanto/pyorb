@@ -5,6 +5,9 @@ Created on Wed Oct 10 10:24:47 2018
 
 @author: Niccolo' Dal Santo
 @email : niccolo.dalsanto@epfl.ch
+
+An example where the RB method is constructed by importing from files the snapshots and the affine decomposition of FE matrices and vectors 
+
 """
 
 #%%
@@ -25,7 +28,6 @@ import parameter_handler as ph
 import thermal_block_problem as tbp
 
 print( rm.__doc__ )
-
 
 mu0_min = 1.0; mu0_max = 50.
 mu1_min = 1.0; mu1_max = 50.
