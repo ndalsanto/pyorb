@@ -15,19 +15,20 @@ import numpy as np
 
 import affine_decomposition as ad
 import fom_problem as fm
+import parameter_handler as ph
 
 class RbManager( ):
     
-    def __init__( self, _affine_decomposition, _fom_problem ):
+    def __init__( self, _affine_decomposition, _fom_problem, _parameter_handler ):
         
         self.set_affine_decomposition_handler( _affine_decomposition )
         self.set_fom_problem( _fom_problem )
+        self.set_parameter_handler( _parameter_handler )
+        
         return
 
     def import_snapshots_parameters( self, _input_file ):
-        
         self.M_offline_ns_parameters = np.loadtxt( _input_file )
-        
         return 
 
     def import_snapshots_matrix( self, _input_file ):
@@ -170,6 +171,10 @@ class RbManager( ):
         self.M_fom_problem = _fom_problem
         return
 
+    def set_parameter_handler( self, _parameter_handler ):
+        self.M_parameter_handler = _parameter_handler
+        return
+
     def reset_rb_approximation( self ):
         
         print( "Resetting RB approximation" )
@@ -178,13 +183,26 @@ class RbManager( ):
         self.M_basis = np.zeros( 0 )
         self.M_affineDecomposition.reset_rb_approximation( )
 
-    def build_rb_approximation( self, _tol = 10**(-5), _ns ):
+    # _ns is the number of snapshots to be added to the snapshots matrix
+    def build_snapshots( self, _ns ):
+        
+        current_snapshots_number = self.M_snapshots_matrix.shape[1]
+        fom_dimension = self.M_snapshots_matrix.shape[0]
+
+        
+        
+        for iS in range( _ns ):
+            self.M_fom_problem.solve_fom_parameter(  )
+        
+        return
+
+    def build_rb_approximation( self, _ns, _tol = 10**(-5) ):
         
         self.reset_rb_approximation( )
         
         if self.M_ns < _ns :
             print( 'We miss some snalshots! I have only %d in memoory and I need to compute %d more.' % (self.M_ns, _ns-self.M_ns) )
-        
+            self.build_snapshots( _ns - self.M_ns )
         
         
         self.perform_pod( _tol )
@@ -196,9 +214,11 @@ class RbManager( ):
     M_verbose = False
     M_get_test = False 
     
+    M_parameter_handler = ph.Parameter_handler( )
+    
     M_ns = 0
-    M_snapshots_matrix = np.zeros( 0 )
-    M_offline_ns_parameters = np.zeros( 0 )
+    M_snapshots_matrix = np.zeros( ( 0, 0 ) )
+    M_offline_ns_parameters = np.zeros( ( 0, 0 ) )
     M_ns_test = 0
     M_test_snapshots_matrix = np.zeros( 0 )
     M_test_parameters = np.zeros( 0 )

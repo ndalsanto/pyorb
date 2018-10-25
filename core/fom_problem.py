@@ -40,6 +40,11 @@ class fom_problem( ):
         
         return
     
+    def solve_param( self, _param, _fom_specifics ):
+        
+        print( "You should define the solve_param function specific for your problem and the external library you are using" )
+
+        return
 
     M_fom_specifics = 0
     M_theta_a = default_theta_function
