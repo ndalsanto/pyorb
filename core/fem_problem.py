@@ -16,6 +16,9 @@ def default_theta_function( _param, _q ):
 class fem_problem( ):
     
     def __init__( self ):
+    
+        self.define_theta_functions( )
+        
         return
     
     def get_theta_a( self, _param, _q ):
@@ -23,6 +26,12 @@ class fem_problem( ):
     
     def get_theta_f( self, _param, _q ):
         return self.M_theta_f( _param, _q )
+    
+    def define_theta_functions( self ):
+        
+        print( "You should define the theta function specific for your problem " )
+        
+        return
     
     M_theta_a = default_theta_function
     M_theta_f = default_theta_function   

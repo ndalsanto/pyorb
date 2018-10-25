@@ -28,6 +28,10 @@ class thermal_block_problem( fp.fem_problem ):
     def __init__( self ):
         fp.fem_problem.__init__( self )
         
+        return
+   
+    def define_theta_functions( self ):
+        
         self.M_theta_a = tb_theta_a
         self.M_theta_f = tb_theta_f
         
