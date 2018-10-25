@@ -33,10 +33,15 @@ class fom_problem( ):
         
         return
     
-    def start_fom_configuration( self ):
-    
-        return
+    # initialize anything which needs to be specified for using the external engine 
+    def configure_fom( self, _fom_specifics ):
         
+        self.M_fom_specifics = _fom_specifics
+        
+        return
+    
+
+    M_fom_specifics = 0
     M_theta_a = default_theta_function
     M_theta_f = default_theta_function   
     

@@ -47,6 +47,17 @@ my_parameter_handler.print_parameters( )
 # define the fem problem 
 my_tbp = tbp.thermal_block_problem( )
 
+
+fom_specifics = { 
+        'number_of_elements': 20, 
+        'polynomial_degree' : 'P1' }
+
+
+my_tbp.initialize_fom_problem( fom_specifics )
+
+
+
+
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )                   # number of affine terms

@@ -68,8 +68,6 @@ my_rb_manager.set_save_basis_functions( True, "basis.txt" )
 
 my_rb_manager.build_rb_approximation( 10**(-6) )
 
-
-
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 
