@@ -7,11 +7,89 @@ Created on Thu Oct 25 14:17:29 2018
 @email : niccolo.dalsanto@epfl.ch
 """
 
-
-import sys
 import matlab.engine
-#sol = eng.solve_parameter( matlab.double([param]), n_elements_x )
+import error_manager as em
 
+class external_engine( ):
+
+    def __init__( self, _engine_type, _library_path ):
+        
+        self.M_engine_type  = _engine_type
+        self.M_library_path = _library_path
+        
+        return
+
+    def start_engine( self ):
+        self.start_specific_engine( )
+        return
+    
+    def quit_engine( self ):
+        self.quit_specific_engine( )
+        return
+
+    def start_specific_engine( self ):
+        
+        em.error_raiser( 'SystemError', 'external_engine::start_engine', "You are using the default start_engine, \
+                          please provide specific ones for your specific engine " )
+        return
+
+    def quit_specific_engine( self ):
+        
+        em.error_raiser( 'SystemError', 'external_engine::quit_engine', "You are using the default start_engine, \
+                          please provide specific ones for your specific engine " )
+        return
+
+    def convert_parameter( self, _param ):
+
+        em.error_raiser( 'SystemError', 'external_engine::convert_parameter', "You are using the default start_engine, \
+                          please provide specific ones for your specific engine " )
+
+
+    def solve_parameter( self, _param, _fom_specifics ):
+
+        em.error_raiser( 'SystemError', 'external_engine::solve_parameter', "You are using the default start_engine, \
+                          please provide specific ones for your specific engine " )
+
+
+    M_engine_type = ""
+    M_library_path = ""
+    M_engine = 0
+
+
+class matlab_external_engine( external_engine ):
+    
+    def __init__( self, _engine_type, _library_path ):
+        
+        external_engine.__init__( self, _engine_type, _library_path )
+        
+        return
+
+    def start_specific_engine( self ):
+        
+        self.M_engine = matlab.engine.start_matlab( )
+        self.M_engine.addpath( self.M_engine.genpath( self.M_library_path ) )
+
+        print( 'Successfully started matlab engine and corresponding FOM library %s ' % self.M_library_path )
+
+        return
+
+    def quit_specific_engine( self ):
+
+        self.M_engine.quit( )
+
+        print( 'Successfully quitted matlab engine' )
+
+        return
+
+    def convert_parameter( self, _param ):
+
+        return matlab.double(_param.tolist())
+
+    def solve_parameter( self, _param, _fom_specifics ):
+
+        return self.M_engine.solve_parameter( self.convert_parameter( _param ), _fom_specifics )
+
+        
 
 class external_engine_manager( ):
     
@@ -20,60 +98,25 @@ class external_engine_manager( ):
         self.M_engine_type  = _engine_type
         self.M_library_path = _library_path
         
+        if _engine_type == 'matlab':
+            self.M_external_engine = matlab_external_engine( _engine_type, _library_path )
+        
         return
 
     M_engine_type = ""
     M_library_path = ""
-    M_engine = 0
+    M_external_engine = 0
     
-    def get_engine( self ):
-        
-        return self.M_engine
-    
+    def get_external_engine( self ):
+        return self.M_external_engine
+
     def start_engine( self ):
-        
-        engine_switcher = {
-                    'matlab': self.start_matlab_engine # , \
-                }
-        
-        # retrieving the function activating the correct engine and giving a lambda as default value
-        engine_activation = engine_switcher.get( self.M_engine_type, lambda: "Invalid engine activation" )
-        
-        engine_activation( )
-        
+        self.M_external_engine.start_engine( )
         return
     
     def quit_engine( self ):
-        
-        engine_switcher = {
-                    'matlab': self.quit_matlab_engine # , \
-                }
-        
-        # retrieving the function activating the correct engine and giving a lambda as default value
-        engine_deactivation = engine_switcher.get( self.M_engine_type, lambda: "Invalid engine deactivation" )
-        
-        engine_deactivation( )
-        
+        self.M_external_engine.quit_engine( )
         return
-
-    
-    def start_matlab_engine( self ):
-        
-        self.M_engine = matlab.engine.start_matlab( )
-        self.M_engine.addpath( self.M_engine.genpath( self.M_library_path ) )
-
-        print( 'Successfully started matlab engine and corresponding FOM library' )
-
-        return
-
-    def quit_matlab_engine( self ):
-        
-        self.M_engine.quit( )
-        
-        print( 'Successfully quitted matlab engine' )
-
-        return
-
 
 
 

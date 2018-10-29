@@ -142,8 +142,6 @@ class RbManager( ):
 
             u = np.array( sol['u'] )
 
-            print( 'NORM %f' % np.linalg.norm( u ) )
-
             self.M_snapshots_matrix[:, iS] = u[:, 0]
             current_snapshots_number = current_snapshots_number + 1
         
@@ -152,18 +150,12 @@ class RbManager( ):
         return
 
     def perform_pod( self, _tol = 10**(-5) ):
-        
-        print( "The snapshots matrix is" )
-        print( self.M_snapshots_matrix )
-        
+
         U, s, V = np.linalg.svd( self.M_snapshots_matrix, full_matrices=False )
         
         total_energy = np.dot( s, np.transpose(s) )
         
         print( "The total energy of the field is %g" % total_energy )
-        
-        print( "Singular values are" )
-        print( s )
         
         self.M_N = 0
         
@@ -193,7 +185,7 @@ class RbManager( ):
                         output_file.write( " " % self.M_basis[iNs, iP] )
                     else:
                         output_file.write( "\n" % self.M_basis[iNs, iP] )
-        
+            
             output_file.close( )
 
         return

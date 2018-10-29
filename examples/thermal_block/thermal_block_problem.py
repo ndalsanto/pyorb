@@ -38,19 +38,6 @@ class thermal_block_problem( fp.fom_problem ):
         
         return
      
-    def solve_external_fom_problem( self, _param ):
-        
-        print( "Solving the FOM problem with parameter \n" )
-        print( _param ) 
-        
-        converted_param = self.convert_parameter( _param )
-             
-        print( "Converted parameter is \n" )
-        print( converted_param ) 
-           
-        sol = self.M_external_engine.solve_parameter( converted_param, self.M_fom_specifics )
 
-        return sol
-        
   
     

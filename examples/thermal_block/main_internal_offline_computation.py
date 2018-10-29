@@ -19,7 +19,9 @@ import manage_external_engine as mee
 # playing around with engine manager 
 my_matlab_engine_manager = mee.external_engine_manager( 'matlab', '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat' )
 my_matlab_engine_manager.start_engine( )
-my_matlab_engine = my_matlab_engine_manager.get_engine( )
+my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
+
+
 
 #%%
 
@@ -46,7 +48,7 @@ fom_specifics = {
         'number_of_elements': 20, 
         'polynomial_degree' : 'P1' }
 
-my_tbp.configure_fom( my_matlab_engine, fom_specifics )
+my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
 
 sol = my_tbp.solve_fom_problem( np.array([6.7477,3.0286,43.620200000000004]) )
 
@@ -59,7 +61,9 @@ print( rm.__doc__ )
 
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
-my_affine_decomposition.set_Q( 4, 1 )                   # number of affine terms
+my_affine_decomposition.set_Q( 4, 1 )               # number of affine terms
+
+# OLD way for importing affine matrices
 my_affine_decomposition.import_affine_matrices( 'affine_matrix_20_A' )
 my_affine_decomposition.import_affine_vectors(  'affine_vector_20_f' )
 
@@ -74,7 +78,8 @@ my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp, my_parameter_hand
 #my_rb_manager.import_snapshots_matrix( 'train_snapshots_matrix_20_50.txt', 'train_parameters.data' )
 
 my_rb_manager.set_save_basis_functions( False, "basis.txt" )
-my_rb_manager.build_rb_approximation( 1000, 10**(-5) )
+my_rb_manager.reset_rb_approximation( )
+my_rb_manager.build_rb_approximation( 100, 10**(-5) )
 
 
 

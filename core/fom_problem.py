@@ -8,7 +8,6 @@ Created on Thu Oct 11 12:02:21 2018
 """
 
 import error_manager as em
-import matlab
 
 def default_theta_function( _param, _q ):
 
@@ -42,6 +41,7 @@ class fom_problem( ):
         self.M_external_engine = _external_engine
         self.M_fom_specifics  = _fom_specifics
         self.M_configured_fom = True
+        
         return
 
     def check_configured_fom( self ):
@@ -53,33 +53,14 @@ class fom_problem( ):
 
     # used to retrieve information from fom (e.g. number of dofs, fields, ... )
     def retrieve_fom_data( self ):
-        
         self.check_configured_fom( )
-        
-        
-        
         return
     
     def solve_fom_problem( self, _param ):
-        
         self.check_configured_fom( )
-        
-        return self.solve_external_fom_problem( _param )
-        
-    def solve_external_fom_problem( self, _param ):
-        
-        em.error_raiser( 'SystemError', 'fom_problem::solve_external_fom_problem', "You should define the solve_param function \
-                          specific for your problem and the external library you are using." )
-        return
+        sol = self.M_external_engine.solve_parameter( _param, self.M_fom_specifics )
+        return sol
 
-    def convert_parameter( self, _param ):
-        
-#        converted_param = self.M_external_engine.zeros( _param.shape[0], 1 )
-#
-#        for iP in range( len(_param) ):
-#            converted_param[iP] = converted_param[iP] + _param[iP]
-
-        return matlab.double(_param.tolist())
 
 
     M_configured_fom = False
