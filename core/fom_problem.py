@@ -44,8 +44,6 @@ class fom_problem( ):
     # used to retrieve information from fom (e.g. number of dofs, fields, ... )
     def retrieve_fom_data( ):
         
-        self.M_externl_engine.
-        
         return
     
     def solve_fom_problem( self, _param ):
