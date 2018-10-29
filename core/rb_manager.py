@@ -183,19 +183,6 @@ class RbManager( ):
         self.M_basis = np.zeros( 0 )
         self.M_affineDecomposition.reset_rb_approximation( )
 
-    # _ns is the number of snapshots to be added to the snapshots matrix
-    def build_snapshots( self, _ns ):
-        
-        current_snapshots_number = self.M_snapshots_matrix.shape[1]
-        fom_dimension = self.M_snapshots_matrix.shape[0]
-
-        
-        
-        for iS in range( _ns ):
-            self.M_fom_problem.solve_fom_parameter(  )
-        
-        return
-
     def build_rb_approximation( self, _ns, _tol = 10**(-5) ):
         
         self.reset_rb_approximation( )

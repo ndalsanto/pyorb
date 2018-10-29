@@ -11,6 +11,8 @@ import numpy as np
 
 import sys
 sys.path.insert(0, '../../core')
+print(sys.path)
+#%%
 
 import manage_external_engine as mee
 
@@ -51,7 +53,7 @@ fom_specifics = {
         'number_of_elements': 20, 
         'polynomial_degree' : 'P1' }
 
-my_tbp.configure_fom( fom_specifics )
+my_tbp.configure_fom( my_matlab_engine, fom_specifics )
 
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )

@@ -36,5 +36,11 @@ class thermal_block_problem( fp.fom_problem ):
         self.M_theta_f = tb_theta_f
         
         return
-   
+     
+    def solve_fom_problem( self, _param ):
+        
+        
+
+        return
+  
     
