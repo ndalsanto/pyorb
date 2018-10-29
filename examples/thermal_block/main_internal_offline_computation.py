@@ -55,6 +55,8 @@ fom_specifics = {
 
 my_tbp.configure_fom( my_matlab_engine, fom_specifics )
 
+
+
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )                   # number of affine terms

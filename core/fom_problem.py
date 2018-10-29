@@ -31,20 +31,31 @@ class fom_problem( ):
     
     def define_theta_functions( self ):
         
-        em.error_raiser( 'SystemError', 'fom_problem::define_theta_functions', "You should define the theta function specific for your problem in the inherited class" )
+        em.error_raiser( 'SystemError', 'fom_problem::define_theta_functions', "You should define the theta function specific for your problem in the inherited class." )
         
         return
     
     # initialize anything which needs to be specified for using the external engine 
-    def configure_fom( self, _externl_engine, _fom_specifics ):
+    def configure_fom( self, _external_engine, _fom_specifics ):
         
-        self.M_externl_engine = _externl_engine
+        self.M_external_engine = _external_engine
         self.M_fom_specifics  = _fom_specifics
         self.M_configured_fom = True
         return
 
+    def check_configured_fom( self ):
+
+        if self.M_configured_fom == False:
+            em.error_raiser( 'SystemError', 'fom_problem::retrieve_fom_data', "The fom problem has not been configured." )
+
+        return        
+
     # used to retrieve information from fom (e.g. number of dofs, fields, ... )
-    def retrieve_fom_data( ):
+    def retrieve_fom_data( self ):
+        
+        self.check_configured_fom( )
+        
+        
         
         return
     
@@ -56,21 +67,24 @@ class fom_problem( ):
     
     def solve_external_fom_problem( self, _param ):
         
-        print( "You should define the solve_param function specific for your problem \
-                and the external library you are using" )
-        em.error_raiser( 'SystemError', 'fom_problem::solve_external_fom_problem', "You should define the solve_param function specific for your problem \
-                          and the external library you are using" )
-
+        em.error_raiser( 'SystemError', 'fom_problem::solve_external_fom_problem', "You should define the solve_param function \
+                          specific for your problem and the external library you are using." )
         return
 
     def convert_parameter( self, _param ):
-        return self.M_externl_engine( _param )
+        
+        converted_param = self.M_external_engine.zeros( _param.shape[0], 1 )
+
+        for iP in range( len(_param) ):
+            converted_param[iP] = converted_param[iP] + _param[iP]
+
+        return converted_param
 
 
     M_configured_fom = False
 
     # engine used to perform offline computation relying on an external engine
-    M_externl_engine = 0
+    M_external_engine = 0
     M_fom_specifics = 0
     
     # theta functions
