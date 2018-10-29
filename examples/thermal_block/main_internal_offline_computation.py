@@ -7,8 +7,6 @@ Created on Thu Oct 25 14:31:17 2018
 @email : niccolo.dalsanto@epfl.ch
 """
 
-import matlab
-
 import numpy as np
 
 import sys
@@ -25,12 +23,7 @@ my_matlab_engine = my_matlab_engine_manager.get_engine( )
 
 #%%
 
-import rb_manager as rm
-import affine_decomposition as ad
 import parameter_handler as ph
-
-
-print( rm.__doc__ )
 
 mu0_min = 1.0; mu0_max = 50.
 mu1_min = 1.0; mu1_max = 50.
@@ -55,15 +48,14 @@ fom_specifics = {
 
 my_tbp.configure_fom( my_matlab_engine, fom_specifics )
 
-sol = my_tbp.solve_fom_problem( param_max )
+sol = my_tbp.solve_fom_problem( np.array([6.7477,3.0286,43.620200000000004]) )
+
+sol['u']
 
 
-
-
-
-
-
-
+import rb_manager as rm
+import affine_decomposition as ad
+print( rm.__doc__ )
 
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
@@ -74,22 +66,15 @@ my_affine_decomposition.import_affine_vectors(  'affine_vector_20_f' )
 # building the RB manager
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp, my_parameter_handler )
 
-
-
-
-
-
-
 # OLD importing snapshots, offline parameters and building RB space
 #my_rb_manager.import_snapshots_parameters( 'train_parameters.data' )
 #my_rb_manager.import_snapshots_matrix( 'train_snapshots_matrix_20_50.txt' )
-
 
 # new way for importing snapshots
 #my_rb_manager.import_snapshots_matrix( 'train_snapshots_matrix_20_50.txt', 'train_parameters.data' )
 
 my_rb_manager.set_save_basis_functions( False, "basis.txt" )
-my_rb_manager.build_rb_approximation( 10**(-5) )
+my_rb_manager.build_rb_approximation( 1000, 10**(-5) )
 
 
 

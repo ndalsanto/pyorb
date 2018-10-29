@@ -116,7 +116,45 @@ class RbManager( ):
         self.M_save_basis_functions = _save
         self.M_save_file_basis_functions = _file
     
+    # _ns is the number of snapshots to be added to the snapshots matrix
+    def build_snapshots( self, _new_snapshots ):
+        
+        current_snapshots_number = self.M_snapshots_matrix.shape[1]
+
+        if current_snapshots_number == 0:
+            print( "There are no snapshots at the moment, therefore we need to create everything from scratch" )
+
+        num_parameters = self.M_parameter_handler.get_num_parameters( )
+        new_parameters = np.zeros( ( _new_snapshots, num_parameters ) )
+        
+        for iS in range( _new_snapshots ):
+            
+            self.M_parameter_handler.generate_parameter( )
+            new_parameters[iS, :] = self.M_parameter_handler.get_parameter( )
+            
+            print( "Considering the parameter" )
+            print( new_parameters[iS, :] )
+
+            sol = self.M_fom_problem.solve_fom_problem( new_parameters[iS, :] )
+            
+            if current_snapshots_number == 0:
+                self.M_snapshots_matrix = np.zeros( ( len(sol['u']), _new_snapshots ) )
+
+            u = np.array( sol['u'] )
+
+            print( 'NORM %f' % np.linalg.norm( u ) )
+
+            self.M_snapshots_matrix[:, iS] = u[:, 0]
+            current_snapshots_number = current_snapshots_number + 1
+        
+        self.M_ns = self.M_ns + _new_snapshots
+        
+        return
+
     def perform_pod( self, _tol = 10**(-5) ):
+        
+        print( "The snapshots matrix is" )
+        print( self.M_snapshots_matrix )
         
         U, s, V = np.linalg.svd( self.M_snapshots_matrix, full_matrices=False )
         
@@ -124,16 +162,23 @@ class RbManager( ):
         
         print( "The total energy of the field is %g" % total_energy )
         
+        print( "Singular values are" )
+        print( s )
+        
         self.M_N = 0
         
         cumulative_energy = 0.0
         record_cumulative_energy = np.ones( self.M_ns )
         
-        while cumulative_energy / total_energy < 1 - _tol**2:
-            print( "Now N is %d and the cumulative energy is %g --- %g --- current sv %g " % ( self.M_N, cumulative_energy, cumulative_energy / total_energy, s[ self.M_N ] ) )
+        while cumulative_energy / total_energy < 1. - _tol**2:
+            print( "Now N is %d and the cumulative energy is %g --- %g --- current sv %g " \
+                                  % ( self.M_N, cumulative_energy, cumulative_energy / total_energy, s[ self.M_N ] ) )
+
             record_cumulative_energy[ self.M_N ] = cumulative_energy
-            cumulative_energy = cumulative_energy + s[ self.M_N ]*s[ self.M_N ]  # add the energy of next basis
+            cumulative_energy = cumulative_energy + s[ self.M_N ] * s[ self.M_N ]  # add the energy of next basis
             self.M_N = self.M_N + 1                                       # add a basis in the count
+
+        print( "Final N is %d" % self.M_N )
 
         self.M_basis = U[:, 0:self.M_N]
     
@@ -190,6 +235,7 @@ class RbManager( ):
         if self.M_ns < _ns :
             print( 'We miss some snalshots! I have only %d in memoory and I need to compute %d more.' % (self.M_ns, _ns-self.M_ns) )
             self.build_snapshots( _ns - self.M_ns )
+        
         
         
         self.perform_pod( _tol )
