@@ -7,9 +7,11 @@ Created on Thu Oct 11 12:02:21 2018
 @email : niccolo.dalsanto@epfl.ch
 """
 
+import error_manager as em
+
 def default_theta_function( _param, _q ):
 
-    print( "You are using the default theta function, please provide specific ones for your problem " )
+    em.error_raiser( 'SystemError', 'default_theta_function', "You are using the default theta function, please provide specific ones for your problem " )
     
     pass
 
@@ -29,7 +31,7 @@ class fom_problem( ):
     
     def define_theta_functions( self ):
         
-        print( "You should define the theta function specific for your problem in the inherited class" )
+        em.error_raiser( 'SystemError', 'fom_problem::define_theta_functions', "You should define the theta function specific for your problem in the inherited class" )
         
         return
     
@@ -56,6 +58,8 @@ class fom_problem( ):
         
         print( "You should define the solve_param function specific for your problem \
                 and the external library you are using" )
+        em.error_raiser( 'SystemError', 'fom_problem::solve_external_fom_problem', "You should define the solve_param function specific for your problem \
+                          and the external library you are using" )
 
         return
 
