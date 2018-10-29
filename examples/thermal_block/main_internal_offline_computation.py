@@ -7,6 +7,8 @@ Created on Thu Oct 25 14:31:17 2018
 @email : niccolo.dalsanto@epfl.ch
 """
 
+import matlab
+
 import numpy as np
 
 import sys
@@ -27,7 +29,6 @@ import rb_manager as rm
 import affine_decomposition as ad
 import parameter_handler as ph
 
-import thermal_block_problem as tbp
 
 print( rm.__doc__ )
 
@@ -43,10 +44,9 @@ num_parameters = param_min.shape[0]
 my_parameter_handler = ph.Parameter_handler( )
 my_parameter_handler.assign_parameters_bounds( param_min, param_max )
 
-my_parameter_handler.generate_parameter( )
-my_parameter_handler.print_parameters( )
-
 # define the fem problem 
+import thermal_block_problem as tbp
+
 my_tbp = tbp.thermal_block_problem( )
 
 fom_specifics = { 
@@ -54,6 +54,14 @@ fom_specifics = {
         'polynomial_degree' : 'P1' }
 
 my_tbp.configure_fom( my_matlab_engine, fom_specifics )
+
+sol = my_tbp.solve_fom_problem( param_max )
+
+
+
+
+
+
 
 
 

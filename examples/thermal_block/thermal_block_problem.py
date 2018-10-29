@@ -7,6 +7,8 @@ Created on Thu Oct 11 11:58:02 2018
 @email : niccolo.dalsanto@epfl.ch
 """
 
+import numpy as np
+
 import fom_problem as fp
 
 def tb_theta_a( _param, _q ):
@@ -20,7 +22,6 @@ def tb_theta_a( _param, _q ):
 
 def tb_theta_f( _param, _q ):
     return 1.0
-
 
 
 class thermal_block_problem( fp.fom_problem ):
@@ -37,10 +38,19 @@ class thermal_block_problem( fp.fom_problem ):
         
         return
      
-    def solve_fom_problem( self, _param ):
+    def solve_external_fom_problem( self, _param ):
         
+        print( "Solving the FOM problem with parameter \n" )
+        print( _param ) 
         
+        converted_param = self.convert_parameter( _param )
+             
+        print( "Converted parameter is \n" )
+        print( converted_param ) 
+           
+        sol = self.M_external_engine.solve_parameter( converted_param, self.M_fom_specifics )
 
-        return
+        return sol
+        
   
     
