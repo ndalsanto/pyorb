@@ -23,8 +23,6 @@ def sparse_matrix_vector_mul( mat, vec ):
     return Av
 
 
-
-
 class AffineDecomposition( ):
 
     def __init__( self ):
@@ -45,7 +43,6 @@ class AffineDecomposition( ):
         
         print( "Number of affine decomposition matrices %d" % self.M_qa )
         print( "Number of affine decomposition vectors  %d"  % self.M_qf )
-
         
         return 
     
@@ -87,6 +84,8 @@ class AffineDecompositionHandler( ):
 
         assert Qa > 0
         
+        self.M_feAffineAq = []
+        
         for iQa in range( Qa ):
             self.M_feAffineAq.append( np.loadtxt( _input_file + str(iQa) + '.txt' ) )   # importing matrix in sparse format
         
@@ -98,6 +97,8 @@ class AffineDecompositionHandler( ):
         Qf = self.M_affineDecomposition.get_Qf( )
 
         assert Qf > 0
+
+        self.M_feAffineFq = []
         
         for iQf in range( Qf ):
             self.M_feAffineFq.append( np.loadtxt( _input_file + str(iQf) + '.txt' ) )   # importing vectors
@@ -110,30 +111,63 @@ class AffineDecompositionHandler( ):
         
         return 
     
+    def print_affine_components( self ):
+    
+        Qf = self.get_Qf( )
+        Qa = self.get_Qa( )
+
+        for iQf in range( Qf ):
+            print( '\nRB rhs affine components %d \n' % iQf )
+            print( self.M_rbAffineFq[iQf] ) 
+            
+        for iQa in range( Qa ):
+            print( '\nRB mat affine components %d \n' % iQa )
+            print( self.M_rbAffineAq[iQf] ) 
+                    
+        return 
+
     def reset_rb_approximation( self ):
         self.M_rbAffineFq = []
         self.M_rbAffineAq = []
 
     
-    def build_rb_affine_decompositions( self, _basis ):
+    def build_rb_affine_decompositions( self, _basis, _fom_problem ):
         
         N = _basis.shape[1]
         
         Qf = self.get_Qf( )
-        
-        for iQf in range( Qf ):
-            
-            self.M_rbAffineFq.append( np.zeros( N ) )
-            self.M_rbAffineFq[iQf] = _basis.T.dot( self.M_feAffineFq[iQf] )
-      
         Qa = self.get_Qa( )
 
+        if self.check_set_fom_arrays( ) == False:
+
+            print( "Importing FOM affine arrays " )
+
+            fff = _fom_problem.retrieve_fe_affine_components( 'f' )
+
+            for iQf in range( Qf ):
+                self.M_feAffineFq.append( np.array( fff['f' + str(iQf)] ) )
+                self.M_feAffineFq[iQf] = self.M_feAffineFq[iQf][:, 0]
+                
+            AAA = _fom_problem.retrieve_fe_affine_components( 'A' )
+
+            for iQa in range( Qa ):
+                self.M_feAffineAq.append( np.array( AAA['A' + str(iQa)] ) )
+
+        for iQf in range( Qf ):
+            self.M_rbAffineFq.append( np.zeros( N ) )
+            self.M_rbAffineFq[iQf] = _basis.T.dot( self.M_feAffineFq[iQf] )
+            
         for iQa in range( Qa ):
             Av = sparse_matrix_vector_mul( self.M_feAffineAq[iQa], _basis )
             self.M_rbAffineAq.append( np.zeros( (N, N) ) )
             self.M_rbAffineAq[iQa] = _basis.T.dot( Av )
-            
+        
         return
+
+
+    def check_set_fom_arrays( self ):
+        return len( self.M_feAffineAq ) > 0 and len( self.M_feAffineFq ) > 0
+
 
     M_feAffineAq = []
     M_feAffineFq = []
@@ -142,10 +176,6 @@ class AffineDecompositionHandler( ):
     M_rbAffineFq = []
     
     M_affineDecomposition = AffineDecomposition( )
-
-
-
-
 
 
 

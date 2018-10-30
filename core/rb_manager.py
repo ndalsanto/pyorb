@@ -228,11 +228,9 @@ class RbManager( ):
             print( 'We miss some snalshots! I have only %d in memoory and I need to compute %d more.' % (self.M_ns, _ns-self.M_ns) )
             self.build_snapshots( _ns - self.M_ns )
         
-        
-        
         self.perform_pod( _tol )
         
-        self.M_affineDecomposition.build_rb_affine_decompositions( self.M_basis )
+        self.M_affineDecomposition.build_rb_affine_decompositions( self.M_basis, self.M_fom_problem )
         
         return
 

@@ -61,7 +61,19 @@ class fom_problem( ):
         sol = self.M_external_engine.solve_parameter( _param, self.M_fom_specifics )
         return sol
 
-
+    def compute_fom_product( self, _basis, _q, _operator ):
+        
+        print( "Performing compute_fom_product" )
+        product = self.M_external_engine.build_rb_affine_component( _basis, _q, _operator, self.M_fom_specifics )
+        
+        return product.array
+        
+    def retrieve_fe_affine_components( self, _operator ):
+        return self.M_external_engine.build_fe_affine_components( _operator, self.M_fom_specifics )
+        
+        
+        
+        
 
     M_configured_fom = False
 

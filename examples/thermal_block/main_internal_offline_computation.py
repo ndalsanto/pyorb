@@ -50,24 +50,35 @@ fom_specifics = {
 
 my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
 
-sol = my_tbp.solve_fom_problem( np.array([6.7477,3.0286,43.620200000000004]) )
+sol = my_tbp.solve_fom_problem( np.array([6.7477,3.0286,43.6202]) )
 
 sol['u']
 
+AAA = my_matlab_external_engine.build_fe_affine_components( 'A', fom_specifics )
 
-import rb_manager as rm
+A0 = AAA['A0']
+
+fff = my_matlab_external_engine.build_fe_affine_components( 'f', fom_specifics )
+
+fff['f0']
+
+f0 = np.array( fff['f0'] )
+
+
+
 import affine_decomposition as ad
-print( rm.__doc__ )
 
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )               # number of affine terms
 
 # OLD way for importing affine matrices
-my_affine_decomposition.import_affine_matrices( 'affine_matrix_20_A' )
-my_affine_decomposition.import_affine_vectors(  'affine_vector_20_f' )
+#my_affine_decomposition.import_affine_matrices( 'affine_matrix_20_A' )
+#my_affine_decomposition.import_affine_vectors(  'affine_vector_20_f' )
 
 # building the RB manager
+import rb_manager as rm
+print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp, my_parameter_handler )
 
 # OLD importing snapshots, offline parameters and building RB space
@@ -77,15 +88,11 @@ my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp, my_parameter_hand
 # new way for importing snapshots
 #my_rb_manager.import_snapshots_matrix( 'train_snapshots_matrix_20_50.txt', 'train_parameters.data' )
 
-my_rb_manager.set_save_basis_functions( False, "basis.txt" )
-my_rb_manager.reset_rb_approximation( )
-my_rb_manager.build_rb_approximation( 100, 10**(-5) )
-
-
+my_rb_manager.set_save_basis_functions( True, "basis.txt" )
+my_rb_manager.build_rb_approximation( 200, 10**(-6) )
 
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
-
 
 my_rb_manager.import_test_parameters( 'test_parameters.data' )
 my_rb_manager.import_test_snapshots_matrix( 'test_snapshots_matrix_20_20.txt' )

@@ -29,26 +29,39 @@ class external_engine( ):
 
     def start_specific_engine( self ):
         
-        em.error_raiser( 'SystemError', 'external_engine::start_engine', "You are using the default start_engine, \
+        em.error_raiser( 'SystemError', 'external_engine::start_engine', "You are using the default start_specific_engine, \
                           please provide specific ones for your specific engine " )
         return
 
     def quit_specific_engine( self ):
         
-        em.error_raiser( 'SystemError', 'external_engine::quit_engine', "You are using the default start_engine, \
+        em.error_raiser( 'SystemError', 'external_engine::quit_engine', "You are using the default quit_specific_engine, \
                           please provide specific ones for your specific engine " )
         return
 
     def convert_parameter( self, _param ):
 
-        em.error_raiser( 'SystemError', 'external_engine::convert_parameter', "You are using the default start_engine, \
+        em.error_raiser( 'SystemError', 'external_engine::convert_parameter', "You are using the default convert_parameter, \
                           please provide specific ones for your specific engine " )
-
+        return
 
     def solve_parameter( self, _param, _fom_specifics ):
 
-        em.error_raiser( 'SystemError', 'external_engine::solve_parameter', "You are using the default start_engine, \
+        em.error_raiser( 'SystemError', 'external_engine::solve_parameter', "You are using the default solve_parameter, \
                           please provide specific ones for your specific engine " )
+        return
+
+    def build_rb_affine_component( self, _param, _fom_specifics ):
+
+        em.error_raiser( 'SystemError', 'external_engine::build_rb_affine_component', "You are using the default build_rb_affine_component, \
+                          please provide specific ones for your specific engine " )
+        return
+
+    def build_fe_affine_components( self, _operator, _fom_specifics ):
+        
+        em.error_raiser( 'SystemError', 'external_engine::build_rb_affine_component', "You are using the default build_fe_affine_components, \
+                          please provide specific ones for your specific engine " )
+        return
 
 
     M_engine_type = ""
@@ -89,7 +102,14 @@ class matlab_external_engine( external_engine ):
 
         return self.M_engine.solve_parameter( self.convert_parameter( _param ), _fom_specifics )
 
+    def build_rb_affine_component( self, _basis, _q, _operator, _fom_specifics ):
+
+        return self.M_engine.build_rb_affine_component( _basis, _q, _operator, _fom_specifics )
+
+    def build_fe_affine_components( self, _operator, _fom_specifics ):
         
+        return self.M_engine.build_fe_affine_components( _operator, _fom_specifics )
+
 
 class external_engine_manager( ):
     
