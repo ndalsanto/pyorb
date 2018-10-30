@@ -89,7 +89,7 @@ my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp, my_parameter_hand
 #my_rb_manager.import_snapshots_matrix( 'train_snapshots_matrix_20_50.txt', 'train_parameters.data' )
 
 my_rb_manager.set_save_basis_functions( True, "basis.txt" )
-my_rb_manager.build_rb_approximation( 200, 10**(-6) )
+my_rb_manager.build_rb_approximation( 50, 10**(-6) )
 
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
@@ -102,8 +102,7 @@ for snapshot_number in range(20):
     my_rb_manager.compute_rb_test_snapshots_error( snapshot_number )
     
 
-
-
+avg_error = my_rb_manager.test_rb_solver( 100 )
 
 
 

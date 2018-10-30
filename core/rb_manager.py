@@ -132,7 +132,7 @@ class RbManager( ):
             self.M_parameter_handler.generate_parameter( )
             new_parameters[iS, :] = self.M_parameter_handler.get_parameter( )
             
-            print( "Considering the parameter" )
+            print( "Considering the parameter %d " % iS )
             print( new_parameters[iS, :] )
 
             sol = self.M_fom_problem.solve_fom_problem( new_parameters[iS, :] )
@@ -331,6 +331,39 @@ class RbManager( ):
         print( "The norm of the error for TEST snapshot %d is %g" % (_snapshot_number, norm_of_error) )
         
         return norm_of_error
+
+    def test_rb_solver( self, _n_test ):
+        
+        all_errors = 0.;
+        
+        for iP in range( _n_test ):
+            
+            new_param = self.M_parameter_handler.generate_parameter( )
+            new_param = self.M_parameter_handler.get_parameter( )
+
+            print( "New parameter %d " %( iP ) )
+            print( new_param )
+
+            self.solve_reduced_problem( new_param )
+            self.reconstruct_fem_solution( self.M_un )
+            
+            uhh = self.M_fom_problem.solve_fom_problem( new_param )
+            uh = np.array( uhh['u'] )
+            uh = uh[:, 0]
+            error = self.M_utildeh
+            error = error - uh
+            
+            norm_of_error = np.sqrt( np.sum( error * error ) / np.sum( uh * uh )  )
+            all_errors = all_errors + norm_of_error
+            
+            print( "The error is %e \n\n" % norm_of_error )
+
+        avg_error = all_errors / _n_test
+
+        print( "The average error is %E" % avg_error )
+        
+        return avg_error
+
 
     M_An = np.zeros( (0, 0) )
     M_fn = np.zeros( 0 )
