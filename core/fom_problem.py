@@ -17,9 +17,10 @@ def default_theta_function( _param, _q ):
 
 class fom_problem( ):
     
-    def __init__( self ):
+    def __init__( self, _parameter_handler ):
     
         self.define_theta_functions( )
+        self.M_parameter_handler = _parameter_handler
         
         return
     
@@ -70,9 +71,21 @@ class fom_problem( ):
         
     def retrieve_fe_affine_components( self, _operator ):
         return self.M_external_engine.build_fe_affine_components( _operator, self.M_fom_specifics )
-        
-        
-        
+
+    def assemble_fom_matrix( self, _param ):
+        return self.M_external_engine.assemble_fom_matrix( _param, self.M_fom_specifics )
+
+    def get_num_parameters( self ):
+        return self.M_parameter_handler.get_num_parameters( )    
+    
+    def generate_parameter( self ):
+        return self.M_parameter_handler.generate_parameter( )
+    
+    def get_parameter( self ):
+        return self.M_parameter_handler.get_parameter( )
+
+
+    M_parameter_handler = 0
         
 
     M_configured_fom = False

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Oct 11 11:58:02 2018
+Created on Wed Oct 31 18:43:23 2018
 
 @author: Niccolo' Dal Santo
 @email : niccolo.dalsanto@epfl.ch
@@ -24,7 +24,7 @@ def tb_theta_f( _param, _q ):
     return 1.0
 
 
-class thermal_block_problem( fp.fom_problem ):
+class nonaffine_diffusion_problem( fp.fom_problem ):
 
     def __init__( self, _parameter_handler ):
         fp.fom_problem.__init__( self, _parameter_handler )

@@ -1,7 +1,7 @@
     #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Oct 25 14:31:17 2018
+Created on Thu Oct 31 14:31:17 2018
 
 @author: Niccolo' Dal Santo
 @email : niccolo.dalsanto@epfl.ch
@@ -26,9 +26,9 @@ my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
 import parameter_handler as ph
 
-mu0_min = 1.0; mu0_max = 50.
-mu1_min = 1.0; mu1_max = 50.
-mu2_min = 1.0; mu2_max = 50.
+mu0_min = 0.2; mu0_max = 0.8
+mu1_min = 0.2; mu1_max = 0.8
+mu2_min = 0.01; mu2_max = 0.2
 
 param_min = np.array([mu0_min, mu1_min, mu2_min])
 param_max = np.array([mu0_max, mu1_max, mu2_max])
@@ -39,19 +39,28 @@ my_parameter_handler = ph.Parameter_handler( )
 my_parameter_handler.assign_parameters_bounds( param_min, param_max )
 
 # define the fem problem 
-import thermal_block_problem as tbp
+import nonaffine_diffusion_problem as ndp
 
-my_tbp = tbp.thermal_block_problem( my_parameter_handler )
+my_ndp = ndp.nonaffine_diffusion_problem( my_parameter_handler )
 
 fom_specifics = { 
         'number_of_elements': 20, 
         'polynomial_degree' : 'P1' }
 
-my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
+my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 
 
 my_parameter_handler.generate_parameter( )
 para = my_parameter_handler.get_parameter( )
+
+
+import rb_manager as rm
+
+my_mdeim = rm.Mdeim( my_ndp )
+
+my_mdeim.build_mdeim_basis( 100, 10**(-6) )
+
+
 
 #%%
 
@@ -68,7 +77,7 @@ my_affine_decomposition.set_Q( 4, 1 )               # number of affine terms
 # building the RB manager
 import rb_manager as rm
 print( rm.__doc__ )
-my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
+my_rb_manager = rm.RbManager( my_affine_decomposition, my_ndp )
 
 # OLD importing snapshots, offline parameters and building RB space
 #my_rb_manager.import_snapshots_parameters( 'train_parameters.data' )

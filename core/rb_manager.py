@@ -17,9 +17,115 @@ import affine_decomposition as ad
 import fom_problem as fm
 import parameter_handler as ph
 
+
+
+
+
+class ProperOrthogonalDecompostion( ):
+    
+    def __init__( self ):
+        return
+        
+    def perform_pod( self, _snapshots_matrix, _tol = 10**(-5) ):
+
+        self.M_snapshots_matrix = _snapshots_matrix
+        self.M_ns = self.M_snapshots_matrix.shape[1]
+    
+        U, s, V = np.linalg.svd( self.M_snapshots_matrix, full_matrices=False )
+        
+        total_energy = np.dot( s, np.transpose(s) )
+        
+        print( "The total energy of the field is %g" % total_energy )
+        
+        self.M_N = 0
+        
+        cumulative_energy = 0.0
+        record_cumulative_energy = np.ones( self.M_ns )
+        
+        while cumulative_energy / total_energy < 1. - _tol**2:
+            print( "Now N is %d and the cumulative energy is %g --- %g --- current sv %g " \
+                                  % ( self.M_N, cumulative_energy, cumulative_energy / total_energy, s[ self.M_N ] ) )
+
+            record_cumulative_energy[ self.M_N ] = cumulative_energy
+            cumulative_energy = cumulative_energy + s[ self.M_N ] * s[ self.M_N ]   # add the energy of next basis
+            self.M_N = self.M_N + 1                                                 # add a basis in the count
+
+        print( "Final N is %d" % self.M_N )
+
+        self.M_basis = U[:, 0:self.M_N]
+
+    def get_basis( self ):
+        return self.M_basis
+
+    M_snapshots_matrix = np.zeros( ( 0, 0 ) )
+    M_basis = np.zeros( ( 0, 0 ) )
+    M_N = 0
+    M_ns = 0
+    
+
+class Mdeim( ):
+    
+    def __init__( self, _fom_problem ):
+        self.M_fom_problem = _fom_problem
+        return
+
+    def reset_mdeim( self ):
+        self.M_snapshots_matrix = np.zeros( ( 0, 0 ) )
+        self.M_basis = np.zeros( ( 0, 0 ) )
+        self.M_N = 0
+        self.M_ns = 0
+        
+        return
+
+    def build_mdeim_snapshots( self, _ns ):
+        
+        self.M_ns = _ns
+        
+        current_snapshots_number = self.M_snapshots_matrix.shape[1]
+        
+        for iNs in range( _ns ):
+            
+            self.M_fom_problem.generate_parameter( )
+            param = self.M_fom_problem.get_parameter( )
+
+            AAA = self.M_fom_problem.assemble_fom_matrix( param )
+            AA = np.array( AAA['A'] )
+ 
+            if current_snapshots_number == 0:
+                self.M_snapshots_matrix = np.zeros( ( AA.shape[0], _ns ) )
+
+            self.M_snapshots_matrix[:, iNs] = AA[:, 2]
+            current_snapshots_number = current_snapshots_number + 1
+       
+        return
+
+    def build_mdeim_basis( self, _ns, _tol ):
+        
+        self.reset_mdeim( )
+        
+        self.build_mdeim_snapshots( _ns )
+        
+        pod = ProperOrthogonalDecompostion( )
+        
+        pod.perform_pod( self.M_snapshots_matrix, _tol )
+        
+        self.M_basis = pod.get_basis( )
+    
+        self.M_N = self.M_basis.shape[1]
+ 
+
+    M_fom_problem = 0
+    M_snapshots_matrix = np.zeros( ( 0, 0 ) )
+    M_basis = np.zeros( ( 0, 0 ) )
+    M_N = 0
+    M_ns = 0
+ 
+
+
+
 class RbManager( ):
     
-    def __init__( self, _affine_decomposition, _fom_problem, _parameter_handler ):
+    def __init__( self, _affine_decomposition, _fom_problem ):
         
         self.set_affine_decomposition_handler( _affine_decomposition )
         self.set_fom_problem( _fom_problem )
@@ -125,13 +231,13 @@ class RbManager( ):
         if current_snapshots_number == 0:
             print( "There are no snapshots at the moment, therefore we need to create everything from scratch" )
 
-        num_parameters = self.M_parameter_handler.get_num_parameters( )
+        num_parameters = self.M_fom_problem.get_num_parameters( )
         new_parameters = np.zeros( ( _new_snapshots, num_parameters ) )
         
         for iS in range( _new_snapshots ):
             
-            self.M_parameter_handler.generate_parameter( )
-            new_parameters[iS, :] = self.M_parameter_handler.get_parameter( )
+            self.M_fom_problem.generate_parameter( )
+            new_parameters[iS, :] = self.M_fom_problem.get_parameter( )
             
             print( "Considering the parameter %d " % iS )
             print( new_parameters[iS, :] )
@@ -167,28 +273,13 @@ class RbManager( ):
 
     def perform_pod( self, _tol = 10**(-5) ):
 
-        U, s, V = np.linalg.svd( self.M_snapshots_matrix, full_matrices=False )
+        pod = ProperOrthogonalDecompostion( )
         
-        total_energy = np.dot( s, np.transpose(s) )
+        pod.perform_pod( self.M_snapshots_matrix, _tol )
         
-        print( "The total energy of the field is %g" % total_energy )
-        
-        self.M_N = 0
-        
-        cumulative_energy = 0.0
-        record_cumulative_energy = np.ones( self.M_ns )
-        
-        while cumulative_energy / total_energy < 1. - _tol**2:
-            print( "Now N is %d and the cumulative energy is %g --- %g --- current sv %g " \
-                                  % ( self.M_N, cumulative_energy, cumulative_energy / total_energy, s[ self.M_N ] ) )
-
-            record_cumulative_energy[ self.M_N ] = cumulative_energy
-            cumulative_energy = cumulative_energy + s[ self.M_N ] * s[ self.M_N ]  # add the energy of next basis
-            self.M_N = self.M_N + 1                                       # add a basis in the count
-
-        print( "Final N is %d" % self.M_N )
-
-        self.M_basis = U[:, 0:self.M_N]
+        self.M_basis = pod.get_basis( )
+    
+        self.M_N = self.M_basis.shape[1]
     
         if self.M_save_offline_structures == True:
             output_file = open( self.M_save_file_basis_functions, 'w+' )
@@ -222,10 +313,6 @@ class RbManager( ):
 
     def set_fom_problem( self, _fom_problem ):
         self.M_fom_problem = _fom_problem
-        return
-
-    def set_parameter_handler( self, _parameter_handler ):
-        self.M_parameter_handler = _parameter_handler
         return
 
     def reset_rb_approximation( self ):
@@ -270,12 +357,8 @@ class RbManager( ):
         
         return
     
-    
-    
     M_verbose = False
     M_get_test = False 
-    
-    M_parameter_handler = ph.Parameter_handler( )
     
     M_ns = 0
     M_snapshots_matrix = np.zeros( ( 0, 0 ) )
@@ -377,8 +460,8 @@ class RbManager( ):
         
         for iP in range( _n_test ):
             
-            new_param = self.M_parameter_handler.generate_parameter( )
-            new_param = self.M_parameter_handler.get_parameter( )
+            new_param = self.M_fom_problem.generate_parameter( )
+            new_param = self.M_fom_problem.get_parameter( )
 
             print( "New parameter %d " %( iP ) )
             print( new_param )
@@ -408,11 +491,6 @@ class RbManager( ):
     M_fn = np.zeros( 0 )
     M_un = np.zeros( 0 )
     M_utildeh = np.zeros( 0 )
-
-
-
-
-
 
 
 

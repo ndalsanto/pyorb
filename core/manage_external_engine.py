@@ -63,6 +63,11 @@ class external_engine( ):
                           please provide specific ones for your specific engine " )
         return
 
+    def assemble_fom_matrix( self, _param, _fom_specifics ):
+        
+        em.error_raiser( 'SystemError', 'external_engine::assemble_fom_matrix', "You are using the default assemble_fom_matrix, \
+                          please provide specific ones for your specific engine " )
+        return
 
     M_engine_type = ""
     M_library_path = ""
@@ -109,6 +114,13 @@ class matlab_external_engine( external_engine ):
     def build_fe_affine_components( self, _operator, _fom_specifics ):
         
         return self.M_engine.build_fe_affine_components( _operator, _fom_specifics )
+
+    def assemble_fom_matrix( self, _param, _fom_specifics ):
+        
+        print( 'Assembling with MATLAB the FOM matrixxxx ' )
+
+        return self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics )
+
 
 
 class external_engine_manager( ):
