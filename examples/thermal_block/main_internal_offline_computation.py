@@ -88,9 +88,19 @@ my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp, my_parameter_hand
 # new way for importing snapshots
 #my_rb_manager.import_snapshots_matrix( 'train_snapshots_matrix_20_50.txt', 'train_parameters.data' )
 
-my_rb_manager.set_save_basis_functions( True, "basis.txt" )
+
+#%%
+
+my_rb_manager.import_offline_structures( "offline/snapshots", "offline/basis", "offline/rb_affine_components" )
+
+my_affine_decomposition.print_affine_components( )
+
+
+#%%
+my_rb_manager.save_offline_structures( "offline/snapshots", "offline/basis", "offline/rb_affine_components" )
 my_rb_manager.build_rb_approximation( 50, 10**(-6) )
 
+#%%
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 
@@ -109,4 +119,4 @@ avg_error = my_rb_manager.test_rb_solver( 100 )
 
 #%%
 
-my_matlab_engine_manager.quit_engine( )
+#my_matlab_engine_manager.quit_engine( )

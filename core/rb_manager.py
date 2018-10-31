@@ -36,6 +36,11 @@ class RbManager( ):
         self.M_ns = self.M_snapshots_matrix.shape[1]
         return 
 
+    def import_basis_matrix( self, _input_file ):
+        self.M_basis = np.loadtxt( _input_file )
+        self.M_N = self.M_basis.shape[1]
+        return 
+
     def import_snapshots( self, _input_file_snapshots, _input_file_snapshots_parameters ):
 
         self.import_snapshots_matrix( _input_file_snapshots )
@@ -111,11 +116,7 @@ class RbManager( ):
         self.M_snapshots_matrix = np.random.randn( _rows, _cols )
         
         return 
-    
-    def set_save_basis_functions( self, _save, _file ):
-        self.M_save_basis_functions = _save
-        self.M_save_file_basis_functions = _file
-    
+   
     # _ns is the number of snapshots to be added to the snapshots matrix
     def build_snapshots( self, _new_snapshots ):
         
@@ -147,6 +148,21 @@ class RbManager( ):
         
         self.M_ns = self.M_ns + _new_snapshots
         
+        
+        if self.M_save_offline_structures == True:
+            output_file = open( self.M_save_file_snapshots_functions, 'w+' )
+                
+            for iNs in range( self.M_snapshots_matrix.shape[0] ):
+                for iNh in range( self.M_snapshots_matrix.shape[1] ):
+                    output_file.write( "%.10g" % self.M_snapshots_matrix[iNs, iNh] )
+    
+                    if iNh < self.M_snapshots_matrix.shape[1] - 1:
+                        output_file.write( " " % self.M_snapshots_matrix[iNs, iNh] )
+                    else:
+                        output_file.write( "\n" % self.M_snapshots_matrix[iNs, iNh] )
+            
+            output_file.close( )
+
         return
 
     def perform_pod( self, _tol = 10**(-5) ):
@@ -174,7 +190,7 @@ class RbManager( ):
 
         self.M_basis = U[:, 0:self.M_N]
     
-        if self.M_save_basis_functions == True:
+        if self.M_save_offline_structures == True:
             output_file = open( self.M_save_file_basis_functions, 'w+' )
                 
             for iNs in range( self.M_basis.shape[0] ):
@@ -232,8 +248,30 @@ class RbManager( ):
         
         self.M_affineDecomposition.build_rb_affine_decompositions( self.M_basis, self.M_fom_problem )
         
+        if self.M_save_offline_structures == True:
+            self.M_affineDecomposition.save_rb_affine_decomposition( self.M_save_file_affine_components )
+
         return
 
+    def save_offline_structures( self, _snapshot_matrix, _basis_matrix, _affine_components ):
+        
+        self.M_save_offline_structures       = True
+        self.M_save_file_basis_functions     = _basis_matrix
+        self.M_save_file_snapshots_functions = _snapshot_matrix
+        self.M_save_file_affine_components   = _affine_components
+
+        return
+    
+    def import_offline_structures( self, _snapshot_matrix, _basis_matrix, _affine_components ):
+        
+        self.import_snapshots_matrix( _snapshot_matrix )
+        self.import_basis_matrix( _basis_matrix )
+        self.M_affineDecomposition.import_affine_components( _affine_components )
+        
+        return
+    
+    
+    
     M_verbose = False
     M_get_test = False 
     
@@ -248,10 +286,11 @@ class RbManager( ):
 
     M_N = 0
     M_basis = np.zeros( 0 )
-    M_save_basis_functions = False
-    M_save_file_basis_functions = "basis.txt"
     M_affineDecomposition = ad.AffineDecompositionHandler( )
     M_fom_problem = fm.fom_problem
+
+    M_save_offline_structures = False
+    M_save_file_basis_functions = "basis.txt"
 
     def get_rb_affine_matrix( self, _q ):
         return self.M_affineDecomposition.get_rb_affine_matrix( _q )

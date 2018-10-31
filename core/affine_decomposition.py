@@ -122,7 +122,7 @@ class AffineDecompositionHandler( ):
             
         for iQa in range( Qa ):
             print( '\nRB mat affine components %d \n' % iQa )
-            print( self.M_rbAffineAq[iQf] ) 
+            print( self.M_rbAffineAq[iQa] ) 
                     
         return 
 
@@ -168,6 +168,52 @@ class AffineDecompositionHandler( ):
     def check_set_fom_arrays( self ):
         return len( self.M_feAffineAq ) > 0 and len( self.M_feAffineFq ) > 0
 
+    def save_rb_affine_decomposition( self, _file_name ):
+        
+        Qf = self.get_Qf( )
+        Qa = self.get_Qa( )
+
+        for iQa in range( Qa ):
+            output_file = open( _file_name + 'A' + str( iQa ), 'w+' )
+                    
+            for iN in range( self.M_rbAffineAq[iQa].shape[0] ):
+                for jN in range( self.M_rbAffineAq[iQa].shape[1] ):
+                    output_file.write( "%.10g" % self.M_rbAffineAq[iQa][iN, jN] )
+    
+                    if jN < self.M_rbAffineAq[iQa].shape[1] - 1:
+                        output_file.write( " " % self.M_rbAffineAq[iQa][iN, jN] )
+                    else:
+                        output_file.write( "\n" % self.M_rbAffineAq[iQa][iN, jN] )
+            
+            output_file.close( )
+    
+        for iQf in range( Qf ):
+            output_file = open( _file_name + '_f' + str( iQf ), 'w+' )
+                    
+            for iN in range( self.M_rbAffineFq[iQf].shape[0] ):
+                output_file.write( "%.10g" % self.M_rbAffineFq[iQf][iN] )
+                output_file.write( " " % self.M_rbAffineFq[iQf][iN] )
+                output_file.write( "\n" % self.M_rbAffineFq[iQf][iN] )
+            
+            output_file.close( )
+        
+        return
+
+    def import_affine_components( self, _affine_components ):
+        
+        self.M_rbAffineAq = []
+        self.M_rbAffineFq = []
+
+        Qf = self.get_Qf( )
+        Qa = self.get_Qa( )
+
+        for iQa in range( Qa ):
+            self.M_rbAffineAq.append( np.loadtxt( _affine_components + 'A' + str( iQa ) ) )
+            
+        for iQf in range( Qf ):
+            self.M_rbAffineFq.append( np.loadtxt( _affine_components + '_f' + str( iQf ) ) )
+            
+        return
 
     M_feAffineAq = []
     M_feAffineFq = []
