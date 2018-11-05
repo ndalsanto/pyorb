@@ -26,9 +26,9 @@ my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
 import parameter_handler as ph
 
-mu0_min = 0.2; mu0_max = 0.8
-mu1_min = 0.2; mu1_max = 0.8
-mu2_min = 0.01; mu2_max = 0.2
+mu0_min = 0.4; mu0_max = 0.6
+mu1_min = 0.4; mu1_max = 0.6
+mu2_min = 0.25; mu2_max = 0.5
 
 param_min = np.array([mu0_min, mu1_min, mu2_min])
 param_max = np.array([mu0_max, mu1_max, mu2_max])
@@ -45,7 +45,8 @@ my_ndp = ndp.nonaffine_diffusion_problem( my_parameter_handler )
 
 fom_specifics = { 
         'number_of_elements': 20, 
-        'polynomial_degree' : 'P1' }
+        'polynomial_degree' : 'P1',
+        'model': 'nonaffine' }
 
 my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 
@@ -53,14 +54,13 @@ my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 my_parameter_handler.generate_parameter( )
 para = my_parameter_handler.get_parameter( )
 
-
 import rb_manager as rm
 
 my_mdeim = rm.Mdeim( my_ndp )
 
-my_mdeim.build_mdeim_basis( 100, 10**(-6) )
+my_mdeim.build_mdeim_basis( 100, 10**(-5) )
 
-
+"""
 
 #%%
 
@@ -113,7 +113,7 @@ for snapshot_number in range(20):
 avg_error = my_rb_manager.test_rb_solver( 100 )
 
 
-
+"""
 
 #%%
 
