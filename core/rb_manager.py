@@ -85,7 +85,7 @@ class Mdeim( ):
             self.M_fom_problem.generate_parameter( )
             param = self.M_fom_problem.get_parameter( )
 
-            print('Choosing parameter %d' % iNs )
+            print('Choosing parameter %d for MDEIM' % iNs )
 
             AAA = self.M_fom_problem.assemble_fom_matrix( param )
             AA = np.array( AAA['A'] )
@@ -140,6 +140,8 @@ class Mdeim( ):
 
                 output_file.close( )
 
+    def get_num_mdeim_basis( self ):
+        return self.M_N
 
     M_fom_problem = 0
     M_snapshots_matrix = np.zeros( ( 0, 0 ) )
@@ -160,7 +162,6 @@ class RbManager( ):
         
         self.set_affine_decomposition_handler( _affine_decomposition )
         self.set_fom_problem( _fom_problem )
-        self.set_parameter_handler( _parameter_handler )
         
         return
 
@@ -359,7 +360,7 @@ class RbManager( ):
         self.reset_rb_approximation( )
         
         if self.M_ns < _ns :
-            print( 'We miss some snalshots! I have only %d in memoory and I need to compute %d more.' % (self.M_ns, _ns-self.M_ns) )
+            print( 'We miss some snalshots! I have only %d in memory and I need to compute %d more.' % (self.M_ns, _ns-self.M_ns) )
             self.build_snapshots( _ns - self.M_ns )
         
         self.perform_pod( _tol )
@@ -371,6 +372,7 @@ class RbManager( ):
 
         return
 
+    # to save the offline structures in the given locations
     def save_offline_structures( self, _snapshot_matrix, _basis_matrix, _affine_components ):
         
         self.M_save_offline_structures       = True

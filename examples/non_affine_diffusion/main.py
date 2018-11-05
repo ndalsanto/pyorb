@@ -1,4 +1,4 @@
-    #!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Thu Oct 31 14:31:17 2018
@@ -56,11 +56,9 @@ para = my_parameter_handler.get_parameter( )
 
 import rb_manager as rm
 
-my_mdeim = rm.Mdeim( my_ndp )
+# my_mdeim = rm.Mdeim( my_ndp )
 
-my_mdeim.build_mdeim_basis( 100, 10**(-5) )
-
-"""
+# my_mdeim.build_mdeim_basis( 100, 10**(-5) )
 
 #%%
 
@@ -68,40 +66,33 @@ import affine_decomposition as ad
 
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
-my_affine_decomposition.set_Q( 4, 1 )               # number of affine terms
+# my_affine_decomposition.set_Q( my_mdeim.get_num_mdeim_basis( ), 1 )               # number of affine terms
 
-# OLD way for importing affine matrices
-#my_affine_decomposition.import_affine_matrices( 'affine_matrix_20_A' )
-#my_affine_decomposition.import_affine_vectors(  'affine_vector_20_f' )
+my_affine_decomposition.set_Q( 18, 1 )               # number of affine terms
+
+my_affine_decomposition.import_affine_matrices( 'mdeim_basis_A20_' )
+my_affine_decomposition.import_affine_vectors(  'affine_vector_20_f' )
 
 # building the RB manager
 import rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_ndp )
 
-# OLD importing snapshots, offline parameters and building RB space
-#my_rb_manager.import_snapshots_parameters( 'train_parameters.data' )
-#my_rb_manager.import_snapshots_matrix( 'train_snapshots_matrix_20_50.txt' )
-
-# new way for importing snapshots
-#my_rb_manager.import_snapshots_matrix( 'train_snapshots_matrix_20_50.txt', 'train_parameters.data' )
-
-
 #%%
+my_rb_manager.save_offline_structures( "offline/snapshots", "offline/basis", "offline/rb_affine_components" )
+my_rb_manager.build_rb_approximation( 100, 10**(-5) )
 
-my_rb_manager.import_offline_structures( "offline/snapshots", "offline/basis", "offline/rb_affine_components" )
-
-my_affine_decomposition.print_affine_components( )
-
-
-#%%
-#my_rb_manager.save_offline_structures( "offline/snapshots", "offline/basis", "offline/rb_affine_components" )
-my_rb_manager.build_rb_approximation( 20, 10**(-6) )
 
 #%%
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 
+# my_affine_decomposition.print_affine_components( )
+
+
+
+
+"""
 my_rb_manager.import_test_parameters( 'test_parameters.data' )
 my_rb_manager.import_test_snapshots_matrix( 'test_snapshots_matrix_20_20.txt' )
 
@@ -109,12 +100,10 @@ my_rb_manager.import_test_snapshots_matrix( 'test_snapshots_matrix_20_20.txt' )
 for snapshot_number in range(20):
     my_rb_manager.compute_rb_test_snapshots_error( snapshot_number )
     
-
 avg_error = my_rb_manager.test_rb_solver( 100 )
-
 
 """
 
 #%%
 
-#my_matlab_engine_manager.quit_engine( )
+my_matlab_engine_manager.quit_engine( )
