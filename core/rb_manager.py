@@ -15,7 +15,6 @@ import numpy as np
 
 import affine_decomposition as ad
 import fom_problem as fm
-import parameter_handler as ph
 
 
 class ProperOrthogonalDecompostion( ):
@@ -118,7 +117,7 @@ class Mdeim( ):
         print( self.M_basis )
  
         if self.M_save_mdeim_basis == True:
-            output_file = open( self.M_save_file_basis_functions + '_' + '20' + '.txt', 'w' )
+            output_file = open( self.M_save_file_basis_functions + '_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', 'w' )
 
             for iV in range( self.M_basis.shape[0] ):
                 for iB in range( self.M_basis.shape[1] ):
@@ -133,7 +132,7 @@ class Mdeim( ):
 
 
             for iB in range( self.M_basis.shape[1] ):
-                output_file = open( self.M_save_file_basis_functions + '_A' + '20' + '_' + str(iB) + '.txt', 'w' )
+                output_file = open( self.M_save_file_basis_functions + '_A' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '_' + str(iB) + '.txt', 'w' )
                 
                 for iV in range( self.M_basis.shape[0] ):
                     output_file.write( "%d %d %.10g\n" % (self.M_row_map[iV], self.M_col_map[iV], self.M_basis[iV, iB]) )

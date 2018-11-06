@@ -43,7 +43,7 @@ import nonaffine_diffusion_problem as ndp
 
 my_ndp = ndp.nonaffine_diffusion_problem( my_parameter_handler )
 
-fem_size = 20
+fem_size = 100
 fem_size_str = str( fem_size )
 
 fom_specifics = { 
@@ -59,9 +59,9 @@ para = my_parameter_handler.get_parameter( )
 
 import rb_manager as rm
 
-# my_mdeim = rm.Mdeim( my_ndp )
-
-# my_mdeim.build_mdeim_basis( 100, 10**(-5) )
+#my_mdeim = rm.Mdeim( my_ndp )
+#
+#my_mdeim.build_mdeim_basis( 100, 10**(-5) )
 
 #%%
 
@@ -83,9 +83,19 @@ my_rb_manager = rm.RbManager( my_affine_decomposition, my_ndp )
 
 #%%
 
-my_rb_manager.save_offline_structures( "offline/snapshots_" + fem_size_str + '.txt', "offline/basis_" + fem_size_str + '.txt', \
-                                       "offline/rb_affine_components_" + fem_size_str, 'offline/offline_parameters.data' )
-my_rb_manager.build_rb_approximation( 1000, 10**(-5) )
+my_rb_manager.save_offline_structures( "offline_" + fem_size_str + "/snapshots_" + fem_size_str + '.txt', \
+                                       "offline_" + fem_size_str + "/basis_" + fem_size_str + '.txt', \
+                                       "offline_" + fem_size_str + "/rb_affine_components_" + fem_size_str, \
+                                       'offline_' + fem_size_str + '/offline_parameters.data' )
+my_rb_manager.build_rb_approximation( 500, 10**(-5) )
+
+
+my_rb_manager.save_offline_structures( "offline_" + fem_size_str + "/test_snapshots_" + fem_size_str + '.txt', \
+                                       "offline_" + fem_size_str + "/basis_" + fem_size_str + '.txt', \
+                                       "offline_" + fem_size_str + "/rb_affine_components_" + fem_size_str, \
+                                       'offline_' + fem_size_str + '/test_offline_parameters.data' )
+my_rb_manager.build_snapshots( 500 )
+
 
 
 #%%
