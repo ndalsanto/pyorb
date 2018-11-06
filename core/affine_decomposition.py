@@ -105,6 +105,35 @@ class AffineDecompositionHandler( ):
         
         return
         
+    def import_rb_affine_matrices( self, _input_file ):
+        
+        Qa = self.M_affineDecomposition.get_Qa( )
+
+        assert Qa > 0
+        
+        self.M_rbAffineAq = []
+        
+        for iQa in range( Qa ):
+            self.M_rbAffineAq.append( np.loadtxt( _input_file + str(iQa) + '.txt' ) )   # importing rb matrix
+        
+        return
+        
+    # _input_file should be the string that have in common the affine matrices
+    def import_rb_affine_vectors( self, _input_file ):
+        
+        Qf = self.M_affineDecomposition.get_Qf( )
+
+        assert Qf > 0
+
+        self.M_rbAffineFq = []
+        
+        for iQf in range( Qf ):
+            self.M_rbAffineFq.append( np.loadtxt( _input_file + str(iQf) + '.txt' ) )   # importing rb vectors
+        
+        return
+        
+
+    
     def print_ad_summary( self ):
         
         self.M_affineDecomposition.print_ad_summary( )
