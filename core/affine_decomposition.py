@@ -174,7 +174,7 @@ class AffineDecompositionHandler( ):
         Qa = self.get_Qa( )
 
         for iQa in range( Qa ):
-            output_file = open( _file_name + 'A' + str( iQa ), 'w+' )
+            output_file = open( _file_name + '_A' + str( iQa ) + '.txt', 'w+' )
                     
             for iN in range( self.M_rbAffineAq[iQa].shape[0] ):
                 for jN in range( self.M_rbAffineAq[iQa].shape[1] ):
@@ -188,7 +188,7 @@ class AffineDecompositionHandler( ):
             output_file.close( )
     
         for iQf in range( Qf ):
-            output_file = open( _file_name + '_f' + str( iQf ), 'w+' )
+            output_file = open( _file_name + '_f' + str( iQf ) + '.txt', 'w+' )
                     
             for iN in range( self.M_rbAffineFq[iQf].shape[0] ):
                 output_file.write( "%.10g" % self.M_rbAffineFq[iQf][iN] )
