@@ -43,8 +43,11 @@ import nonaffine_diffusion_problem as ndp
 
 my_ndp = ndp.nonaffine_diffusion_problem( my_parameter_handler )
 
+fem_size = 20
+fem_size_str = str( fem_size )
+
 fom_specifics = { 
-        'number_of_elements': 20, 
+        'number_of_elements': fem_size, 
         'polynomial_degree' : 'P1',
         'model': 'nonaffine' }
 
@@ -70,8 +73,8 @@ my_affine_decomposition = ad.AffineDecompositionHandler( )
 
 my_affine_decomposition.set_Q( 18, 1 )               # number of affine terms
 
-my_affine_decomposition.import_affine_matrices( 'mdeim_basis_A20_' )
-my_affine_decomposition.import_affine_vectors(  'affine_vector_20_f' )
+my_affine_decomposition.import_affine_matrices( 'mdeim_basis_A' + fem_size_str + '_' )
+my_affine_decomposition.import_affine_vectors(  'affine_vector_' + fem_size_str + '_f' )
 
 # building the RB manager
 import rb_manager as rm
@@ -79,8 +82,10 @@ print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_ndp )
 
 #%%
-my_rb_manager.save_offline_structures( "offline/snapshots", "offline/basis", "offline/rb_affine_components" )
-my_rb_manager.build_rb_approximation( 100, 10**(-5) )
+
+my_rb_manager.save_offline_structures( "offline/snapshots_" + fem_size_str + '.txt', "offline/basis_" + fem_size_str + '.txt', \
+                                       "offline/rb_affine_components_" + fem_size_str, 'offline/offline_parameters.data' )
+my_rb_manager.build_rb_approximation( 1000, 10**(-5) )
 
 
 #%%

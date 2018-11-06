@@ -295,9 +295,22 @@ class RbManager( ):
                     output_file.write( "%.10g" % self.M_snapshots_matrix[iNs, iNh] )
     
                     if iNh < self.M_snapshots_matrix.shape[1] - 1:
-                        output_file.write( " " % self.M_snapshots_matrix[iNs, iNh] )
+                        output_file.write( " " )
                     else:
-                        output_file.write( "\n" % self.M_snapshots_matrix[iNs, iNh] )
+                        output_file.write( "\n" )
+            
+            output_file.close( )
+            
+            output_file = open( self.M_save_file_offline_parameters, 'w+' )
+
+            for iNs in range( new_parameters.shape[0] ):
+                for iNh in range( new_parameters.shape[1] ):
+                    output_file.write( "%.10g" % new_parameters[iNs, iNh] )
+    
+                    if iNh < new_parameters.shape[1] - 1:
+                        output_file.write( " " )
+                    else:
+                        output_file.write( "\n" )
             
             output_file.close( )
 
@@ -373,12 +386,13 @@ class RbManager( ):
         return
 
     # to save the offline structures in the given locations
-    def save_offline_structures( self, _snapshot_matrix, _basis_matrix, _affine_components ):
+    def save_offline_structures( self, _snapshot_matrix, _basis_matrix, _affine_components, _offline_parameters ):
         
         self.M_save_offline_structures       = True
         self.M_save_file_basis_functions     = _basis_matrix
         self.M_save_file_snapshots_functions = _snapshot_matrix
         self.M_save_file_affine_components   = _affine_components
+        self.M_save_file_offline_parameters  = _offline_parameters
 
         return
     
@@ -407,6 +421,7 @@ class RbManager( ):
 
     M_save_offline_structures = False
     M_save_file_basis_functions = "basis.txt"
+    M_save_file_offline_parameters = "offline_parameters.data"
 
     def get_rb_affine_matrix( self, _q ):
         return self.M_affineDecomposition.get_rb_affine_matrix( _q )
