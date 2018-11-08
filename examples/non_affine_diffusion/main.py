@@ -58,8 +58,9 @@ my_parameter_handler.generate_parameter( )
 para = my_parameter_handler.get_parameter( )
 
 import rb_manager as rm
+import m_deim
 
-#my_mdeim = rm.Mdeim( my_ndp )
+#my_mdeim = m_deim.Mdeim( my_ndp )
 #
 #my_mdeim.build_mdeim_basis( 100, 10**(-5) )
 

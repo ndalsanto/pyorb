@@ -6,6 +6,7 @@ Created on Thu Nov  8 17:21:31 2018
 @author: Niccolo' Dal Santo
 @email : niccolo.dalsanto@epfl.ch
 """
+import numpy as np
 
 
 class ProperOrthogonalDecompostion( ):
