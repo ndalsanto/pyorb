@@ -351,6 +351,9 @@ class RbManager( ):
         
         return
 
+    def print_affine_components( self ):
+        self.M_affineDecomposition.print_affine_components( )
+
     def set_affine_decomposition_handler( self, _affineDecomposition ):
         self.M_affineDecomposition = _affineDecomposition
         return
@@ -370,6 +373,8 @@ class RbManager( ):
     def build_rb_approximation( self, _ns, _tol = 10**(-5) ):
         
         self.reset_rb_approximation( )
+        
+        print( 'Building RB approximation with %d snapshots and a tolerance %f' % (_ns, _tol) )
         
         if self.M_ns < _ns :
             print( 'We miss some snalshots! I have only %d in memory and I need to compute %d more.' % (self.M_ns, _ns-self.M_ns) )
@@ -403,6 +408,13 @@ class RbManager( ):
         
         return
     
+    def get_Qa( self ):
+        return self.M_affineDecomposition.get_Qa( )
+
+    def get_Qf( self ):
+        return self.M_affineDecomposition.get_Qf( )
+
+
     M_verbose = False
     M_get_test = False 
     
@@ -538,7 +550,6 @@ class RbManager( ):
     M_fn = np.zeros( 0 )
     M_un = np.zeros( 0 )
     M_utildeh = np.zeros( 0 )
-
 
 
 
