@@ -43,7 +43,7 @@ import nonaffine_diffusion_problem as ndp
 
 my_ndp = ndp.nonaffine_diffusion_problem( my_parameter_handler )
 
-fem_size = 100
+fem_size = 10
 fem_size_str = str( fem_size )
 
 fom_specifics = { 
@@ -57,12 +57,11 @@ my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 my_parameter_handler.generate_parameter( )
 para = my_parameter_handler.get_parameter( )
 
-import rb_manager as rm
-import m_deim
 
-#my_mdeim = m_deim.Mdeim( my_ndp )
-#
-#my_mdeim.build_mdeim_basis( 100, 10**(-5) )
+import m_deim
+my_mdeim = m_deim.Mdeim( my_ndp )
+
+my_mdeim.build_mdeim_basis( 100, 10**(-5) )
 
 #%%
 
@@ -72,7 +71,7 @@ import affine_decomposition as ad
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 # my_affine_decomposition.set_Q( my_mdeim.get_num_mdeim_basis( ), 1 )               # number of affine terms
 
-my_affine_decomposition.set_Q( 18, 1 )               # number of affine terms
+my_affine_decomposition.set_Q( my_mdeim.get_num_mdeim_basis(), 1 )               # number of affine terms
 
 my_affine_decomposition.import_affine_matrices( 'mdeim_basis_A' + fem_size_str + '_' )
 my_affine_decomposition.import_affine_vectors(  'affine_vector_' + fem_size_str + '_f' )
