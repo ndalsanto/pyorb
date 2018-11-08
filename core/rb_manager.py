@@ -65,7 +65,7 @@ class Mdeim( ):
         
         self.build_mdeim_snapshots( _ns )
         
-        pod = ProperOrthogonalDecompostion( )
+        pod = podec.ProperOrthogonalDecompostion( )
         
         pod.perform_pod( self.M_snapshots_matrix, _tol )
         
@@ -277,7 +277,7 @@ class RbManager( ):
 
     def perform_pod( self, _tol = 10**(-5) ):
 
-        pod = ProperOrthogonalDecompostion( )
+        pod = podec.ProperOrthogonalDecompostion( )
         
         pod.perform_pod( self.M_snapshots_matrix, _tol )
         
