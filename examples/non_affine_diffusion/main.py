@@ -22,8 +22,6 @@ my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
 
-
-
 import parameter_handler as ph
 
 mu0_min = 0.4; mu0_max = 0.6
@@ -52,11 +50,6 @@ fom_specifics = {
         'model': 'nonaffine' }
 
 my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
-
-
-my_parameter_handler.generate_parameter( )
-para = my_parameter_handler.get_parameter( )
-
 
 import m_deim
 my_mdeim = m_deim.Mdeim( my_ndp )

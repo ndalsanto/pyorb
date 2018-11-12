@@ -117,8 +117,6 @@ class matlab_external_engine( external_engine ):
 
     def assemble_fom_matrix( self, _param, _fom_specifics ):
         
-        print( 'Assembling with MATLAB the FOM matrixxxx ' )
-
         return self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics )
 
 

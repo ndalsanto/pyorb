@@ -10,19 +10,6 @@ Created on Thu Nov  8 18:21:34 2018
 import numpy as np
 import proper_orthogonal_decomposition as podec
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 class Deim( ):
     
     def __init__( self, _fom_problem ):
@@ -39,11 +26,11 @@ class Deim( ):
 
     def build_deim_snapshots( self, _ns ):
         
-        self.M_ns = _ns
+        print('You need to code this !! ' )
+
+#        self.M_ns = _ns
         
-        current_snapshots_number = self.M_snapshots_matrix.shape[1]
-#        
-        print('Code this !! ' )
+#        current_snapshots_number = self.M_snapshots_matrix.shape[1]
         
 #        for iNs in range( _ns ):
 #            
@@ -92,7 +79,6 @@ class Deim( ):
 
             output_file.close( )
 
-
             for iB in range( self.M_basis.shape[1] ):
                 output_file = open( self.M_save_file_basis_functions + '_A' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '_' + str(iB) + '.txt', 'w' )
                 
@@ -111,20 +97,61 @@ class Deim( ):
         
         return
 
-    def get_num_mdeim_basis( self ):
+    def get_num_basis( self ):
         return self.M_N
 
+    def print_reduced_indices( self ):
+        print( self.M_reduced_indices )
+        return
+
+    def identify_reduced_indeces( self ):
+        
+        self.M_reduced_indices = np.zeros( self.M_N )
+        
+        self.M_reduced_indices[0] = int( np.argmax( self.M_basis[:, 0] ) )
+        
+        print('Identified reduced index : %d' % np.argmax( self.M_basis[:, 0] ) )
+        
+        res = self.M_basis[ self.M_reduced_indices[0].astype(int), 1] \
+            / self.M_basis[ self.M_reduced_indices[0].astype(int), 0 ]
+        
+        r = self.M_basis[:, 1] - self.M_basis[:, 0].dot( res )
+
+        self.M_reduced_indices[1] = np.argmax( abs( r ) )
+
+        print('Identified 2nd reduced index : %d' % self.M_reduced_indices[1] )
+
+        for iB in range(2, self.M_N):
+            
+#            print(int( self.M_reduced_indices[0:iB]) )
+            
+#            print(self.M_basis[ int( self.M_reduced_indices[0:iB] ), 0:iB ] )
+            
+            res = np.linalg.solve( self.M_basis[ self.M_reduced_indices[0:iB].astype(int), 0:iB ], 
+                                   self.M_basis[ self.M_reduced_indices[0:iB].astype(int), iB])
+            
+#            print(res)
+            
+#            print( self.M_basis[:, 0:iB] )
+            r = self.M_basis[:, iB] - self.M_basis[:, 0:iB].dot( res.T )
+            
+#            print(r)
+            
+            self.M_reduced_indices[iB] = np.argmax( np.abs( r ) )
+            
+        return
+    
     M_fom_problem = 0
     M_snapshots_matrix = np.zeros( ( 0, 0 ) )
     M_basis = np.zeros( ( 0, 0 ) )
     M_N = 0
     M_ns = 0
+    M_offline_parameters = np.zeros( ( 0, 0 ) )
 
-    M_row_map = np.zeros( ( 0, 0 ) )
-    M_col_map = np.zeros( ( 0, 0 ) )
+    M_reduced_indices = np.zeros( (0, 0) )
 
-    M_save_file_basis_functions = "mdeim_basis"
-    M_save_mdeim_basis = True
+    M_save_file_basis_functions = "deim_basis"
+    M_save_deim_basis = True
 
 
 
@@ -134,6 +161,7 @@ class Mdeim( Deim ):
     
     def __init__( self, _fom_problem ):
         Deim.__init__( self, _fom_problem )
+        self.M_save_file_basis_functions = "mdeim_basis"
         return
 
     def reset_mdeim( self ):
@@ -149,13 +177,22 @@ class Mdeim( Deim ):
         self.M_ns = _ns
         
         current_snapshots_number = self.M_snapshots_matrix.shape[1]
+
+        self.M_fom_problem.generate_parameter( )
+
+        self.M_offline_parameters = np.zeros( (_ns, self.M_fom_problem.get_num_parameters( ) ) )
         
         for iNs in range( _ns ):
+            
+            random.seed( (iNs + 13) * 1013 )
             
             self.M_fom_problem.generate_parameter( )
             param = self.M_fom_problem.get_parameter( )
 
-            print('Choosing parameter %d for MDEIM' % iNs )
+            self.M_offline_parameters[iNs, :] = param
+
+            np.set_printoptions(precision=12)
+            print( param )
 
             AAA = self.M_fom_problem.assemble_fom_matrix( param )
             AA = np.array( AAA['A'] )
@@ -174,19 +211,29 @@ class Mdeim( Deim ):
         return
 
     def perform_mdeim( self, _ns, _tol ):
+        
         self.reset_mdeim( )
         
         self.build_mdeim_snapshots( _ns )
         
+        self.compute_offline_mdeim( _ns, _tol )
+        
+        return
+
+    def compute_offline_mdeim( self, _ns, _tol ):
+        
         self.build_deim_basis( _ns, _tol )
 
-        return
+        self.identify_reduced_indeces( )
 
 
     def get_num_mdeim_basis( self ):
         return self.M_N
 
+    M_row_map = np.zeros( ( 0, 0 ) )
+    M_col_map = np.zeros( ( 0, 0 ) )
 
+    M_save_mdeim_basis = True
 
 
 
