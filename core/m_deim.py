@@ -109,7 +109,7 @@ class Deim( ):
         
         self.M_reduced_indices = np.zeros( self.M_N )
         
-        self.M_reduced_indices[0] = np.argmax( abs( self.M_basis[:, 0] ) )
+        self.M_reduced_indices[0] = np.argmax( np.abs( self.M_basis[:, 0] ) )
         
         res = self.M_basis[ self.M_reduced_indices[0].astype(int), 1] \
             / self.M_basis[ self.M_reduced_indices[0].astype(int), 0 ]
