@@ -151,7 +151,9 @@ class Deim( ):
 
     M_save_file_basis_functions = "deim_basis"
     M_save_deim_basis = True
-
+    
+    M_current_theta = np.zeros( 0 )
+    M_current_param = np.zeros( 0 )
 
 
 class Mdeim( Deim ):
@@ -187,6 +189,8 @@ class Mdeim( Deim ):
             param = self.M_fom_problem.get_parameter( )
 
             self.M_offline_parameters[iNs, :] = param
+
+            self.M_current_param = param
 
             np.set_printoptions(precision=12)
             print( param )
@@ -265,9 +269,19 @@ class Mdeim( Deim ):
         
         rhs = self.M_fom_problem.assemble_fom_matrix( _param, _elements=self.M_reduced_elements, \
                                                       _indices=self.M_reduced_indices_mat )
-        theta = np.linalg.solve( self.M_interpolation_matrix, rhs[:, 2] )
+        self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs[:, 2] )
         
-        return theta
+        return self.M_current_theta
+    
+    def compute_theta_coefficients_q( self, _param, _q ):
+        
+        if (self.M_current_param != _param).all():
+            print( 'Recomputing for new paramter!' )
+            self.M_current_param = _param
+            self.compute_theta_coefficients( _param )
+        
+        return self.M_current_theta[_q]
+        
     
     def compute_theta_bounds( self, _n_tests ):
         
@@ -290,12 +304,7 @@ class Mdeim( Deim ):
             max_thetas = np.maximum( this_theta, max_thetas )
             min_thetas = np.minimum( this_theta, min_thetas )
 
-#            print('New bounds:')
-#            print(max_thetas)
-#            print(min_thetas)
- 
         return min_thetas, max_thetas
-
 
 
     M_row_map = np.zeros( ( 0, 0 ) )
