@@ -9,6 +9,7 @@ Created on Thu Nov  8 18:21:34 2018
 
 import numpy as np
 import proper_orthogonal_decomposition as podec
+import random
 
 class Deim( ):
     
@@ -108,37 +109,26 @@ class Deim( ):
         
         self.M_reduced_indices = np.zeros( self.M_N )
         
-        self.M_reduced_indices[0] = int( np.argmax( self.M_basis[:, 0] ) )
-        
-        print('Identified reduced index : %d' % np.argmax( self.M_basis[:, 0] ) )
+        self.M_reduced_indices[0] = np.argmax( abs( self.M_basis[:, 0] ) )
         
         res = self.M_basis[ self.M_reduced_indices[0].astype(int), 1] \
             / self.M_basis[ self.M_reduced_indices[0].astype(int), 0 ]
         
         r = self.M_basis[:, 1] - self.M_basis[:, 0].dot( res )
 
-        self.M_reduced_indices[1] = np.argmax( abs( r ) )
-
-        print('Identified 2nd reduced index : %d' % self.M_reduced_indices[1] )
+        self.M_reduced_indices[1] = np.argmax( abs( r ) ).astype( int )
 
         for iB in range(2, self.M_N):
-            
-#            print(int( self.M_reduced_indices[0:iB]) )
-            
-#            print(self.M_basis[ int( self.M_reduced_indices[0:iB] ), 0:iB ] )
             
             res = np.linalg.solve( self.M_basis[ self.M_reduced_indices[0:iB].astype(int), 0:iB ], 
                                    self.M_basis[ self.M_reduced_indices[0:iB].astype(int), iB])
             
-#            print(res)
-            
-#            print( self.M_basis[:, 0:iB] )
             r = self.M_basis[:, iB] - self.M_basis[:, 0:iB].dot( res.T )
             
-#            print(r)
-            
             self.M_reduced_indices[iB] = np.argmax( np.abs( r ) )
-            
+    
+        self.M_reduced_indices = self.M_reduced_indices.astype( int )
+        
         return
     
     M_fom_problem = 0
@@ -152,8 +142,6 @@ class Deim( ):
 
     M_save_file_basis_functions = "deim_basis"
     M_save_deim_basis = True
-
-
 
 
 
@@ -207,6 +195,21 @@ class Mdeim( Deim ):
        
         return
 
+    def identify_reduced_mat_indeces( self ):
+        
+        self.M_indices_mat = np.zeros( (self.M_N, 2) )
+        
+        self.M_indices_mat[:, 0] = self.M_row_map[ self.M_reduced_indices ]
+        self.M_indices_mat[:, 1] = self.M_col_map[ self.M_reduced_indices ]
+        
+        return
+
+    def print_reduced_indices_mat( self ):
+        
+        print( self.M_indices_mat )
+        
+        return
+
     def build_mdeim_basis( self, _ns, _tol ):
         return
 
@@ -226,12 +229,15 @@ class Mdeim( Deim ):
 
         self.identify_reduced_indeces( )
 
+        self.identify_reduced_mat_indeces( )
 
     def get_num_mdeim_basis( self ):
         return self.M_N
 
     M_row_map = np.zeros( ( 0, 0 ) )
     M_col_map = np.zeros( ( 0, 0 ) )
+
+    M_indices_mat = np.zeros( ( 0, 0 ) )
 
     M_save_mdeim_basis = True
 
