@@ -187,8 +187,8 @@ class Mdeim( Deim ):
  
             if current_snapshots_number == 0:
                 self.M_snapshots_matrix = np.zeros( ( AA.shape[0], _ns ) )
-                self.M_row_map = AA[:, 0]
-                self.M_col_map = AA[:, 1]
+                self.M_row_map = AA[:, 0].astype( int )
+                self.M_col_map = AA[:, 1].astype( int )
 
             self.M_snapshots_matrix[:, iNs] = AA[:, 2]
             current_snapshots_number = current_snapshots_number + 1
@@ -197,16 +197,31 @@ class Mdeim( Deim ):
 
     def identify_reduced_mat_indeces( self ):
         
-        self.M_indices_mat = np.zeros( (self.M_N, 2) )
+        self.M_reduced_indices_mat = np.zeros( (self.M_N, 2) )
         
-        self.M_indices_mat[:, 0] = self.M_row_map[ self.M_reduced_indices ]
-        self.M_indices_mat[:, 1] = self.M_col_map[ self.M_reduced_indices ]
+        self.M_reduced_indices_mat[:, 0] = self.M_row_map[ self.M_reduced_indices ]
+        self.M_reduced_indices_mat[:, 1] = self.M_col_map[ self.M_reduced_indices ]
         
+        self.M_reduced_indices_mat = self.M_reduced_indices_mat.astype( int )
+        
+        return
+
+    def identify_reduced_elements( self ):
+        
+        self.M_reduced_elements = np.array( self.M_fom_problem.find_mdeim_elements_fem_specifics( \
+                                                         self.M_reduced_indices_mat ) ).astype(int)
+
         return
 
     def print_reduced_indices_mat( self ):
         
-        print( self.M_indices_mat )
+        print( self.M_reduced_indices_mat )
+        
+        return
+
+    def print_reduced_elements( self ):
+        
+        print( self.M_reduced_elements )
         
         return
 
@@ -231,13 +246,18 @@ class Mdeim( Deim ):
 
         self.identify_reduced_mat_indeces( )
 
+        self.identify_reduced_elements( )
+        
+        return
+
     def get_num_mdeim_basis( self ):
         return self.M_N
 
     M_row_map = np.zeros( ( 0, 0 ) )
     M_col_map = np.zeros( ( 0, 0 ) )
 
-    M_indices_mat = np.zeros( ( 0, 0 ) )
+    M_reduced_indices_mat = np.zeros( ( 0, 0 ) )
+    M_reduced_elements = np.zeros( ( 0, 0 ) )
 
     M_save_mdeim_basis = True
 

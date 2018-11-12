@@ -69,6 +69,14 @@ class external_engine( ):
                           please provide specific ones for your specific engine " )
         return
 
+    def find_mdeim_elements_fem_specifics( self, _fom_specifics, _indices_mat ):
+
+        em.error_raiser( 'SystemError', 'external_engine::find_mdeim_elements_fem_specifics', \
+                         "You are using the default find_mdeim_elements_fem_specifics, \
+                          please provide specific ones for your specific engine " )
+        return
+
+        
     M_engine_type = ""
     M_library_path = ""
     M_engine = 0
@@ -103,6 +111,10 @@ class matlab_external_engine( external_engine ):
 
         return matlab.double(_param.tolist())
 
+    def convert_indices( self, _indices ):
+
+        return matlab.int64(_indices.tolist())
+
     def solve_parameter( self, _param, _fom_specifics ):
 
         return self.M_engine.solve_parameter( self.convert_parameter( _param ), _fom_specifics )
@@ -118,6 +130,10 @@ class matlab_external_engine( external_engine ):
     def assemble_fom_matrix( self, _param, _fom_specifics ):
         
         return self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics )
+    
+    def find_mdeim_elements_fem_specifics( self, _fom_specifics, _indices_mat ):
+
+        return self.M_engine.find_mdeim_elements_fem_specifics( _fom_specifics, self.convert_indices( _indices_mat ) )
 
 
 

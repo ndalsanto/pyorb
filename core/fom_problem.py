@@ -84,7 +84,9 @@ class fom_problem( ):
     def get_parameter( self ):
         return self.M_parameter_handler.get_parameter( )
 
-    
+    def find_mdeim_elements_fem_specifics( self, _indices_mat ):
+        return self.M_external_engine.find_mdeim_elements_fem_specifics( self.M_fom_specifics, _indices_mat )
+
 
     M_parameter_handler = 0
         
