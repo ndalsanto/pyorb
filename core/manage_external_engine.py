@@ -9,6 +9,7 @@ Created on Thu Oct 25 14:17:29 2018
 
 import matlab.engine
 import error_manager as em
+import numpy as np
 
 class external_engine( ):
 
@@ -63,7 +64,7 @@ class external_engine( ):
                           please provide specific ones for your specific engine " )
         return
 
-    def assemble_fom_matrix( self, _param, _fom_specifics ):
+    def assemble_fom_matrix( self, _param, _fom_specifics, _elements, _indices ):
         
         em.error_raiser( 'SystemError', 'external_engine::assemble_fom_matrix', "You are using the default assemble_fom_matrix, \
                           please provide specific ones for your specific engine " )
@@ -109,7 +110,11 @@ class matlab_external_engine( external_engine ):
 
     def convert_parameter( self, _param ):
 
-        return matlab.double(_param.tolist())
+        return self.convert_double( _param )
+
+    def convert_double( self, _np_array ):
+
+        return matlab.double( _np_array.tolist() )
 
     def convert_indices( self, _indices ):
 
@@ -127,14 +132,26 @@ class matlab_external_engine( external_engine ):
         
         return self.M_engine.build_fe_affine_components( _operator, _fom_specifics )
 
-    def assemble_fom_matrix( self, _param, _fom_specifics ):
+    def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):
         
-        return self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics )
-    
-    def find_mdeim_elements_fem_specifics( self, _fom_specifics, _indices_mat ):
+        if len( _elements ) == 0:
+            return self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics )
+        else:
+            # if I'd convert elements and indices to int it also retrieve from int values inside the matrx from MATLAB
+            # therefore I convert them to double
+            matrix = self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics, \
+                                                        self.convert_parameter(_elements), \
+                                                        self.convert_parameter(_indices) )
 
-        return self.M_engine.find_mdeim_elements_fem_specifics( _fom_specifics, self.convert_indices( _indices_mat ) )
+            print('In the engine')
+            print(np.array( matrix['A'] ))
 
+            return np.array( matrix['A'] )
+        
+    def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
+
+        return np.array( self.M_engine.find_mdeim_elements_fem_specifics( _fom_specifics, \
+                                       self.convert_indices( _indices_mat ) ) ).astype(int)
 
 
 class external_engine_manager( ):

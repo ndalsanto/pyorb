@@ -413,19 +413,3 @@ class RbManager( ):
     M_fn = np.zeros( 0 )
     M_un = np.zeros( 0 )
     M_utildeh = np.zeros( 0 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

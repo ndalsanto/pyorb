@@ -72,8 +72,8 @@ class fom_problem( ):
     def retrieve_fe_affine_components( self, _operator ):
         return self.M_external_engine.build_fe_affine_components( _operator, self.M_fom_specifics )
 
-    def assemble_fom_matrix( self, _param ):
-        return self.M_external_engine.assemble_fom_matrix( _param, self.M_fom_specifics )
+    def assemble_fom_matrix( self, _param, _elements=[], _indices=[] ):
+        return self.M_external_engine.assemble_fom_matrix( _param, self.M_fom_specifics, _elements, _indices )
 
     def get_num_parameters( self ):
         return self.M_parameter_handler.get_num_parameters( )    
@@ -84,8 +84,8 @@ class fom_problem( ):
     def get_parameter( self ):
         return self.M_parameter_handler.get_parameter( )
 
-    def find_mdeim_elements_fem_specifics( self, _indices_mat ):
-        return self.M_external_engine.find_mdeim_elements_fem_specifics( self.M_fom_specifics, _indices_mat )
+    def find_mdeim_elements_fom_specifics( self, _indices_mat ):
+        return self.M_external_engine.find_mdeim_elements_fom_specifics( self.M_fom_specifics, _indices_mat )
 
 
     M_parameter_handler = 0

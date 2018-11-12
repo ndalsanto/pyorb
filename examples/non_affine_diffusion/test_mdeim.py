@@ -54,9 +54,26 @@ my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 import m_deim
 my_mdeim = m_deim.Mdeim( my_ndp )
 
-my_mdeim.perform_mdeim( 20, 10**(-4) )
+my_mdeim.perform_mdeim( 20, 10**(-8) )
 
 my_mdeim.print_reduced_indices( )
+my_mdeim.print_reduced_indices_mat( )
+#my_mdeim.print_reduced_elements( )
+
+A = my_ndp.assemble_fom_matrix( param_min )
+AA_mu_min = np.array(  A['A'] )
+AA_mu_min = AA_mu_min[:, 2]
+
+theta = my_mdeim.compute_theta_coefficients( param_min )
+
+approximated_AA_mu_min = my_mdeim.get_basis( ).dot( theta )
+
+error_AA_mu_min = AA_mu_min - approximated_AA_mu_min
+
+error_norm = np.sqrt( np.sum( error_AA_mu_min * error_AA_mu_min ) / np.sum( AA_mu_min * AA_mu_min ) )
+
+print( 'error  while approximating AA_mu_min is %f' % error_norm )
+
 
 
 

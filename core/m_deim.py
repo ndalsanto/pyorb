@@ -63,8 +63,8 @@ class Deim( ):
     
         self.M_N = self.M_basis.shape[1]
 
-        print( 'MDEIM BASIS' )
-        print( self.M_basis )
+#        print( 'MDEIM BASIS' )
+#        print( self.M_basis )
  
         if self.M_save_mdeim_basis == True:
             output_file = open( self.M_save_file_basis_functions + '_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', 'w' )
@@ -128,9 +128,17 @@ class Deim( ):
             self.M_reduced_indices[iB] = np.argmax( np.abs( r ) )
     
         self.M_reduced_indices = self.M_reduced_indices.astype( int )
-        
+    
+        self.M_interpolation_matrix = self.M_basis[ self.M_reduced_indices[0:self.M_N].astype(int), :]
+    
+#        print( self.M_interpolation_matrix )
+    
         return
     
+    def get_basis( self ):
+        
+        return self.M_basis
+
     M_fom_problem = 0
     M_snapshots_matrix = np.zeros( ( 0, 0 ) )
     M_basis = np.zeros( ( 0, 0 ) )
@@ -138,6 +146,7 @@ class Deim( ):
     M_ns = 0
     M_offline_parameters = np.zeros( ( 0, 0 ) )
 
+    M_interpolation_matrix = np.zeros( ( 0, 0 ) )
     M_reduced_indices = np.zeros( (0, 0) )
 
     M_save_file_basis_functions = "deim_basis"
@@ -208,8 +217,7 @@ class Mdeim( Deim ):
 
     def identify_reduced_elements( self ):
         
-        self.M_reduced_elements = np.array( self.M_fom_problem.find_mdeim_elements_fem_specifics( \
-                                                         self.M_reduced_indices_mat ) ).astype(int)
+        self.M_reduced_elements = self.M_fom_problem.find_mdeim_elements_fom_specifics( self.M_reduced_indices_mat )
 
         return
 
@@ -252,6 +260,15 @@ class Mdeim( Deim ):
 
     def get_num_mdeim_basis( self ):
         return self.M_N
+
+    def compute_theta_coefficients( self, _param ):
+        
+        rhs = self.M_fom_problem.assemble_fom_matrix( _param, _elements=self.M_reduced_elements, \
+                                                      _indices=self.M_reduced_indices_mat )
+        theta = np.linalg.solve( self.M_interpolation_matrix, rhs[:, 2] )
+        
+        return theta
+    
 
     M_row_map = np.zeros( ( 0, 0 ) )
     M_col_map = np.zeros( ( 0, 0 ) )
