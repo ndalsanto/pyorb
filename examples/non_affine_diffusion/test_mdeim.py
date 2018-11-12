@@ -56,8 +56,10 @@ my_mdeim = m_deim.Mdeim( my_ndp )
 
 my_mdeim.perform_mdeim( 20, 10**(-2) )
 
-my_mdeim.print_reduced_indices( )
-my_mdeim.print_reduced_indices_mat( )
+my_mdeim.compute_theta_coefficients( param_min, 1 )
+
+#my_mdeim.print_reduced_indices( )
+#my_mdeim.print_reduced_indices_mat( )
 #my_mdeim.print_reduced_elements( )
 
 A = my_ndp.assemble_fom_matrix( param_min )
@@ -76,4 +78,13 @@ print( 'error  while approximating AA_mu_min is %f' % error_norm )
 
 my_mdeim.compute_theta_bounds( 3 )
 
+
+
+## Check whether deim works wihtin the fom problem once it is set
+
+my_ndp.set_mdeim( my_mdeim )
+
+my_mdeim.compute_theta_coefficients_q( param_min, 1 )
+
+my_ndp.get_theta_a( param_min, 1 )
 
