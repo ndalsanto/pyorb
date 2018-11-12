@@ -269,6 +269,34 @@ class Mdeim( Deim ):
         
         return theta
     
+    def compute_theta_bounds( self, _n_tests ):
+        
+        self.M_fom_problem.generate_parameter( )
+        param = self.M_fom_problem.get_parameter( )
+
+        min_thetas = self.compute_theta_coefficients( param )
+        max_thetas = min_thetas
+        
+        for iT in range( 1, _n_tests ):
+            self.M_fom_problem.generate_parameter( )
+            param = self.M_fom_problem.get_parameter( )
+            this_theta = self.compute_theta_coefficients( param )
+            
+#            print('Current bounds:')
+#            print(this_theta)
+#            print(max_thetas)
+#            print(min_thetas)
+            
+            max_thetas = np.maximum( this_theta, max_thetas )
+            min_thetas = np.minimum( this_theta, min_thetas )
+
+#            print('New bounds:')
+#            print(max_thetas)
+#            print(min_thetas)
+ 
+        return min_thetas, max_thetas
+
+
 
     M_row_map = np.zeros( ( 0, 0 ) )
     M_col_map = np.zeros( ( 0, 0 ) )

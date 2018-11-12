@@ -142,10 +142,6 @@ class matlab_external_engine( external_engine ):
             matrix = self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics, \
                                                         self.convert_parameter(_elements), \
                                                         self.convert_parameter(_indices) )
-
-            print('In the engine')
-            print(np.array( matrix['A'] ))
-
             return np.array( matrix['A'] )
         
     def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
