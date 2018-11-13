@@ -46,7 +46,7 @@ my_parameter_handler.generate_parameter( )
 my_parameter_handler.print_parameters( )
 
 # define the fem problem 
-my_tbp = tbp.thermal_block_problem( )
+my_tbp = tbp.thermal_block_problem( my_parameter_handler )
 
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
@@ -64,13 +64,10 @@ snapshots_file = 'train_snapshots_matrix_20_50.txt'
 
 my_rb_manager.import_snapshots_matrix( snapshots_file )
 
-my_rb_manager.set_save_basis_functions( True, "basis.txt" )
-
 my_rb_manager.build_rb_approximation( 10**(-6) )
 
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
-
 
 my_rb_manager.import_test_parameters( 'test_parameters.data' )
 my_rb_manager.import_test_snapshots_matrix( 'test_snapshots_matrix_20_20.txt' )

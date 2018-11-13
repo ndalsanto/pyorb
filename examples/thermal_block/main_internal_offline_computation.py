@@ -59,33 +59,22 @@ import affine_decomposition as ad
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )               # number of affine terms
 
-# OLD way for importing affine matrices
-#my_affine_decomposition.import_affine_matrices( 'affine_matrix_20_A' )
-#my_affine_decomposition.import_affine_vectors(  'affine_vector_20_f' )
-
 # building the RB manager
 import rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 
-# OLD importing snapshots, offline parameters and building RB space
-#my_rb_manager.import_snapshots_parameters( 'train_parameters.data' )
-#my_rb_manager.import_snapshots_matrix( 'train_snapshots_matrix_20_50.txt' )
-
-# new way for importing snapshots
-#my_rb_manager.import_snapshots_matrix( 'train_snapshots_matrix_20_50.txt', 'train_parameters.data' )
-
-
 #%%
 
-my_rb_manager.import_offline_structures( "offline/snapshots", "offline/basis", "offline/rb_affine_components" )
+REDO_OFFLINE = 1
 
-my_affine_decomposition.print_affine_components( )
+if REDO_OFFLINE == 1:
+    my_rb_manager.build_rb_approximation( 20, 10**(-6) )
+else:
+    my_rb_manager.import_offline_structures( "offline/snapshots", "offline/basis", "offline/rb_affine_components" )
 
+#my_affine_decomposition.print_affine_components( )
 
-#%%
-#my_rb_manager.save_offline_structures( "offline/snapshots", "offline/basis", "offline/rb_affine_components" )
-my_rb_manager.build_rb_approximation( 20, 10**(-6) )
 
 #%%
 # printing summary
