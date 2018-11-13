@@ -54,7 +54,9 @@ my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 import m_deim
 my_mdeim = m_deim.Mdeim( my_ndp )
 
-my_mdeim.perform_mdeim( 100, 10**(-5) )
+my_mdeim.perform_mdeim( 50, 10**(-6) )
+
+my_ndp.set_mdeim( my_mdeim )
 
 #%%
 
@@ -62,32 +64,30 @@ import affine_decomposition as ad
 
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
-# my_affine_decomposition.set_Q( my_mdeim.get_num_mdeim_basis( ), 1 )               # number of affine terms
-
 my_affine_decomposition.set_Q( my_mdeim.get_num_mdeim_basis(), 1 )               # number of affine terms
 
-my_affine_decomposition.import_affine_matrices( 'mdeim_basis_A' + fem_size_str + '_' )
-my_affine_decomposition.import_affine_vectors(  'affine_vector_' + fem_size_str + '_f' )
+my_affine_decomposition.set_affine_a( my_mdeim.get_basis_list( ) )
+
+# shortcut to assign the rhs afine terms
+sol = my_matlab_external_engine.solve_parameter( param_min, fom_specifics )
+rhs = []
+rhs.append( np.array( sol['b'] ) )
+my_affine_decomposition.set_affine_f( rhs )
+
+#my_affine_decomposition.import_affine_matrices( 'mdeim_basis_A' + fem_size_str + '_' )
+#my_affine_decomposition.import_affine_vectors(  'affine_vector_' + fem_size_str + '_f' )
 
 # building the RB manager
 import rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_ndp )
 
-#%%
+#my_rb_manager.save_offline_structures( "offline_" + fem_size_str + "/test_snapshots_" + fem_size_str + '.txt', \
+#                                       "offline_" + fem_size_str + "/basis_" + fem_size_str + '.txt', \
+#                                       "offline_" + fem_size_str + "/rb_affine_components_" + fem_size_str, \
+#                                       'offline_' + fem_size_str + '/test_offline_parameters.data' )
 
-my_rb_manager.save_offline_structures( "offline_" + fem_size_str + "/snapshots_" + fem_size_str + '.txt', \
-                                       "offline_" + fem_size_str + "/basis_" + fem_size_str + '.txt', \
-                                       "offline_" + fem_size_str + "/rb_affine_components_" + fem_size_str, \
-                                       'offline_' + fem_size_str + '/offline_parameters.data' )
-my_rb_manager.build_rb_approximation( 500, 10**(-5) )
-
-
-my_rb_manager.save_offline_structures( "offline_" + fem_size_str + "/test_snapshots_" + fem_size_str + '.txt', \
-                                       "offline_" + fem_size_str + "/basis_" + fem_size_str + '.txt', \
-                                       "offline_" + fem_size_str + "/rb_affine_components_" + fem_size_str, \
-                                       'offline_' + fem_size_str + '/test_offline_parameters.data' )
-my_rb_manager.build_snapshots( 500 )
+my_rb_manager.build_rb_approximation( 50, 5*10**(-6) )
 
 
 
@@ -95,22 +95,10 @@ my_rb_manager.build_snapshots( 500 )
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 
-# my_affine_decomposition.print_affine_components( )
+my_affine_decomposition.print_affine_components( )
 
 
-
-
-"""
-my_rb_manager.import_test_parameters( 'test_parameters.data' )
-my_rb_manager.import_test_snapshots_matrix( 'test_snapshots_matrix_20_20.txt' )
-
-
-for snapshot_number in range(20):
-    my_rb_manager.compute_rb_test_snapshots_error( snapshot_number )
-    
-avg_error = my_rb_manager.test_rb_solver( 100 )
-
-"""
+my_rb_manager.test_rb_solver( 20 )
 
 #%%
 

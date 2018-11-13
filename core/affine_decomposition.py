@@ -131,8 +131,6 @@ class AffineDecompositionHandler( ):
             self.M_rbAffineFq.append( np.loadtxt( _input_file + str(iQf) + '.txt' ) )   # importing rb vectors
         
         return
-        
-
     
     def print_ad_summary( self ):
         
@@ -158,6 +156,14 @@ class AffineDecompositionHandler( ):
     def reset_rb_approximation( self ):
         self.M_rbAffineFq = []
         self.M_rbAffineAq = []
+    
+    
+    def set_affine_a( self, _feAffineAq ):
+        self.M_feAffineAq = _feAffineAq
+
+
+    def set_affine_f( self, _feAffineFq ):
+        self.M_feAffineFq = _feAffineFq
 
     
     def build_rb_affine_decompositions( self, _basis, _fom_problem ):
@@ -181,6 +187,8 @@ class AffineDecompositionHandler( ):
 
             for iQa in range( Qa ):
                 self.M_feAffineAq.append( np.array( AAA['A' + str(iQa)] ) )
+        else:
+            print( "Already set the FOM affine arrays " )
 
         for iQf in range( Qf ):
             self.M_rbAffineFq.append( np.zeros( N ) )
@@ -191,8 +199,9 @@ class AffineDecompositionHandler( ):
             self.M_rbAffineAq.append( np.zeros( (N, N) ) )
             self.M_rbAffineAq[iQa] = _basis.T.dot( Av )
         
-        return
+        print( 'Finished to build the RB affine arrays' )
 
+        return
 
     def check_set_fom_arrays( self ):
         return len( self.M_feAffineAq ) > 0 and len( self.M_feAffineFq ) > 0

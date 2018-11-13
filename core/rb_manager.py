@@ -325,8 +325,14 @@ class RbManager( ):
             self.M_An = self.M_An + self.M_fom_problem.get_theta_a( _param, iQa ) * self.get_rb_affine_matrix( iQa )
 
         for iQf in range( self.M_affineDecomposition.get_Qf( ) ):
-            self.M_fn = self.M_fn + self.M_fom_problem.get_theta_f( _param, iQf ) * self.get_rb_affine_vector( iQf )
+
+            theta_f = self.M_fom_problem.get_theta_f( _param, iQf )
+            Fq = self.get_rb_affine_vector( iQf )
+
+            for ii in range( N ):
+                self.M_fn[ii] = self.M_fn[ii] + theta_f * Fq[ii]
         
+
         return
     
     def reconstruct_fem_solution( self, _un ):
@@ -390,6 +396,9 @@ class RbManager( ):
 
             self.solve_reduced_problem( new_param )
             self.reconstruct_fem_solution( self.M_un )
+            
+            print( 'RB solution is ' )
+            print( self.M_un )
             
             uhh = self.M_fom_problem.solve_fom_problem( new_param )
             uh = np.array( uhh['u'] )

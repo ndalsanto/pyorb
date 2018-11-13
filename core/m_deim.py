@@ -15,6 +15,7 @@ class Deim( ):
     
     def __init__( self, _fom_problem ):
         self.M_fom_problem = _fom_problem
+        self.M_current_param = np.zeros( _fom_problem.get_num_parameters( ) )
         return
 
     def reset_deim( self ):
@@ -131,8 +132,6 @@ class Deim( ):
     
         self.M_interpolation_matrix = self.M_basis[ self.M_reduced_indices[0:self.M_N].astype(int), :]
     
-#        print( self.M_interpolation_matrix )
-    
         return
     
     def get_basis( self ):
@@ -189,8 +188,6 @@ class Mdeim( Deim ):
             param = self.M_fom_problem.get_parameter( )
 
             self.M_offline_parameters[iNs, :] = param
-
-            self.M_current_param = param
 
             np.set_printoptions(precision=12)
             print( param )
@@ -277,7 +274,7 @@ class Mdeim( Deim ):
         
         if (self.M_current_param != _param).all():
             print( 'Recomputing for new paramter!' )
-            self.M_current_param = _param
+            self.M_current_param = _param + np.zeros( _param.shape )
             self.compute_theta_coefficients( _param )
         
         return self.M_current_theta[_q]
@@ -295,17 +292,25 @@ class Mdeim( Deim ):
             self.M_fom_problem.generate_parameter( )
             param = self.M_fom_problem.get_parameter( )
             this_theta = self.compute_theta_coefficients( param )
-            
-#            print('Current bounds:')
-#            print(this_theta)
-#            print(max_thetas)
-#            print(min_thetas)
-            
+
             max_thetas = np.maximum( this_theta, max_thetas )
             min_thetas = np.minimum( this_theta, min_thetas )
 
         return min_thetas, max_thetas
+    
+    def get_basis_list( self ):
+        l = []
+        
+        for iB in range( self.M_N ):
+            
+            basis = np.zeros( (self.M_basis.shape[0], 3) )
+            basis[:, 0] = self.M_row_map
+            basis[:, 1] = self.M_col_map
+            basis[:, 2] = self.M_basis[:, iB]
 
+            l.append( basis )
+            
+        return l
 
     M_row_map = np.zeros( ( 0, 0 ) )
     M_col_map = np.zeros( ( 0, 0 ) )
@@ -313,7 +318,7 @@ class Mdeim( Deim ):
     M_reduced_indices_mat = np.zeros( ( 0, 0 ) )
     M_reduced_elements = np.zeros( ( 0, 0 ) )
 
-    M_save_mdeim_basis = True
+    M_save_mdeim_basis = False
 
 
 
