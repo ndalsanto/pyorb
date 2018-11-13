@@ -246,10 +246,10 @@ class AffineDecompositionHandler( ):
         Qa = self.get_Qa( )
 
         for iQa in range( Qa ):
-            self.M_rbAffineAq.append( np.loadtxt( _affine_components + 'A' + str( iQa ) ) )
+            self.M_rbAffineAq.append( np.loadtxt( _affine_components + '_A' + str( iQa ) + '.txt' ) )
             
         for iQf in range( Qf ):
-            self.M_rbAffineFq.append( np.loadtxt( _affine_components + '_f' + str( iQf ) ) )
+            self.M_rbAffineFq.append( np.loadtxt( _affine_components + '_f' + str( iQf ) + '.txt' ) )
             
         return
 
