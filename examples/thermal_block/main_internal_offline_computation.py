@@ -45,13 +45,11 @@ my_tbp = tbp.thermal_block_problem( my_parameter_handler )
 
 fom_specifics = { 
         'number_of_elements': 20, 
-        'polynomial_degree' : 'P1' }
+        'polynomial_degree' : 'P1',
+        'model'             : 'thermal_block' }
 
 my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
 
-
-my_parameter_handler.generate_parameter( )
-para = my_parameter_handler.get_parameter( )
 
 #%%
 
