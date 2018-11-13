@@ -396,10 +396,6 @@ class RbManager( ):
 
             self.solve_reduced_problem( new_param )
             self.reconstruct_fem_solution( self.M_un )
-            
-            print( 'RB solution is ' )
-            print( self.M_un )
-            
             uhh = self.M_fom_problem.solve_fom_problem( new_param )
             uh = np.array( uhh['u'] )
             uh = uh[:, 0]

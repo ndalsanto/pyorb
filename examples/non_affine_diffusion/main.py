@@ -21,7 +21,6 @@ my_matlab_engine_manager = mee.external_engine_manager( 'matlab', '/usr/scratch/
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
-
 import parameter_handler as ph
 
 mu0_min = 0.4; mu0_max = 0.6
@@ -54,9 +53,10 @@ my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 import m_deim
 my_mdeim = m_deim.Mdeim( my_ndp )
 
-my_mdeim.perform_mdeim( 50, 10**(-6) )
+my_mdeim.perform_mdeim( 100, 10**(-9) )
 
 my_ndp.set_mdeim( my_mdeim )
+
 
 #%%
 
@@ -87,17 +87,12 @@ my_rb_manager = rm.RbManager( my_affine_decomposition, my_ndp )
 #                                       "offline_" + fem_size_str + "/rb_affine_components_" + fem_size_str, \
 #                                       'offline_' + fem_size_str + '/test_offline_parameters.data' )
 
-my_rb_manager.build_rb_approximation( 50, 5*10**(-6) )
+my_rb_manager.build_rb_approximation( 50, 10**(-7) )
 
-
-
-#%%
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 
 my_affine_decomposition.print_affine_components( )
-
-
 my_rb_manager.test_rb_solver( 20 )
 
 #%%

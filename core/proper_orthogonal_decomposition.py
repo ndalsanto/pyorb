@@ -30,7 +30,7 @@ class ProperOrthogonalDecompostion( ):
         cumulative_energy = 0.0
         record_cumulative_energy = np.ones( self.M_ns )
         
-        while cumulative_energy / total_energy < 1. - _tol**2:
+        while cumulative_energy / total_energy < 1. - _tol**2 and self.M_N < self.M_ns:
             print( "Now N is %d and the cumulative energy is %g --- %g --- current sv %g " \
                                   % ( self.M_N, cumulative_energy, cumulative_energy / total_energy, s[ self.M_N ] ) )
 
