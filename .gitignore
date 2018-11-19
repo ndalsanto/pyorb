@@ -2,3 +2,8 @@ __pycache__
 *.txt
 *.data
 *.gz
+*offline*
+*.xml
+*.h5
+*.xmf
+
