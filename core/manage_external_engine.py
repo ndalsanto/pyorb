@@ -8,8 +8,12 @@ Created on Thu Oct 25 14:17:29 2018
 """
 
 import matlab.engine
-import error_manager as em
+import ctypes
 import numpy as np
+from mpi4py import MPI
+
+import error_manager as em
+
 
 class external_engine( ):
 
@@ -83,6 +87,90 @@ class external_engine( ):
     M_engine = 0
 
 
+
+class cpp_external_engine( external_engine ):
+    
+    def __init__( self, _engine_type, _library_path ):
+        
+        external_engine.__init__( self, _engine_type, _library_path )
+        
+        return
+
+    def start_specific_engine( self ):
+
+        self.M_comm = MPI.COMM_WORLD
+        self.M_c_lib = ctypes.cdll.LoadLibrary( self.M_library_path )
+        
+        return
+
+    def quit_specific_engine( self ):
+
+        return
+
+    def convert_parameter( self, _param ):
+
+        return _param.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+
+    def convert_double( self, _np_array ):
+
+        return _np_array.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+
+    def convert_indices( self, _indices ):
+
+        return _indices.ctypes.data_as( ctypes.POINTER( ctypes.c_int ) )
+
+    def solve_parameter( self, _param, _fom_specifics ):
+        
+        sol = np.zeros( 6267 )
+        c_sol = sol.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+ 
+        class c_fom_specifics( ctypes.Structure ):
+        
+            _fields_ = [('model', ctypes.POINTER( ctypes.c_char ) ), \
+                        ('datafile_path', ctypes.POINTER( ctypes.c_char ) ), \
+                        ('external_communicator', ctypes.c_void_p),\
+                        ('u', ctypes.POINTER( ctypes.c_double ))]
+        
+        
+        ccc = c_fom_specifics( ctypes.create_string_buffer( _fom_specifics['model'].encode('utf-8') ), \
+                               ctypes.create_string_buffer( _fom_specifics['datafile_path'].encode('utf-8') ), \
+                               ctypes.c_void_p( MPI._addressof( self.M_comm ) ), \
+                               c_sol )
+        
+        self.M_c_lib.solve_parameter( self.convert_parameter( _param ), ccc )
+
+        return sol
+
+#    def build_rb_affine_component( self, _basis, _q, _operator, _fom_specifics ):
+#
+#        return self.M_engine.build_rb_affine_component( _basis, _q, _operator, _fom_specifics )
+#
+#    def build_fe_affine_components( self, _operator, _fom_specifics ):
+#        
+#        return self.M_engine.build_fe_affine_components( _operator, _fom_specifics )
+#
+#    def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):
+#        
+#        if len( _elements ) == 0:
+#            return self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics )
+#        else:
+#            matrix = self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics, \
+#                                                        self.convert_parameter(_elements), \
+#                                                        self.convert_parameter(_indices) )
+#            return np.array( matrix['A'] )
+#        
+#    def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
+#
+#        return np.array( self.M_engine.find_mdeim_elements_fem_specifics( _fom_specifics, \
+#                                       self.convert_indices( _indices_mat ) ) ).astype(int)
+        
+
+    M_comm = 0
+    M_c_lib = 0
+
+
+
+
 class matlab_external_engine( external_engine ):
     
     def __init__( self, _engine_type, _library_path ):
@@ -150,6 +238,8 @@ class matlab_external_engine( external_engine ):
                                        self.convert_indices( _indices_mat ) ) ).astype(int)
 
 
+
+
 class external_engine_manager( ):
     
     def __init__( self, _engine_type, _library_path ):
@@ -159,6 +249,8 @@ class external_engine_manager( ):
         
         if _engine_type == 'matlab':
             self.M_external_engine = matlab_external_engine( _engine_type, _library_path )
+        elif _engine_type == 'cpp':
+            self.M_external_engine = cpp_external_engine( _engine_type, _library_path )
         
         return
 
