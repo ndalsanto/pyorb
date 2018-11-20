@@ -9,7 +9,7 @@ Created on Wed Oct 10 10:22:53 2018
 This module allows to handle RB methods in python starting from a set of FE arrays imported from another library.
 """
 
-
+import random
 
 import numpy as np
 
@@ -130,6 +130,8 @@ class RbManager( ):
         
         for iS in range( _new_snapshots ):
             
+            random.seed( 201 * (iS + 1) + iS )
+            
             self.M_fom_problem.generate_parameter( )
             new_parameters[iS, :] = self.M_fom_problem.get_parameter( )
             
@@ -143,7 +145,7 @@ class RbManager( ):
 
             u = np.array( sol['u'] )
 
-            self.M_snapshots_matrix[:, iS] = u[:, 0]
+            self.M_snapshots_matrix[:, iS] = u
             current_snapshots_number = current_snapshots_number + 1
         
         self.M_ns = self.M_ns + _new_snapshots
@@ -310,7 +312,18 @@ class RbManager( ):
             print( _param )
         
         self.build_reduced_problem( _param )
+        
+        print( 'RB matrix ' )
+        print( self.M_An )
+        
+        print( '\n\nRB rhs ' )
+        print( self.M_fn )
+        
         self.M_un = np.linalg.solve( self.M_An, self.M_fn )
+        
+        print( '\n\nRB sol ' )
+        print( self.M_un )
+        
         
         return self.M_un
     
@@ -388,6 +401,8 @@ class RbManager( ):
         
         for iP in range( _n_test ):
             
+            random.seed(9001 * (iP + 1) + iP)
+            
             new_param = self.M_fom_problem.generate_parameter( )
             new_param = self.M_fom_problem.get_parameter( )
 
@@ -398,7 +413,7 @@ class RbManager( ):
             self.reconstruct_fem_solution( self.M_un )
             uhh = self.M_fom_problem.solve_fom_problem( new_param )
             uh = np.array( uhh['u'] )
-            uh = uh[:, 0]
+#            uh = uh[:, 0]
             error = self.M_utildeh
             error = error - uh
             

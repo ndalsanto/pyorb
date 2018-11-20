@@ -69,8 +69,8 @@ class fom_problem( ):
         
         return product.array
         
-    def retrieve_fe_affine_components( self, _operator ):
-        return self.M_external_engine.build_fe_affine_components( _operator, self.M_fom_specifics )
+    def retrieve_fom_affine_components( self, _operator, _num_affine_components ):
+        return self.M_external_engine.build_fom_affine_components( _operator, _num_affine_components, self.M_fom_specifics )
 
     def assemble_fom_matrix( self, _param, _elements=[], _indices=[] ):
         return self.M_external_engine.assemble_fom_matrix( _param, self.M_fom_specifics, _elements, _indices )

@@ -18,7 +18,8 @@ def sparse_matrix_vector_mul( mat, vec ):
     nnz = mat.shape[0]
     
     for i in range( nnz ):
-        Av[ int(mat[i, 0])-1, :] = Av[ int(mat[i, 0])-1, :] + mat[i, 2] * vec[ int(mat[i, 1])-1, : ]
+#        Av[ int(mat[i, 0])-1, :] = Av[ int(mat[i, 0])-1, :] + mat[i, 2] * vec[ int(mat[i, 1])-1, : ]
+        Av[ int(mat[i, 0]), :] = Av[ int(mat[i, 0]), :] + mat[i, 2] * vec[ int(mat[i, 1]), : ]
     
     return Av
 
@@ -88,7 +89,11 @@ class AffineDecompositionHandler( ):
         
         for iQa in range( Qa ):
             self.M_feAffineAq.append( np.loadtxt( _input_file + str(iQa) + '.txt' ) )   # importing matrix in sparse format
-        
+            
+            #  if the matrix indices start from 1, we rescale them
+            if np.min( self.M_feAffineAq[iQa][:, 0:2] ) > 0 :
+                self.M_feAffineAq[iQa][:, 0:2] = self.M_feAffineAq[iQa][:, 0:2] - 1
+
         return
         
     # _input_file should be the string that have in common the affine matrices
@@ -177,13 +182,13 @@ class AffineDecompositionHandler( ):
 
             print( "Importing FOM affine arrays " )
 
-            fff = _fom_problem.retrieve_fe_affine_components( 'f' )
+            fff = _fom_problem.retrieve_fom_affine_components( 'f', Qf )
 
             for iQf in range( Qf ):
                 self.M_feAffineFq.append( np.array( fff['f' + str(iQf)] ) )
-                self.M_feAffineFq[iQf] = self.M_feAffineFq[iQf][:, 0]
+#                self.M_feAffineFq[iQf] = self.M_feAffineFq[iQf][:, 0]
                 
-            AAA = _fom_problem.retrieve_fe_affine_components( 'A' )
+            AAA = _fom_problem.retrieve_fom_affine_components( 'A', Qa )
 
             for iQa in range( Qa ):
                 self.M_feAffineAq.append( np.array( AAA['A' + str(iQa)] ) )

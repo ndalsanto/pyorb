@@ -62,9 +62,9 @@ class external_engine( ):
                           please provide specific ones for your specific engine " )
         return
 
-    def build_fe_affine_components( self, _operator, _fom_specifics ):
+    def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
         
-        em.error_raiser( 'SystemError', 'external_engine::build_rb_affine_component', "You are using the default build_fe_affine_components, \
+        em.error_raiser( 'SystemError', 'external_engine::build_rb_affine_component', "You are using the default build_fom_affine_components, \
                           please provide specific ones for your specific engine " )
         return
 
@@ -74,17 +74,30 @@ class external_engine( ):
                           please provide specific ones for your specific engine " )
         return
 
-    def find_mdeim_elements_fem_specifics( self, _fom_specifics, _indices_mat ):
+    def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
 
-        em.error_raiser( 'SystemError', 'external_engine::find_mdeim_elements_fem_specifics', \
-                         "You are using the default find_mdeim_elements_fem_specifics, \
+        em.error_raiser( 'SystemError', 'external_engine::find_mdeim_elements_fom_specifics', \
+                         "You are using the default find_mdeim_elements_fom_specifics, \
                           please provide specific ones for your specific engine " )
         return
 
-        
+
     M_engine_type = ""
     M_library_path = ""
     M_engine = 0
+
+
+
+
+class c_fom_specifics( ctypes.Structure ):
+
+    _fields_ = [('model', ctypes.POINTER( ctypes.c_char ) ), \
+            ('datafile_path', ctypes.POINTER( ctypes.c_char ) ), \
+            ('external_communicator', ctypes.c_void_p),\
+            ('u', ctypes.POINTER( ctypes.c_double ) ),\
+            ('A', ctypes.POINTER( ctypes.c_double ) ),\
+            ('f', ctypes.POINTER( ctypes.c_double ) )]
+
 
 
 
@@ -121,24 +134,23 @@ class cpp_external_engine( external_engine ):
 
     def solve_parameter( self, _param, _fom_specifics ):
         
-        sol = np.zeros( 6267 )
-        c_sol = sol.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
- 
-        class c_fom_specifics( ctypes.Structure ):
-        
-            _fields_ = [('model', ctypes.POINTER( ctypes.c_char ) ), \
-                        ('datafile_path', ctypes.POINTER( ctypes.c_char ) ), \
-                        ('external_communicator', ctypes.c_void_p),\
-                        ('u', ctypes.POINTER( ctypes.c_double ))]
-        
+        u = np.zeros( 6267 )
+        cp_u = u.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+        A = np.zeros( 0 )
+        cp_A = A.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+        f = np.zeros( 0 )
+        cp_f = f.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
         
         c_fom_spec = c_fom_specifics( ctypes.create_string_buffer( _fom_specifics['model'].encode('utf-8') ), \
                                ctypes.create_string_buffer( _fom_specifics['datafile_path'].encode('utf-8') ), \
                                ctypes.c_void_p( MPI._addressof( self.M_comm ) ), \
-                               c_sol )
+                               cp_u, cp_A, cp_f )
 
         # the FOM is supposed to fill in c_fom_specs.c_sol with the FOM 
         self.M_c_lib.solve_parameter( self.convert_parameter( _param ), c_fom_spec )
+
+        sol = {}
+        sol['u'] = u
 
         return sol
 
@@ -146,9 +158,111 @@ class cpp_external_engine( external_engine ):
 #
 #        return self.M_engine.build_rb_affine_component( _basis, _q, _operator, _fom_specifics )
 
-    def build_fe_affine_components( self, _operator, _fom_specifics ):
+
+    def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
         
-        return self.M_engine.build_fe_affine_components( _operator, _fom_specifics )
+        if _operator == 'A':
+            return self.build_fom_matrix_affine_components( _num_affine_components, _fom_specifics )
+        elif _operator == 'f':
+            return self.build_fom_vector_affine_components( _num_affine_components, _fom_specifics )
+        else:
+            em.error_raiser( 'SystemError', 'cpp_external_engine::build_fom_affine_components', \
+                             "You should provide a valid operator for building the corresponding affine component" )
+            
+
+    
+    def build_fom_matrix_affine_components( self, _num_affine_components, _fom_specifics ):
+
+        # fake parameters which are not used for real
+        u = np.zeros( 0 )
+        cp_u = u.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+        f = np.zeros( 0 )
+        cp_f = f.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+        
+        affine_components = { }
+        
+        print( 'Building %d matrix affine components' % _num_affine_components )
+
+        for iQa in range( _num_affine_components ):
+            
+            print( 'Building rhs affine components number %d ' % iQa )
+
+            A = np.zeros( 0 )
+            cp_A = A.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+            
+            c_fom_spec = c_fom_specifics( ctypes.create_string_buffer( _fom_specifics['model'].encode('utf-8') ), \
+                                          ctypes.create_string_buffer( _fom_specifics['datafile_path'].encode('utf-8') ), \
+                                          ctypes.c_void_p( MPI._addressof( self.M_comm ) ), \
+                                          cp_u, cp_A, cp_f )
+
+            # retrieve at first the number of nnz
+            compute_only_the_nnz = True
+            matrix_nnz = self.M_c_lib.build_fom_affine_components( ctypes.create_string_buffer( 'A'.encode('utf-8') ), iQa, 
+                                                                c_fom_spec, compute_only_the_nnz )
+            
+            # For the COO format, 3 * nnz must be stored
+            A = np.zeros( matrix_nnz * 3 )
+            cp_A = A.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+            c_fom_spec = c_fom_specifics( ctypes.create_string_buffer( _fom_specifics['model'].encode('utf-8') ), \
+                              ctypes.create_string_buffer( _fom_specifics['datafile_path'].encode('utf-8') ), \
+                              ctypes.c_void_p( MPI._addressof( self.M_comm ) ), \
+                              cp_u, cp_A, cp_f )
+
+            # retrieve at first the number of nnz
+            compute_only_the_nnz = False
+            self.M_c_lib.build_fom_affine_components( ctypes.create_string_buffer( 'A'.encode('utf-8') ), iQa, 
+                                                      c_fom_spec, compute_only_the_nnz )
+
+            affine_components['A' + str(iQa)] = np.reshape( A, (matrix_nnz, 3), order='C' )
+        
+        return affine_components
+
+
+    def build_fom_vector_affine_components( self, _num_affine_components, _fom_specifics ):
+
+        # fake parameters which are not used in the computation
+        u = np.zeros( 0 )
+        cp_u = u.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+        A = np.zeros( 0 )
+        cp_A = A.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+        
+        affine_components = { }
+        
+        print( 'Building %d rhs affine components' % _num_affine_components )
+        
+        for iQf in range( _num_affine_components ):
+
+            print( 'Building rhs affine components number %d ' % iQf )
+
+            f = np.zeros( 0 )
+            cp_f = f.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+            
+            c_fom_spec = c_fom_specifics( ctypes.create_string_buffer( _fom_specifics['model'].encode('utf-8') ), \
+                                          ctypes.create_string_buffer( _fom_specifics['datafile_path'].encode('utf-8') ), \
+                                          ctypes.c_void_p( MPI._addressof( self.M_comm ) ), \
+                                          cp_u, cp_A, cp_f )
+
+            # retrieve at first the dim of the rhs
+            compute_only_the_dim = True
+            vector_dim = self.M_c_lib.build_fom_affine_components( ctypes.create_string_buffer( 'f'.encode('utf-8') ), iQf, 
+                                                                  c_fom_spec, compute_only_the_dim )
+            
+            f = np.zeros( vector_dim )
+            cp_f = f.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+            
+            c_fom_spec = c_fom_specifics( ctypes.create_string_buffer( _fom_specifics['model'].encode('utf-8') ), \
+                                          ctypes.create_string_buffer( _fom_specifics['datafile_path'].encode('utf-8') ), \
+                                          ctypes.c_void_p( MPI._addressof( self.M_comm ) ), \
+                                          cp_u, cp_A, cp_f )
+            
+            compute_only_the_dim = False
+            self.M_c_lib.build_fom_affine_components( ctypes.create_string_buffer( 'f'.encode('utf-8') ), iQf, 
+                                                     c_fom_spec, compute_only_the_dim )
+            
+            affine_components['f' + str(iQf)] = f
+
+        return affine_components
+
 
 #    def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):
 #        
@@ -162,7 +276,7 @@ class cpp_external_engine( external_engine ):
 #        
 #    def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
 #
-#        return np.array( self.M_engine.find_mdeim_elements_fem_specifics( _fom_specifics, \
+#        return np.array( self.M_engine.find_mdeim_elements_fom_specifics( _fom_specifics, \
 #                                       self.convert_indices( _indices_mat ) ) ).astype(int)
         
 
@@ -217,9 +331,17 @@ class matlab_external_engine( external_engine ):
 
         return self.M_engine.build_rb_affine_component( _basis, _q, _operator, _fom_specifics )
 
-    def build_fe_affine_components( self, _operator, _fom_specifics ):
+    # normally a MATLAB application can directly provide a dictionary with all the affine components 
+    def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
         
-        return self.M_engine.build_fe_affine_components( _operator, _fom_specifics )
+        affine_components = self.M_engine.build_fom_affine_components( _operator, _fom_specifics )
+
+        # rescale the matrix indices so that the counting starts from 0 (and not from 1 as in MATLAB)
+        if _operator == 'A':
+            for iQa in range( _num_affine_components ):
+                affine_components['A' + str(iQa)][:, 0:2] = affine_components['A' + str(iQa)][:, 0:2] - 1
+
+        return affine_components
 
     def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):
         
@@ -235,7 +357,7 @@ class matlab_external_engine( external_engine ):
         
     def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
 
-        return np.array( self.M_engine.find_mdeim_elements_fem_specifics( _fom_specifics, \
+        return np.array( self.M_engine.find_mdeim_elements_fom_specifics( _fom_specifics, \
                                        self.convert_indices( _indices_mat ) ) ).astype(int)
 
 
