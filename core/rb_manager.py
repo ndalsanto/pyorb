@@ -313,17 +313,7 @@ class RbManager( ):
         
         self.build_reduced_problem( _param )
         
-        print( 'RB matrix ' )
-        print( self.M_An )
-        
-        print( '\n\nRB rhs ' )
-        print( self.M_fn )
-        
         self.M_un = np.linalg.solve( self.M_An, self.M_fn )
-        
-        print( '\n\nRB sol ' )
-        print( self.M_un )
-        
         
         return self.M_un
     
