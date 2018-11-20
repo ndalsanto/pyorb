@@ -132,23 +132,24 @@ class cpp_external_engine( external_engine ):
                         ('u', ctypes.POINTER( ctypes.c_double ))]
         
         
-        ccc = c_fom_specifics( ctypes.create_string_buffer( _fom_specifics['model'].encode('utf-8') ), \
+        c_fom_spec = c_fom_specifics( ctypes.create_string_buffer( _fom_specifics['model'].encode('utf-8') ), \
                                ctypes.create_string_buffer( _fom_specifics['datafile_path'].encode('utf-8') ), \
                                ctypes.c_void_p( MPI._addressof( self.M_comm ) ), \
                                c_sol )
-        
-        self.M_c_lib.solve_parameter( self.convert_parameter( _param ), ccc )
+
+        # the FOM is supposed to fill in c_fom_specs.c_sol with the FOM 
+        self.M_c_lib.solve_parameter( self.convert_parameter( _param ), c_fom_spec )
 
         return sol
 
 #    def build_rb_affine_component( self, _basis, _q, _operator, _fom_specifics ):
 #
 #        return self.M_engine.build_rb_affine_component( _basis, _q, _operator, _fom_specifics )
-#
-#    def build_fe_affine_components( self, _operator, _fom_specifics ):
-#        
-#        return self.M_engine.build_fe_affine_components( _operator, _fom_specifics )
-#
+
+    def build_fe_affine_components( self, _operator, _fom_specifics ):
+        
+        return self.M_engine.build_fe_affine_components( _operator, _fom_specifics )
+
 #    def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):
 #        
 #        if len( _elements ) == 0:
