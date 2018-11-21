@@ -61,15 +61,7 @@ import rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 
-
-
-REDO_OFFLINE = 1
-
-if REDO_OFFLINE == 1:
-    my_rb_manager.build_rb_approximation( 50, 10**(-6) )
-else:
-    my_rb_manager.import_offline_structures( "offline/snapshots", "offline/basis", "offline/rb_affine_components" )
-
+my_rb_manager.build_rb_approximation( 50, 10**(-6) )
 
 #%%
 # printing summary

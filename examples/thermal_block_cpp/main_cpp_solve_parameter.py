@@ -54,7 +54,7 @@ my_tbp.configure_fom( my_cpp_engine_manager, fom_specifics )
 
 my_parameter_handler.generate_parameter( )
 param = my_parameter_handler.get_parameter( )
-soll = my_tbp.solve_fom_problem( param )
+u = my_tbp.solve_fom_problem( param )
 
 
 

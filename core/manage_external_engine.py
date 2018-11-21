@@ -342,9 +342,6 @@ class matlab_external_engine( external_engine ):
         
         affine_components = self.M_engine.build_fom_affine_components( _operator, _fom_specifics )
 
-        for key in affine_components:
-            print( key )
-
         # rescale the matrix indices so that the counting starts from 0 (and not from 1 as in MATLAB)
         if _operator == 'A':
             matrix_affine = { }
