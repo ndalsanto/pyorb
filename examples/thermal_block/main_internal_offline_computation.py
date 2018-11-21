@@ -75,19 +75,8 @@ else:
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 
-my_rb_manager.import_test_parameters( 'test_parameters.data' )
-my_rb_manager.import_test_snapshots_matrix( 'test_snapshots_matrix_20_20.txt' )
-
-
-for snapshot_number in range(20):
-    my_rb_manager.compute_rb_test_snapshots_error( snapshot_number )
-    
-
 avg_error = my_rb_manager.test_rb_solver( 100 )
-
-
-
 
 #%%
 
-#my_matlab_engine_manager.quit_engine( )
+my_matlab_engine_manager.quit_engine( )
