@@ -191,7 +191,7 @@ class AffineDecompositionHandler( ):
             AAA = _fom_problem.retrieve_fom_affine_components( 'A', Qa )
 
             for iQa in range( Qa ):
-                self.M_feAffineAq.append( np.array( AAA['A' + str(iQa)] ) )
+                self.M_feAffineAq.append( AAA['A' + str(iQa)] )
         else:
             print( "Already set the FOM affine arrays " )
 

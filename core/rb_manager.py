@@ -138,12 +138,12 @@ class RbManager( ):
             print( "Considering the parameter %d " % iS )
             print( new_parameters[iS, :] )
 
-            sol = self.M_fom_problem.solve_fom_problem( new_parameters[iS, :] )
+            u = self.M_fom_problem.solve_fom_problem( new_parameters[iS, :] )
             
             if current_snapshots_number == 0:
-                self.M_snapshots_matrix = np.zeros( ( len(sol['u']), _new_snapshots ) )
+                self.M_snapshots_matrix = np.zeros( ( len(u), _new_snapshots ) )
 
-            u = np.array( sol['u'] )
+#            u = np.array( sol['u'] )
 
             self.M_snapshots_matrix[:, iS] = u
             current_snapshots_number = current_snapshots_number + 1
@@ -401,8 +401,8 @@ class RbManager( ):
 
             self.solve_reduced_problem( new_param )
             self.reconstruct_fem_solution( self.M_un )
-            uhh = self.M_fom_problem.solve_fom_problem( new_param )
-            uh = np.array( uhh['u'] )
+            uh = self.M_fom_problem.solve_fom_problem( new_param )
+
 #            uh = uh[:, 0]
             error = self.M_utildeh
             error = error - uh

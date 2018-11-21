@@ -149,10 +149,10 @@ class cpp_external_engine( external_engine ):
         # the FOM is supposed to fill in c_fom_specs.c_sol with the FOM 
         self.M_c_lib.solve_parameter( self.convert_parameter( _param ), c_fom_spec )
 
-        sol = {}
-        sol['u'] = u
+#        sol = {}
+#        sol['u'] = u
 
-        return sol
+        return u
 
 #    def build_rb_affine_component( self, _basis, _q, _operator, _fom_specifics ):
 #
@@ -325,7 +325,11 @@ class matlab_external_engine( external_engine ):
 
     def solve_parameter( self, _param, _fom_specifics ):
 
-        return self.M_engine.solve_parameter( self.convert_parameter( _param ), _fom_specifics )
+        u = self.M_engine.solve_parameter( self.convert_parameter( _param ), _fom_specifics )
+
+        sol = np.array( u['u'] )
+
+        return sol[:, 0]
 
     def build_rb_affine_component( self, _basis, _q, _operator, _fom_specifics ):
 
@@ -333,14 +337,32 @@ class matlab_external_engine( external_engine ):
 
     # normally a MATLAB application can directly provide a dictionary with all the affine components 
     def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
+
+        print( 'Building affine components with operator %c' % _operator )
         
         affine_components = self.M_engine.build_fom_affine_components( _operator, _fom_specifics )
 
+        for key in affine_components:
+            print( key )
+
         # rescale the matrix indices so that the counting starts from 0 (and not from 1 as in MATLAB)
         if _operator == 'A':
+            matrix_affine = { }
             for iQa in range( _num_affine_components ):
-                affine_components['A' + str(iQa)][:, 0:2] = affine_components['A' + str(iQa)][:, 0:2] - 1
+                matrix_affine['A' + str(iQa)] = np.array( affine_components['A' + str(iQa)] )
+                matrix_affine['A' + str(iQa)][:, 0:2] = matrix_affine['A' + str(iQa)][:, 0:2] - 1
+                
+            affine_components = matrix_affine
 
+        # resetting to just one-size array
+        if _operator == 'f':
+            rhs_affine = {}
+            for iQf in range( _num_affine_components ):
+                rhs_affine['f' + str(iQf)] = np.array( affine_components['f' + str(iQf)] )
+                rhs_affine['f' + str(iQf)] = np.reshape( rhs_affine['f' + str(iQf)], \
+                                                         rhs_affine['f' + str(iQf)].shape[0] )
+            affine_components = rhs_affine
+        
         return affine_components
 
     def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):

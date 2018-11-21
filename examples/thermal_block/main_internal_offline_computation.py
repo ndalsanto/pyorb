@@ -21,9 +21,6 @@ my_matlab_engine_manager = mee.external_engine_manager( 'matlab', '/usr/scratch/
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
-
-
-
 import parameter_handler as ph
 
 mu0_min = 1.0; mu0_max = 50.
@@ -38,7 +35,7 @@ num_parameters = param_min.shape[0]
 my_parameter_handler = ph.Parameter_handler( )
 my_parameter_handler.assign_parameters_bounds( param_min, param_max )
 
-# define the fem problem 
+# define the fem problem
 import thermal_block_problem as tbp
 
 my_tbp = tbp.thermal_block_problem( my_parameter_handler )
@@ -64,16 +61,14 @@ import rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 
-#%%
+
 
 REDO_OFFLINE = 1
 
 if REDO_OFFLINE == 1:
-    my_rb_manager.build_rb_approximation( 20, 10**(-6) )
+    my_rb_manager.build_rb_approximation( 50, 10**(-6) )
 else:
     my_rb_manager.import_offline_structures( "offline/snapshots", "offline/basis", "offline/rb_affine_components" )
-
-#my_affine_decomposition.print_affine_components( )
 
 
 #%%
