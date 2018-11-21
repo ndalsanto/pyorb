@@ -1,6 +1,6 @@
 __pycache__
 *.txt
-*.data
+*data
 *.gz
 *offline*
 *.xml
