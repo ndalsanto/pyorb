@@ -9,7 +9,7 @@ Created on Thu Oct 11 11:58:02 2018
 
 import numpy as np
 
-import fom_problem as fp
+import pyorb_core.pde_problem.fom_problem as fp
 
 def tb_theta_a( _param, _q ):
     

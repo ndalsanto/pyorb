@@ -1,85 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Oct 25 14:17:29 2018
+Created on Thu Nov 22 13:52:15 2018
 
 @author: Niccolo' Dal Santo
 @email : niccolo.dalsanto@epfl.ch
 """
 
-import matlab.engine
 import ctypes
-import numpy as np
 from mpi4py import MPI
 
-import error_manager as em
-
-
-class external_engine( ):
-
-    def __init__( self, _engine_type, _library_path ):
-        
-        self.M_engine_type  = _engine_type
-        self.M_library_path = _library_path
-        
-        return
-
-    def start_engine( self ):
-        self.start_specific_engine( )
-        return
-    
-    def quit_engine( self ):
-        self.quit_specific_engine( )
-        return
-
-    def start_specific_engine( self ):
-        
-        em.error_raiser( 'SystemError', 'external_engine::start_engine', "You are using the default start_specific_engine, \
-                          please provide specific ones for your specific engine " )
-        return
-
-    def quit_specific_engine( self ):
-        
-        em.error_raiser( 'SystemError', 'external_engine::quit_engine', "You are using the default quit_specific_engine, \
-                          please provide specific ones for your specific engine " )
-        return
-
-    def convert_parameter( self, _param ):
-
-        em.error_raiser( 'SystemError', 'external_engine::convert_parameter', "You are using the default convert_parameter, \
-                          please provide specific ones for your specific engine " )
-        return
-
-    def solve_parameter( self, _param, _fom_specifics ):
-
-        em.error_raiser( 'SystemError', 'external_engine::solve_parameter', "You are using the default solve_parameter, \
-                          please provide specific ones for your specific engine " )
-        return
-
-    def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
-        
-        em.error_raiser( 'SystemError', 'external_engine::build_rb_affine_component', "You are using the default build_fom_affine_components, \
-                          please provide specific ones for your specific engine " )
-        return
-
-    def assemble_fom_matrix( self, _param, _fom_specifics, _elements, _indices ):
-        
-        em.error_raiser( 'SystemError', 'external_engine::assemble_fom_matrix', "You are using the default assemble_fom_matrix, \
-                          please provide specific ones for your specific engine " )
-        return
-
-    def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
-
-        em.error_raiser( 'SystemError', 'external_engine::find_mdeim_elements_fom_specifics', \
-                         "You are using the default find_mdeim_elements_fom_specifics, \
-                          please provide specific ones for your specific engine " )
-        return
-
-
-    M_engine_type = ""
-    M_library_path = ""
-    M_engine = 0
-
+from pyorb_core.tpl_managers import external_engine as ee
 
 class c_fom_specifics( ctypes.Structure ):
 
@@ -90,12 +21,11 @@ class c_fom_specifics( ctypes.Structure ):
             ('A', ctypes.POINTER( ctypes.c_double ) ),\
             ('f', ctypes.POINTER( ctypes.c_double ) )]
 
-
-class cpp_external_engine( external_engine ):
+class cpp_external_engine( ee.external_engine ):
     
     def __init__( self, _engine_type, _library_path ):
         
-        external_engine.__init__( self, _engine_type, _library_path )
+        ee.external_engine.__init__( self, _engine_type, _library_path )
         
         return
 
@@ -158,8 +88,6 @@ class cpp_external_engine( external_engine ):
         else:
             em.error_raiser( 'SystemError', 'cpp_external_engine::build_fom_affine_components', \
                              "You should provide a valid operator for building the corresponding affine component" )
-            
-
     
     def build_fom_matrix_affine_components( self, _num_affine_components, _fom_specifics ):
 
@@ -255,138 +183,3 @@ class cpp_external_engine( external_engine ):
 
     M_comm = 0
     M_c_lib = 0
-
-
-
-
-class matlab_external_engine( external_engine ):
-    
-    def __init__( self, _engine_type, _library_path ):
-        
-        external_engine.__init__( self, _engine_type, _library_path )
-        
-        return
-
-    def start_specific_engine( self ):
-        
-        self.M_engine = matlab.engine.start_matlab( )
-        self.M_engine.addpath( self.M_engine.genpath( self.M_library_path ) )
-
-        print( 'Successfully started matlab engine and corresponding FOM library %s ' % self.M_library_path )
-
-        return
-
-    def quit_specific_engine( self ):
-
-        self.M_engine.quit( )
-
-        print( 'Successfully quitted matlab engine' )
-
-        return
-
-    def convert_parameter( self, _param ):
-
-        return self.convert_double( _param )
-
-    def convert_double( self, _np_array ):
-
-        return matlab.double( _np_array.tolist() )
-
-    def convert_indices( self, _indices ):
-
-        return matlab.int64(_indices.tolist())
-
-    def solve_parameter( self, _param, _fom_specifics ):
-
-        u = self.M_engine.solve_parameter( self.convert_parameter( _param ), _fom_specifics )
-
-        sol = np.array( u['u'] )
-
-        return sol[:, 0]
-
-    # normally a MATLAB application can directly provide a dictionary with all the affine components 
-    def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
-
-        print( 'Building affine components with operator %c' % _operator )
-        
-        affine_components = self.M_engine.build_fom_affine_components( _operator, _fom_specifics )
-
-        # rescale the matrix indices so that the counting starts from 0 (and not from 1 as in MATLAB)
-        if _operator == 'A':
-            matrix_affine = { }
-            for iQa in range( _num_affine_components ):
-                matrix_affine['A' + str(iQa)] = np.array( affine_components['A' + str(iQa)] )
-                matrix_affine['A' + str(iQa)][:, 0:2] = matrix_affine['A' + str(iQa)][:, 0:2] - 1
-                
-            affine_components = matrix_affine
-
-        # resetting to just one-size array
-        if _operator == 'f':
-            rhs_affine = {}
-            for iQf in range( _num_affine_components ):
-                rhs_affine['f' + str(iQf)] = np.array( affine_components['f' + str(iQf)] )
-                rhs_affine['f' + str(iQf)] = np.reshape( rhs_affine['f' + str(iQf)], \
-                                                         rhs_affine['f' + str(iQf)].shape[0] )
-            affine_components = rhs_affine
-        
-        return affine_components
-
-    def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):
-        
-        if len( _elements ) == 0:
-            matrix = self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics )
-            A = np.array( matrix['A'] )
-            A[:, 0:2] = A[:, 0:2] - 1
-            return A
-        else:
-            # if I'd convert elements and indices to int it also retrieve from int values inside the matrx from MATLAB
-            # therefore I convert them to double
-            matrix = self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics, \
-                                                        self.convert_parameter( _elements ), \
-                                                        self.convert_parameter( _indices + 1 ) )
-            
-            A = np.array( matrix['A'] )
-            A[:, 0:2] = A[:, 0:2] - 1
-            
-            return A
-        
-    # NB the +1 is needed to convert the python indices over MATLAB
-    def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
-
-        return np.array( self.M_engine.find_mdeim_elements_fom_specifics( _fom_specifics, \
-                                       self.convert_indices( _indices_mat + 1 ) ) ).astype(int)
-
-
-
-
-class external_engine_manager( ):
-    
-    def __init__( self, _engine_type, _library_path ):
-        
-        self.M_engine_type  = _engine_type
-        self.M_library_path = _library_path
-        
-        if _engine_type == 'matlab':
-            self.M_external_engine = matlab_external_engine( _engine_type, _library_path )
-        elif _engine_type == 'cpp':
-            self.M_external_engine = cpp_external_engine( _engine_type, _library_path )
-        
-        return
-
-    M_engine_type = ""
-    M_library_path = ""
-    M_external_engine = 0
-    
-    def get_external_engine( self ):
-        return self.M_external_engine
-
-    def start_engine( self ):
-        self.M_external_engine.start_engine( )
-        return
-    
-    def quit_engine( self ):
-        self.M_external_engine.quit_engine( )
-        return
-
-
-

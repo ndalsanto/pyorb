@@ -7,7 +7,7 @@ Created on Thu Oct 11 12:02:21 2018
 @email : niccolo.dalsanto@epfl.ch
 """
 
-import error_manager as em
+import pyorb_core.error_manager as em
 
 def default_theta_function( _param, _q ):
 
