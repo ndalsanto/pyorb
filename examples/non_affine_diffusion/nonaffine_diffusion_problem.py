@@ -7,7 +7,7 @@ Created on Wed Oct 31 18:43:23 2018
 @email : niccolo.dalsanto@epfl.ch
 """
 
-import fom_problem as fp
+import pyorb_core.pde_problem.fom_problem as fp
 
 def ndp_theta_f( _param, _q ):
     return 1.0

@@ -10,11 +10,11 @@ Created on Thu Oct 31 14:31:17 2018
 import numpy as np
 
 import sys
-sys.path.insert(0, '../../core')
+sys.path.insert(0, '../../')
 print(sys.path)
 
 
-import manage_external_engine as mee
+import pyorb_core.tpl_managers.external_engine_manager as mee
 
 matlab_library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat'
 
@@ -23,7 +23,8 @@ my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
-import parameter_handler as ph
+
+import pyorb_core.pde_problem.parameter_handler as ph
 
 mu0_min = 0.4; mu0_max = 0.6
 mu1_min = 0.4; mu1_max = 0.6
@@ -52,7 +53,7 @@ fom_specifics = {
 
 my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 
-import m_deim
+import pyorb_core.rb_library.m_deim as m_deim
 my_mdeim = m_deim.Mdeim( my_ndp )
 
 my_mdeim.perform_mdeim( 20, 10**(-6) )
@@ -68,7 +69,7 @@ my_ndp.set_mdeim( my_mdeim )
 
 #%%
 
-import affine_decomposition as ad
+import pyorb_core.rb_library.affine_decomposition as ad
 
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
@@ -81,7 +82,7 @@ my_affine_decomposition.set_affine_a( my_mdeim.get_basis_list( ) )
 #my_affine_decomposition.import_affine_vectors(  'affine_vector_' + fem_size_str + '_f' )
 
 # building the RB manager
-import rb_manager as rm
+import pyorb_core.rb_library.rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_ndp )
 
