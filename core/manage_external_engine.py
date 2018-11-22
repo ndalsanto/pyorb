@@ -124,20 +124,28 @@ class cpp_external_engine( external_engine ):
 
     def solve_parameter( self, _param, _fom_specifics ):
         
-        u = np.zeros( 6267 )
-        cp_u = u.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
-        A = np.zeros( 0 )
-        cp_A = A.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
-        f = np.zeros( 0 )
-        cp_f = f.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+        u = np.zeros( 0 ); cp_u = u.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+        A = np.zeros( 0 ); cp_A = A.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+        f = np.zeros( 0 ); cp_f = f.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
         
         c_fom_spec = c_fom_specifics( ctypes.create_string_buffer( _fom_specifics['model'].encode('utf-8') ), \
                                ctypes.create_string_buffer( _fom_specifics['datafile_path'].encode('utf-8') ), \
                                ctypes.c_void_p( MPI._addressof( self.M_comm ) ), \
                                cp_u, cp_A, cp_f )
 
-        # the FOM is supposed to fill in c_fom_specs.c_sol with the FOM 
-        self.M_c_lib.solve_parameter( self.convert_parameter( _param ), c_fom_spec )
+        compute_only_the_dim = True
+        vector_dim = self.M_c_lib.solve_parameter( self.convert_parameter( _param ), c_fom_spec, compute_only_the_dim )
+
+        u = np.zeros( vector_dim ); cp_u = u.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
+
+        c_fom_spec = c_fom_specifics( ctypes.create_string_buffer( _fom_specifics['model'].encode('utf-8') ), \
+                               ctypes.create_string_buffer( _fom_specifics['datafile_path'].encode('utf-8') ), \
+                               ctypes.c_void_p( MPI._addressof( self.M_comm ) ), \
+                               cp_u, cp_A, cp_f )
+
+        # the FOM library is supposed to fill in c_fom_specs.c_sol with the FOM 
+        compute_only_the_dim = False
+        self.M_c_lib.solve_parameter( self.convert_parameter( _param ), c_fom_spec, compute_only_the_dim )
 
         return u
 
