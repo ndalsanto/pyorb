@@ -52,11 +52,6 @@ class fom_problem( ):
 
         return        
 
-    # used to retrieve information from fom (e.g. number of dofs, fields, ... )
-    def retrieve_fom_data( self ):
-        self.check_configured_fom( )
-        return
-    
     def solve_fom_problem( self, _param ):
         self.check_configured_fom( )
         sol = self.M_external_engine.solve_parameter( _param, self.M_fom_specifics )

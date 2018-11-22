@@ -56,12 +56,6 @@ class external_engine( ):
                           please provide specific ones for your specific engine " )
         return
 
-    def build_rb_affine_component( self, _param, _fom_specifics ):
-
-        em.error_raiser( 'SystemError', 'external_engine::build_rb_affine_component', "You are using the default build_rb_affine_component, \
-                          please provide specific ones for your specific engine " )
-        return
-
     def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
         
         em.error_raiser( 'SystemError', 'external_engine::build_rb_affine_component', "You are using the default build_fom_affine_components, \
@@ -87,8 +81,6 @@ class external_engine( ):
     M_engine = 0
 
 
-
-
 class c_fom_specifics( ctypes.Structure ):
 
     _fields_ = [('model', ctypes.POINTER( ctypes.c_char ) ), \
@@ -97,8 +89,6 @@ class c_fom_specifics( ctypes.Structure ):
             ('u', ctypes.POINTER( ctypes.c_double ) ),\
             ('A', ctypes.POINTER( ctypes.c_double ) ),\
             ('f', ctypes.POINTER( ctypes.c_double ) )]
-
-
 
 
 class cpp_external_engine( external_engine ):
@@ -149,15 +139,7 @@ class cpp_external_engine( external_engine ):
         # the FOM is supposed to fill in c_fom_specs.c_sol with the FOM 
         self.M_c_lib.solve_parameter( self.convert_parameter( _param ), c_fom_spec )
 
-#        sol = {}
-#        sol['u'] = u
-
         return u
-
-#    def build_rb_affine_component( self, _basis, _q, _operator, _fom_specifics ):
-#
-#        return self.M_engine.build_rb_affine_component( _basis, _q, _operator, _fom_specifics )
-
 
     def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
         
@@ -263,23 +245,6 @@ class cpp_external_engine( external_engine ):
 
         return affine_components
 
-
-#    def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):
-#        
-#        if len( _elements ) == 0:
-#            return self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics )
-#        else:
-#            matrix = self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics, \
-#                                                        self.convert_parameter(_elements), \
-#                                                        self.convert_parameter(_indices) )
-#            return np.array( matrix['A'] )
-#        
-#    def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
-#
-#        return np.array( self.M_engine.find_mdeim_elements_fom_specifics( _fom_specifics, \
-#                                       self.convert_indices( _indices_mat ) ) ).astype(int)
-        
-
     M_comm = 0
     M_c_lib = 0
 
@@ -331,10 +296,6 @@ class matlab_external_engine( external_engine ):
 
         return sol[:, 0]
 
-    def build_rb_affine_component( self, _basis, _q, _operator, _fom_specifics ):
-
-        return self.M_engine.build_rb_affine_component( _basis, _q, _operator, _fom_specifics )
-
     # normally a MATLAB application can directly provide a dictionary with all the affine components 
     def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
 
@@ -365,19 +326,27 @@ class matlab_external_engine( external_engine ):
     def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):
         
         if len( _elements ) == 0:
-            return self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics )
+            matrix = self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics )
+            A = np.array( matrix['A'] )
+            A[:, 0:2] = A[:, 0:2] - 1
+            return A
         else:
             # if I'd convert elements and indices to int it also retrieve from int values inside the matrx from MATLAB
             # therefore I convert them to double
             matrix = self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics, \
-                                                        self.convert_parameter(_elements), \
-                                                        self.convert_parameter(_indices) )
-            return np.array( matrix['A'] )
+                                                        self.convert_parameter( _elements ), \
+                                                        self.convert_parameter( _indices + 1 ) )
+            
+            A = np.array( matrix['A'] )
+            A[:, 0:2] = A[:, 0:2] - 1
+            
+            return A
         
+    # NB the +1 is needed to convert the python indices over MATLAB
     def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
 
         return np.array( self.M_engine.find_mdeim_elements_fom_specifics( _fom_specifics, \
-                                       self.convert_indices( _indices_mat ) ) ).astype(int)
+                                       self.convert_indices( _indices_mat + 1 ) ) ).astype(int)
 
 
 

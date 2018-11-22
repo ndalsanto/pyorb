@@ -182,16 +182,21 @@ class AffineDecompositionHandler( ):
 
             print( "Importing FOM affine arrays " )
 
-            fff = _fom_problem.retrieve_fom_affine_components( 'f', Qf )
-
-            for iQf in range( Qf ):
-                self.M_feAffineFq.append( np.array( fff['f' + str(iQf)] ) )
-#                self.M_feAffineFq[iQf] = self.M_feAffineFq[iQf][:, 0]
+            if len( self.M_feAffineFq ) == 0:
+                print( "I am importing A affine arrays " )
+    
+                fff = _fom_problem.retrieve_fom_affine_components( 'f', Qf )
+    
+                for iQf in range( Qf ):
+                    self.M_feAffineFq.append( np.array( fff['f' + str(iQf)] ) )
                 
-            AAA = _fom_problem.retrieve_fom_affine_components( 'A', Qa )
+            if len( self.M_feAffineAq ) == 0:
+                print( "I am importing A affine arrays " )
 
-            for iQa in range( Qa ):
-                self.M_feAffineAq.append( AAA['A' + str(iQa)] )
+                AAA = _fom_problem.retrieve_fom_affine_components( 'A', Qa )
+    
+                for iQa in range( Qa ):
+                    self.M_feAffineAq.append( AAA['A' + str(iQa)] )
         else:
             print( "Already set the FOM affine arrays " )
 

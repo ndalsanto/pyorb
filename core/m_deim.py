@@ -30,28 +30,6 @@ class Deim( ):
         
         print('You need to code this !! ' )
 
-#        self.M_ns = _ns
-        
-#        current_snapshots_number = self.M_snapshots_matrix.shape[1]
-        
-#        for iNs in range( _ns ):
-#            
-#            self.M_fom_problem.generate_parameter( )
-#            param = self.M_fom_problem.get_parameter( )
-#
-#            print('Choosing parameter %d for MDEIM' % iNs )
-#
-#            AAA = self.M_fom_problem.assemble_fom_matrix( param )
-#            AA = np.array( AAA['A'] )
-# 
-#            if current_snapshots_number == 0:
-#                self.M_snapshots_matrix = np.zeros( ( AA.shape[0], _ns ) )
-#                self.M_row_map = AA[:, 0]
-#                self.M_col_map = AA[:, 1]
-#
-#            self.M_snapshots_matrix[:, iNs] = AA[:, 2]
-#            current_snapshots_number = current_snapshots_number + 1
-#       
         return
 
     def build_deim_basis( self, _ns, _tol ):
@@ -189,12 +167,11 @@ class Mdeim( Deim ):
 
             self.M_offline_parameters[iNs, :] = param
 
-            np.set_printoptions(precision=12)
+            print( 'Mdeim snapshots compputation, parameter %d' % iNs )
             print( param )
 
-            AAA = self.M_fom_problem.assemble_fom_matrix( param )
-            AA = np.array( AAA['A'] )
- 
+            AA = self.M_fom_problem.assemble_fom_matrix( param )
+    
             if current_snapshots_number == 0:
                 self.M_snapshots_matrix = np.zeros( ( AA.shape[0], _ns ) )
                 self.M_row_map = AA[:, 0].astype( int )
@@ -239,6 +216,8 @@ class Mdeim( Deim ):
 
     def perform_mdeim( self, _ns, _tol ):
         
+        print( "\n\nStarting to perform MDEIM with %d snapshots and %f as POD tolerance \n\n" % ( _ns, _tol ) )
+        
         self.reset_mdeim( )
         
         self.build_mdeim_snapshots( _ns )
@@ -273,7 +252,8 @@ class Mdeim( Deim ):
     def compute_theta_coefficients_q( self, _param, _q ):
         
         if (self.M_current_param != _param).all():
-            print( 'Recomputing for new paramter!' )
+            print( 'Recomputing for new parameter!' )
+            print( _param )
             self.M_current_param = _param + np.zeros( _param.shape )
             self.compute_theta_coefficients( _param )
         

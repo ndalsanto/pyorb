@@ -239,7 +239,7 @@ class RbManager( ):
         
         self.reset_rb_approximation( )
         
-        print( 'Building RB approximation with %d snapshots and a tolerance %f' % (_ns, _tol) )
+        print( '\n\n Building RB approximation with %d snapshots and a tolerance %f \n\n' % (_ns, _tol) )
         
         if self.M_ns < _ns :
             print( 'We miss some snalshots! I have only %d in memory and I need to compute %d more.' % (self.M_ns, _ns-self.M_ns) )
