@@ -58,14 +58,7 @@ my_mdeim = m_deim.Mdeim( my_ndp )
 
 my_mdeim.perform_mdeim( 20, 10**(-6) )
 
-#my_mdeim.print_reduced_indices( )
-#my_mdeim.print_reduced_indices_mat( )
-#my_mdeim.print_reduced_elements( )
-
 my_ndp.set_mdeim( my_mdeim )
-
-
-
 
 #%%
 
@@ -78,25 +71,23 @@ my_affine_decomposition.set_Q( my_mdeim.get_num_mdeim_basis(), 1 )              
 # we externally set the affine components for A, the ones for f are handled in the solver
 my_affine_decomposition.set_affine_a( my_mdeim.get_basis_list( ) )
 
-#my_affine_decomposition.import_affine_matrices( 'mdeim_basis_A' + fem_size_str + '_' )
-#my_affine_decomposition.import_affine_vectors(  'affine_vector_' + fem_size_str + '_f' )
-
-# building the RB manager
 import pyorb_core.rb_library.rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_ndp )
 
-#my_rb_manager.save_offline_structures( "offline_" + fem_size_str + "/test_snapshots_" + fem_size_str + '.txt', \
-#                                       "offline_" + fem_size_str + "/basis_" + fem_size_str + '.txt', \
-#                                       "offline_" + fem_size_str + "/rb_affine_components_" + fem_size_str, \
-#                                       'offline_' + fem_size_str + '/test_offline_parameters.data' )
+SAVE_OFFLINE = 0
+
+if SAVE_OFFLINE == 1:
+    my_rb_manager.save_offline_structures( "offline_" + fem_size_str + "/test_snapshots_" + fem_size_str + '.txt', \
+                                           "offline_" + fem_size_str + "/basis_" + fem_size_str + '.txt', \
+                                           "offline_" + fem_size_str + "/rb_affine_components_" + fem_size_str, \
+                                           'offline_' + fem_size_str + '/test_offline_parameters.data' )
 
 my_rb_manager.build_rb_approximation( 50, 10**(-7) )
 
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 
-#my_affine_decomposition.print_affine_components( )
 my_rb_manager.test_rb_solver( 20 )
 
 #%%
