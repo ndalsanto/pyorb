@@ -12,12 +12,12 @@ Created on Mon Nov 19 12:07:21 2018
 import numpy as np
 
 import sys
-sys.path.insert(0, '../../core')
+sys.path.insert(0, '../../')
 sys.path.insert(0, '../thermal_block')
 print(sys.path)
 
 
-import manage_external_engine as mee
+import pyorb_core.tpl_managers.external_engine_manager as mee
 # playing around with engine manager 
 my_cpp_engine_manager = mee.external_engine_manager( 'cpp', \
                                                      '/usr/scratch/dalsanto/EPFL/DeepLearning/LifeV/lifev-env/lifev-epfl-build/rb/liblifevreducedbasis.so' )
@@ -26,7 +26,7 @@ my_cpp_engine_manager.start_engine( )
 my_cpp_engine_manager = my_cpp_engine_manager.get_external_engine( )
 
 
-import parameter_handler as ph
+import pyorb_core.pde_problem.parameter_handler as ph
 
 mu0_min = 1.0; mu0_max = 50.
 mu1_min = 1.0; mu1_max = 50.
