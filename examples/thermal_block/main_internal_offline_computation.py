@@ -51,14 +51,14 @@ my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
 
 #%%
 
-import pyorb_core.affine_decomposition as ad
+import pyorb_core.rb_library.affine_decomposition as ad
 
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )               # number of affine terms
 
 # building the RB manager
-import pyorb_core.rb_manager as rm
+import pyorb_core.rb_library.rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 

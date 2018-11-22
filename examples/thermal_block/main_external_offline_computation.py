@@ -15,15 +15,15 @@ An example where the RB method is constructed by importing from files the snapsh
 import numpy as np
 
 import sys
-sys.path.insert(0, '../../core')
+sys.path.insert(0, '../../')
 
 #import rb_manager as rm
 #import affine_decomposition as ad
 #import parameter_handler as ph
 
-import rb_manager as rm
-import affine_decomposition as ad
-import parameter_handler as ph
+import pyorb_core.rb_library.rb_manager as rm
+import pyorb_core.rb_library.affine_decomposition as ad
+import pyorb_core.pde_problem.parameter_handler as ph
 
 import thermal_block_problem as tbp
 

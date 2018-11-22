@@ -13,9 +13,9 @@ import random
 
 import numpy as np
 
-import pyorb_core.affine_decomposition as ad
 import pyorb_core.pde_problem.fom_problem as fm
-import pyorb_core.proper_orthogonal_decomposition as podec
+import pyorb_core.rb_library.affine_decomposition as ad
+import pyorb_core.rb_library.proper_orthogonal_decomposition as podec
 
 
 class RbManager( ):

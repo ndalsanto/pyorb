@@ -8,7 +8,7 @@ Created on Thu Nov  8 18:21:34 2018
 """
 
 import numpy as np
-import proper_orthogonal_decomposition as podec
+import pyorb_core.rb_library.proper_orthogonal_decomposition as podec
 import random
 
 class Deim( ):
