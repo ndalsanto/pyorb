@@ -13,11 +13,12 @@ import sys
 sys.path.insert(0, '../../core')
 print(sys.path)
 
-
 import manage_external_engine as mee
 
+matlab_library_folder = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat'
+
 # playing around with engine manager 
-my_matlab_engine_manager = mee.external_engine_manager( 'matlab', '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat' )
+my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_folder )
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
