@@ -31,10 +31,7 @@ class ndp_theta_As( ):
 class nonaffine_diffusion_problem( fp.fom_problem ):
 
     def __init__( self, _parameter_handler ):
-        
-#        self.M_mdeim = _mdeim
         fp.fom_problem.__init__( self, _parameter_handler )
-        
         return
    
     def set_mdeim( self, _mdeim ):

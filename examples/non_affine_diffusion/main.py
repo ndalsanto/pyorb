@@ -16,8 +16,10 @@ print(sys.path)
 
 import manage_external_engine as mee
 
+matlab_library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat'
+
 # playing around with engine manager 
-my_matlab_engine_manager = mee.external_engine_manager( 'matlab', '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat' )
+my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
@@ -25,7 +27,7 @@ import parameter_handler as ph
 
 mu0_min = 0.4; mu0_max = 0.6
 mu1_min = 0.4; mu1_max = 0.6
-mu2_min = 0.25; mu2_max = 0.5
+mu2_min = 0.25; mu2_max = 0.55
 
 param_min = np.array([mu0_min, mu1_min, mu2_min])
 param_max = np.array([mu0_max, mu1_max, mu2_max])
@@ -40,7 +42,7 @@ import nonaffine_diffusion_problem as ndp
 
 my_ndp = ndp.nonaffine_diffusion_problem( my_parameter_handler )
 
-fem_size = 10
+fem_size = 20
 fem_size_str = str( fem_size )
 
 fom_specifics = { 
@@ -53,9 +55,15 @@ my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 import m_deim
 my_mdeim = m_deim.Mdeim( my_ndp )
 
-my_mdeim.perform_mdeim( 100, 10**(-9) )
+my_mdeim.perform_mdeim( 20, 10**(-6) )
+
+#my_mdeim.print_reduced_indices( )
+#my_mdeim.print_reduced_indices_mat( )
+#my_mdeim.print_reduced_elements( )
 
 my_ndp.set_mdeim( my_mdeim )
+
+
 
 
 #%%
@@ -66,13 +74,8 @@ import affine_decomposition as ad
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( my_mdeim.get_num_mdeim_basis(), 1 )               # number of affine terms
 
+# we externally set the affine components for A, the ones for f are handled in the solver
 my_affine_decomposition.set_affine_a( my_mdeim.get_basis_list( ) )
-
-# shortcut to assign the rhs afine terms
-sol = my_matlab_external_engine.solve_parameter( param_min, fom_specifics )
-rhs = []
-rhs.append( np.array( sol['b'] ) )
-my_affine_decomposition.set_affine_f( rhs )
 
 #my_affine_decomposition.import_affine_matrices( 'mdeim_basis_A' + fem_size_str + '_' )
 #my_affine_decomposition.import_affine_vectors(  'affine_vector_' + fem_size_str + '_f' )
@@ -92,7 +95,7 @@ my_rb_manager.build_rb_approximation( 50, 10**(-7) )
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 
-my_affine_decomposition.print_affine_components( )
+#my_affine_decomposition.print_affine_components( )
 my_rb_manager.test_rb_solver( 20 )
 
 #%%
