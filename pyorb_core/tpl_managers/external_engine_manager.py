@@ -26,7 +26,7 @@ class external_engine_manager( ):
 
     M_engine_type = ""
     M_library_path = ""
-    M_external_engine = 0
+    M_external_engine = None
     
     def get_external_engine( self ):
         return self.M_external_engine

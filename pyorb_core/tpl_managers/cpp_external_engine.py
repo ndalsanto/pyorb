@@ -182,5 +182,5 @@ class cpp_external_engine( ee.external_engine ):
 
         return affine_components
 
-    M_comm = 0
-    M_c_lib = 0
+    M_comm = None
+    M_c_lib = None

@@ -70,6 +70,6 @@ class external_engine( ):
 
     M_engine_type = ""
     M_library_path = ""
-    M_engine = 0
+    M_engine = None
 
 

@@ -82,14 +82,11 @@ class fom_problem( ):
     def find_mdeim_elements_fom_specifics( self, _indices_mat ):
         return self.M_external_engine.find_mdeim_elements_fom_specifics( self.M_fom_specifics, _indices_mat )
 
-
-    M_parameter_handler = 0
-        
-
+    M_parameter_handler = None
     M_configured_fom = False
 
     # engine used to perform offline computation relying on an external engine
-    M_external_engine = 0
+    M_external_engine = None
     M_fom_specifics = 0
     
     # theta functions

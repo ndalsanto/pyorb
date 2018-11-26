@@ -116,7 +116,7 @@ class Deim( ):
         
         return self.M_basis
 
-    M_fom_problem = 0
+    M_fom_problem = None
     M_snapshots_matrix = np.zeros( ( 0, 0 ) )
     M_basis = np.zeros( ( 0, 0 ) )
     M_N = 0
