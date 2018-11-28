@@ -16,9 +16,9 @@ print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
-matlab_library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat'
+matlab_library_path = '/Users/luca/deeplearning_pdes/feamat/'
 
-# playing around with engine manager 
+# playing around with engine manager
 my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
@@ -38,7 +38,7 @@ num_parameters = param_min.shape[0]
 my_parameter_handler = ph.Parameter_handler( )
 my_parameter_handler.assign_parameters_bounds( param_min, param_max )
 
-# define the fem problem 
+# define the fem problem
 import nonaffine_diffusion_problem as ndp
 
 my_ndp = ndp.nonaffine_diffusion_problem( my_parameter_handler )
@@ -46,8 +46,8 @@ my_ndp = ndp.nonaffine_diffusion_problem( my_parameter_handler )
 fem_size = 20
 fem_size_str = str( fem_size )
 
-fom_specifics = { 
-        'number_of_elements': fem_size, 
+fom_specifics = {
+        'number_of_elements': fem_size,
         'polynomial_degree' : 'P1',
         'model': 'nonaffine' }
 
