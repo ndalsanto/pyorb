@@ -16,6 +16,7 @@ import numpy as np
 import pyorb_core.pde_problem.fom_problem as fm
 import pyorb_core.rb_library.affine_decomposition as ad
 import pyorb_core.rb_library.proper_orthogonal_decomposition as podec
+import pyorb_core.error_manager as em
 
 
 class RbManager( ):
@@ -60,8 +61,14 @@ class RbManager( ):
     def get_offline_parameter( self, _iP ):
         return self.M_offline_ns_parameters[_iP, :]
     
+    def get_test_parameter_matrix( self ):
+        return self.M_test_parameters
+    
     def get_test_parameter( self, _iP ):
         return self.M_test_parameters[_iP, :]
+    
+    def get_num_test_parameter( self ):
+        return self.M_test_parameters.shape[0]
     
     def get_snapshots_matrix( self, _fom_coordinates=np.array([]) ):
         if _fom_coordinates.shape[0]==0:
@@ -299,6 +306,19 @@ class RbManager( ):
     M_save_file_basis_functions = "basis.txt"
     M_save_file_offline_parameters = "offline_parameters.data"
 
+    def compute_theta_functions( self, _params ):
+
+        Qa = self.get_Qa( )
+            
+        thetas = np.zeros( (_params.shape[0], Qa) )
+        
+        for iP in range( _params.shape[0] ):
+            for iQa in range( Qa ):
+                thetas[iP, iQa] = self.M_fom_problem.get_theta_a( _params[iP, :], iQa )
+        
+        return thetas
+        
+        
     def get_rb_affine_matrix( self, _q ):
         return self.M_affineDecomposition.get_rb_affine_matrix( _q )
 
