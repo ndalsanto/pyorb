@@ -55,10 +55,10 @@ my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 
 import pyorb_core.rb_library.m_deim as m_deim
 my_mdeim = m_deim.Mdeim( my_ndp )
-
 my_mdeim.perform_mdeim( 20, 10**(-6) )
-
 my_ndp.set_mdeim( my_mdeim )
+
+
 
 #%%
 
