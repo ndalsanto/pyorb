@@ -45,8 +45,8 @@ class Deim( ):
 #        print( 'MDEIM BASIS' )
 #        print( self.M_basis )
  
-        if self.M_save_mdeim_basis == True:
-            output_file = open( self.M_save_file_basis_functions + '_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', 'w' )
+        if self.M_save_offline == True:
+            output_file = open( self.M_save_offline_dir + 'mdeim_full_basis_A_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', 'w' )
 
             for iV in range( self.M_basis.shape[0] ):
                 for iB in range( self.M_basis.shape[1] ):
@@ -60,12 +60,14 @@ class Deim( ):
             output_file.close( )
 
             for iB in range( self.M_basis.shape[1] ):
-                output_file = open( self.M_save_file_basis_functions + '_A' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '_' + str(iB) + '.txt', 'w' )
+                output_file = open( self.M_save_offline_dir + 'mdeim_basis_A_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '_' + str(iB) + '.txt', 'w' )
                 
                 for iV in range( self.M_basis.shape[0] ):
                     output_file.write( "%d %d %.10g\n" % (self.M_row_map[iV], self.M_col_map[iV], self.M_basis[iV, iB]) )
 
                 output_file.close( )
+
+
 
     def perform_deim( self, _ns, _tol ):
         
@@ -116,6 +118,11 @@ class Deim( ):
         
         return self.M_basis
 
+    def set_save_offline( self, _save_offline, _save_offline_dir ):
+        self.M_save_offline = _save_offline
+        self.M_save_offline_dir = _save_offline_dir
+        
+        
     M_fom_problem = None
     M_snapshots_matrix = np.zeros( ( 0, 0 ) )
     M_basis = np.zeros( ( 0, 0 ) )
@@ -124,10 +131,11 @@ class Deim( ):
     M_offline_parameters = np.zeros( ( 0, 0 ) )
 
     M_interpolation_matrix = np.zeros( ( 0, 0 ) )
-    M_reduced_indices = np.zeros( (0, 0) )
+    M_reduced_indices = np.zeros( 0 )
 
     M_save_file_basis_functions = "deim_basis"
-    M_save_deim_basis = True
+    M_save_offline = False
+    M_save_offline_dir = False
     
     M_current_theta = np.zeros( 0 )
     M_current_param = np.zeros( 0 )
@@ -236,6 +244,75 @@ class Mdeim( Deim ):
 
         self.identify_reduced_elements( )
         
+        if self.M_save_offline:
+            self.save_offline( )
+        
+        return
+
+    def save_offline( self ):
+        
+        # saving interpolation matrix
+        output_file = open( self.M_save_offline_dir + 'mdeim_interpolation_matrix_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', 'w' )
+
+        for iV in range( self.M_interpolation_matrix.shape[0] ):
+            for iB in range( self.M_interpolation_matrix.shape[1] ):
+                output_file.write( "%.10g" % self.M_interpolation_matrix[iV, iB] )
+
+                if iB < self.M_interpolation_matrix.shape[1] - 1:
+                    output_file.write( " " )
+                else:
+                    output_file.write( "\n" )
+
+        output_file.close( )
+
+        # saving reduced indices of matrix
+        output_file = open( self.M_save_offline_dir + 'mdeim_reduced_indices_matrix_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', 'w' )
+
+        for iV in range( self.M_reduced_indices_mat.shape[0] ):
+            for iB in range( self.M_reduced_indices_mat.shape[1] ):
+                output_file.write( "%.10g" % self.M_reduced_indices_mat[iV, iB] )
+
+                if iB < self.M_reduced_indices_mat.shape[1] - 1:
+                    output_file.write( " " )
+                else:
+                    output_file.write( "\n" )
+
+        output_file.close( )
+
+        # saving reduced indices
+        output_file = open( self.M_save_offline_dir + 'mdeim_reduced_indices_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', 'w' )
+
+        for iV in range( self.M_reduced_indices.shape[0] ):
+                output_file.write( "%.10g \n" % self.M_reduced_indices[iV] )
+
+        output_file.close( )
+
+       
+        # saving reduced elements
+        output_file = open( self.M_save_offline_dir + 'mdeim_reduced_elements_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', 'w' )
+
+        for iV in range( self.M_reduced_elements.shape[0] ):
+                output_file.write( "%.10g \n" % self.M_reduced_elements[iV] )
+
+        output_file.close( )
+
+        return
+        
+
+    def load_offline( self, _save_offline_dir ):
+        
+        self.M_save_offline_dir = _save_offline_dir
+        self.M_reduced_elements      = np.loadtxt( self.M_save_offline_dir + 'mdeim_reduced_elements_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', dtype=int )
+        self.M_reduced_indices       = np.loadtxt( self.M_save_offline_dir + 'mdeim_reduced_indices_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', dtype=int )
+        self.M_reduced_indices_mat   = np.loadtxt( self.M_save_offline_dir + 'mdeim_reduced_indices_matrix_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', dtype=int )
+        self.M_interpolation_matrix  = np.loadtxt( self.M_save_offline_dir + 'mdeim_interpolation_matrix_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt' )
+        
+        self.M_reduced_elements      = self.M_reduced_elements.astype( int )
+        self.M_reduced_indices       = self.M_reduced_indices.astype( int )
+        self.M_reduced_indices_mat   = self.M_reduced_indices_mat.astype( int )
+        
+        self.M_N = len( self.M_reduced_indices )
+        
         return
 
     def get_num_mdeim_basis( self ):
@@ -298,7 +375,6 @@ class Mdeim( Deim ):
     M_reduced_indices_mat = np.zeros( ( 0, 0 ) )
     M_reduced_elements = np.zeros( ( 0, 0 ) )
 
-    M_save_mdeim_basis = False
 
 
 
