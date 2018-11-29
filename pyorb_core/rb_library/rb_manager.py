@@ -125,7 +125,7 @@ class RbManager( ):
         return 
    
     # _ns is the number of snapshots to be added to the snapshots matrix
-    def build_snapshots( self, _new_snapshots ):
+    def build_snapshots( self, _new_snapshots, seed=0 ):
         
         current_snapshots_number = self.M_snapshots_matrix.shape[1]
 
@@ -137,7 +137,7 @@ class RbManager( ):
         
         for iS in range( _new_snapshots ):
             
-            random.seed( 201 * (iS + 1) + iS )
+            random.seed( 201 * (iS + 1) + iS + seed )
             
             self.M_fom_problem.generate_parameter( )
             new_parameters[iS, :] = self.M_fom_problem.get_parameter( )
