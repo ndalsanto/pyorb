@@ -61,6 +61,9 @@ class RbManager( ):
     def get_offline_parameter( self, _iP ):
         return self.M_offline_ns_parameters[_iP, :]
     
+    def get_offline_parameters( self ):
+        return self.M_offline_ns_parameters
+    
     def get_test_parameter_matrix( self ):
         return self.M_test_parameters
     
@@ -125,7 +128,7 @@ class RbManager( ):
         return 
    
     # _ns is the number of snapshots to be added to the snapshots matrix
-    def build_snapshots( self, _new_snapshots ):
+    def build_snapshots( self, _new_snapshots, seed=0 ):
         
         current_snapshots_number = self.M_snapshots_matrix.shape[1]
 
@@ -137,7 +140,7 @@ class RbManager( ):
         
         for iS in range( _new_snapshots ):
             
-            random.seed( 201 * (iS + 1) + iS )
+            random.seed( 201 * (iS + 1) + iS + seed )
             
             self.M_fom_problem.generate_parameter( )
             new_parameters[iS, :] = self.M_fom_problem.get_parameter( )
@@ -159,6 +162,7 @@ class RbManager( ):
         
         
         if self.M_save_offline_structures == True:
+
             output_file = open( self.M_save_file_snapshots_functions, 'w+' )
                 
             for iNs in range( self.M_snapshots_matrix.shape[0] ):
