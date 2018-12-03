@@ -8,6 +8,7 @@ Created on Thu Oct 11 12:02:21 2018
 """
 
 import pyorb_core.error_manager as em
+import numpy as np
 
 def default_theta_function( _param, _q ):
 
@@ -74,10 +75,14 @@ class fom_problem( ):
         return self.M_parameter_handler.get_num_parameters( )    
     
     def generate_parameter( self ):
-        return self.M_parameter_handler.generate_parameter( )
+        self.M_parameter_handler.generate_parameter( )
     
     def get_parameter( self ):
-        return self.M_parameter_handler.get_parameter( )
+        self.M_current_parameter = self.M_parameter_handler.get_parameter( )
+        return self.M_current_parameter
+
+    def get_parameter_handler( self ):
+        return self.M_parameter_handler
 
     def find_mdeim_elements_fom_specifics( self, _indices_mat ):
         return self.M_external_engine.find_mdeim_elements_fom_specifics( self.M_fom_specifics, _indices_mat )
@@ -93,7 +98,8 @@ class fom_problem( ):
     M_theta_a = default_theta_function
     M_theta_f = default_theta_function
     
-    
+    M_current_parameter = np.zeros( 0 )
+
     
     
     
