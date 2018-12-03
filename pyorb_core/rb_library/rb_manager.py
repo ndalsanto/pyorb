@@ -61,6 +61,9 @@ class RbManager( ):
     def get_offline_parameter( self, _iP ):
         return self.M_offline_ns_parameters[_iP, :]
     
+    def get_offline_parameters( self ):
+        return self.M_offline_ns_parameters
+    
     def get_test_parameter_matrix( self ):
         return self.M_test_parameters
     
@@ -159,6 +162,7 @@ class RbManager( ):
         
         
         if self.M_save_offline_structures == True:
+
             output_file = open( self.M_save_file_snapshots_functions, 'w+' )
                 
             for iNs in range( self.M_snapshots_matrix.shape[0] ):
