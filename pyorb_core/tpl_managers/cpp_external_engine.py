@@ -65,6 +65,7 @@ class cpp_external_engine( ee.external_engine ):
                                cp_u, cp_A, cp_f )
 
         compute_only_the_dim = True
+        print(type(self.M_comm))
         vector_dim = self.M_c_lib.solve_parameter( self.convert_parameter( _param ), c_fom_spec, compute_only_the_dim )
 
         u = np.zeros( vector_dim ); cp_u = u.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
@@ -155,7 +156,7 @@ class cpp_external_engine( ee.external_engine ):
 
             f = np.zeros( 0 )
             cp_f = f.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )
-            
+
             c_fom_spec = c_fom_specifics( ctypes.create_string_buffer( _fom_specifics['model'].encode('utf-8') ), \
                                           ctypes.create_string_buffer( _fom_specifics['datafile_path'].encode('utf-8') ), \
                                           ctypes.c_void_p( MPI._addressof( self.M_comm ) ), \

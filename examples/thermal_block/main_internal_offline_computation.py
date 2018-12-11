@@ -15,7 +15,7 @@ print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
-matlab_library_folder = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat'
+matlab_library_folder = '/Users/luca/deeplearning_pdes/feamat'
 
 # playing around with engine manager 
 my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_folder )
