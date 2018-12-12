@@ -62,6 +62,16 @@ import pyorb_core.rb_library.rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 
+SAVE_OFFLINE = 1
+
+name_str = "thermal_block"
+
+if SAVE_OFFLINE == 1:
+    my_rb_manager.save_offline_structures( "offline_" + name_str + "/snapshots_" + name_str + '.txt', \
+                                           "offline_" + name_str + "/basis_" + name_str + '.txt', \
+                                           "offline_" + name_str + "/rb_affine_components_" + name_str, \
+                                           "offline_" + name_str + "/offline_parameters.data" )
+
 my_rb_manager.build_rb_approximation( 50, 10**(-6) )
 
 #%%

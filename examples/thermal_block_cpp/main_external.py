@@ -37,7 +37,6 @@ param_min = np.array([mu0_min, mu1_min, mu2_min])
 param_max = np.array([mu0_max, mu1_max, mu2_max])
 num_parameters = param_min.shape[0]
 
-
 # preparing the parameter handler
 my_parameter_handler = ph.Parameter_handler( )
 my_parameter_handler.assign_parameters_bounds( param_min, param_max )
@@ -48,30 +47,30 @@ my_parameter_handler.print_parameters( )
 # define the fem problem
 my_tbp = tbp.thermal_block_problem( my_parameter_handler )
 
+output_fdr = 'offline_thermal_block/'
+
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )                   # number of affine terms
-my_affine_decomposition.import_affine_matrices( 'exported_offline_data/affine_matrix_20_A' )
-my_affine_decomposition.import_affine_vectors(  'exported_offline_data/affine_vector_20_f' )
+my_affine_decomposition.import_rb_affine_matrices( output_fdr + 'rb_affine_components_thermal_block_A' )
+my_affine_decomposition.import_rb_affine_vectors(  output_fdr + 'rb_affine_components_thermal_block_f' )
 
 # building the RB manager
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 
 # importing snapshots, offline parameters and building RB space
-my_rb_manager.import_snapshots_parameters( 'exported_offline_data/train_parameters.data' )
+my_rb_manager.import_snapshots_parameters( output_fdr + 'offline_parameters.data' )
 
-snapshots_file = 'exported_offline_data/train_snapshots_matrix_20_50.txt'
+snapshots_file = output_fdr + 'snapshots_thermal_block.txt'
 
 my_rb_manager.import_snapshots_matrix( snapshots_file )
 
-my_rb_manager.build_rb_approximation( 10**(-6) )
+my_rb_manager.build_rb_approximation( 50, 10**(-6) )
 
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 
-my_rb_manager.import_test_parameters( 'exported_offline_data/test_parameters.data' )
-my_rb_manager.import_test_snapshots_matrix( 'exported_offline_data/test_snapshots_matrix_20_20.txt' )
-
+my_rb_manager.import_test_parameters( output_fdr + 'offline_parameters.data' )
 
 for snapshot_number in range(20):
     my_rb_manager.compute_rb_test_snapshots_error( snapshot_number )
