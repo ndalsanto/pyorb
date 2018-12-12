@@ -6,7 +6,7 @@ Created on Wed Oct 10 10:24:47 2018
 @author: Niccolo' Dal Santo
 @email : niccolo.dalsanto@epfl.ch
 
-An example where the RB method is constructed by importing from files the snapshots and the affine decomposition of FE matrices and vectors 
+An example where the RB method is constructed by importing from files the snapshots and the affine decomposition of FE matrices and vectors
 
 """
 
@@ -45,7 +45,7 @@ my_parameter_handler.assign_parameters_bounds( param_min, param_max )
 my_parameter_handler.generate_parameter( )
 my_parameter_handler.print_parameters( )
 
-# define the fem problem 
+# define the fem problem
 my_tbp = tbp.thermal_block_problem( my_parameter_handler )
 
 # defining the affine decomposition structure
@@ -75,11 +75,3 @@ my_rb_manager.import_test_snapshots_matrix( 'exported_offline_data/test_snapshot
 
 for snapshot_number in range(20):
     my_rb_manager.compute_rb_test_snapshots_error( snapshot_number )
-    
-
-
-
-
-
-
-

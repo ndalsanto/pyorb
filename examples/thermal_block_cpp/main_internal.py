@@ -16,9 +16,9 @@ print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
-cpp_library_folder = '/Users/luca/deeplearning_pdes/lifev-pyorb/build/libpyorb-lifev-api.dylib'
+cpp_library_folder = '/u/cmcs/pegolott/deeplearning_pdes/lifev-pyorb/build/libpyorb-lifev-api.so'
 
-# playing around with engine manager 
+# playing around with engine manager
 my_cpp_engine_manager = mee.external_engine_manager( 'cpp', cpp_library_folder )
 my_cpp_engine_manager.start_engine( )
 my_cpp_external_engine = my_cpp_engine_manager.get_external_engine( )
@@ -42,11 +42,9 @@ import thermal_block_problem as tbp
 
 my_tbp = tbp.thermal_block_problem( my_parameter_handler )
 
-fom_specifics = { 
-        'number_of_elements': 20, \
-        'polynomial_degree' : 'P1', \
+fom_specifics = {
         'model'             : 'thermal_block', \
-        'datafile_path'     : '/Users/luca/deeplearning_pdes/lifev-pyorb/examples/data'}
+        'datafile_path'     : './data'}
 
 my_tbp.configure_fom( my_cpp_external_engine, fom_specifics )
 
