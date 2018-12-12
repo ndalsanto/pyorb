@@ -153,13 +153,11 @@ class RbManager( ):
             if current_snapshots_number == 0:
                 self.M_snapshots_matrix = np.zeros( ( len(u), _new_snapshots ) )
 
-#            u = np.array( sol['u'] )
-
             self.M_snapshots_matrix[:, iS] = u
             current_snapshots_number = current_snapshots_number + 1
 
         self.M_ns = self.M_ns + _new_snapshots
-
+        self.M_offline_ns_parameters = new_parameters
 
         if self.M_save_offline_structures == True:
 
