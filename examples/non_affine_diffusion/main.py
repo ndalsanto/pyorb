@@ -58,8 +58,6 @@ my_mdeim = m_deim.Mdeim( my_ndp )
 my_mdeim.perform_mdeim( 20, 10**(-6) )
 my_ndp.set_mdeim( my_mdeim )
 
-
-
 #%%
 
 import pyorb_core.rb_library.affine_decomposition as ad

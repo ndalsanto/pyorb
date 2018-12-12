@@ -97,17 +97,4 @@ class fom_problem( ):
     # theta functions
     M_theta_a = default_theta_function
     M_theta_f = default_theta_function
-<<<<<<< HEAD
-=======
-
     M_current_parameter = np.zeros( 0 )
-
-
-
-
-
-
-
-
-
->>>>>>> 2929d618623f2272fff6636e28a24127730b4005
