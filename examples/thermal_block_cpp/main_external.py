@@ -10,12 +10,15 @@ An example where the RB method is constructed by importing from files the snapsh
 
 """
 
+import sys
+sys.path.insert(0, '../../')
+
 #%%
 
 import numpy as np
 
-import sys
-sys.path.insert(0, '../../')
+
+print(sys.path)
 
 #import rb_manager as rm
 #import affine_decomposition as ad
@@ -65,12 +68,17 @@ snapshots_file = output_fdr + 'snapshots_thermal_block.txt'
 
 my_rb_manager.import_snapshots_matrix( snapshots_file )
 
-my_rb_manager.build_rb_approximation( 50, 10**(-6) )
+n_snapshots = 50
+if my_rb_manager.M_ns < n_snapshots :
+    print( 'We miss some snapshots! I have only %d in memory and I need to compute %d more.' % (my_rb_manager.M_ns, n_snapshots-my_rb_manager.M_ns) )
+    my_rb_manager.build_snapshots( n_snapshots - my_rb_manager.M_ns )
+    
+my_rb_manager.perform_pod( 10**(-6) )
 
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
 
 my_rb_manager.import_test_parameters( output_fdr + 'offline_parameters.data' )
-
+my_rb_manager.import_test_snapshots_matrix( snapshots_file )
 for snapshot_number in range(20):
     my_rb_manager.compute_rb_test_snapshots_error( snapshot_number )

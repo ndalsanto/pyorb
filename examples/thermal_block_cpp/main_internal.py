@@ -72,7 +72,7 @@ if SAVE_OFFLINE == 1:
                                            "offline_" + name_str + "/rb_affine_components_" + name_str, \
                                            "offline_" + name_str + "/offline_parameters.data" )
 
-my_rb_manager.build_rb_approximation( 50, 10**(-6) )
+my_rb_manager.build_rb_approximation( 100, 10**(-6) )
 
 #%%
 # printing summary
