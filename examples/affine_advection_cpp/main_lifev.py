@@ -20,7 +20,7 @@ print(sys.path)
 import pyorb_core.tpl_managers.external_engine_manager as mee
 # playing around with engine manager 
 my_cpp_engine_manager = mee.external_engine_manager( 'cpp', \
-                                                     '/usr/scratch/dalsanto/EPFL/DeepLearning/LifeV/lifev-env/lifev-epfl-build/rb/liblifevreducedbasis.so' )
+                                                     '/Users/luca/deeplearning_pdes/lifev-pyorb/build/libpyorb-lifev-api.dylib' )
 
 my_cpp_engine_manager.start_engine( )
 my_cpp_engine = my_cpp_engine_manager.get_external_engine( )
