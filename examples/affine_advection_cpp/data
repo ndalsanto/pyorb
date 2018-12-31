@@ -1,0 +1,49 @@
+# -*- getpot -*- (GetPot mode activation for emacs)
+#-------------------------------------------------
+#      Data file for the Affine Advection example
+#-------------------------------------------------
+
+[exporter]
+    filename  = temperature
+    field_name = T
+[finite_element]
+    degree    = P1
+
+[mesh]
+    mesh_dir  = ./
+    mesh_file = cube.mesh
+    mesh_type = .mesh
+    overlap   = 0
+    verbose   = false
+
+[../solver]
+    param_list_location = ./SolverParamList.xml
+
+[affine_advection]
+    velocity_x = result_liddrivenX
+    velocity_y = result_liddrivenY
+
+[../prec]
+    prectype                     = Ifpack # Ifpack or ML
+    displayList                  = false
+
+    [./ifpack]
+        overlap                  = 0
+
+        [./fact]
+            ilut_level-of-fill   = 1
+            drop_tolerance       = 1.e-5
+            relax_value          = 0
+
+        [../amesos]
+            solvertype           = Amesos_Umfpack # Amesos_KLU or Amesos_Umfpack
+
+        [../partitioner]
+            overlap              = 2
+
+        [../schwarz]
+            reordering_type      = none #metis, rcm, none
+            filter_singletons    = true
+
+    [../]
+[../]
