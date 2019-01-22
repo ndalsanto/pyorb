@@ -6,3 +6,14 @@ Development
 -------
 
 PyORB is conceived, developed and maintained by [Niccolò Dal Santo](https://www.linkedin.com/in/niccolo-dal-santo/) at [EPFL](https://www.epfl.ch/).
+
+Installation
+-------
+
+These preliminary steps must be followed in order to use MPI and the MATLAB and C++ engines within Python.
+
+- MATLAB engine: if matlab_root is the root of the MATLAB installation, run
+```
+    cd "matlabroot/extern/engines/python"
+    python setup.py install
+```

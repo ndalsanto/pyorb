@@ -7,3 +7,5 @@ __pycache__
 *.h5
 *.xmf
 *.m
+*.pyc
+.DS_Store

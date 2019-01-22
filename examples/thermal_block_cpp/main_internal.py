@@ -1,13 +1,14 @@
-    #!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Oct 25 14:31:17 2018
+Created on Fri Dec 7 21:25:00 2018
 
-@author: Niccolo' Dal Santo
-@email : niccolo.dalsanto@epfl.ch
+@author: Luca Pegolotti
+@email : luca.pegolotti@epfl.ch
 """
 
 import numpy as np
+from mpi4py import MPI
 
 import sys
 sys.path.insert(0, '../../')
@@ -15,12 +16,12 @@ print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
-matlab_library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat/'
+cpp_library_folder = '/u/cmcs/pegolott/deeplearning_pdes/lifev-pyorb/build/libpyorb-lifev-api.so'
 
-# playing around with engine manager 
-my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
-my_matlab_engine_manager.start_engine( )
-my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
+# playing around with engine manager
+my_cpp_engine_manager = mee.external_engine_manager( 'cpp', cpp_library_folder )
+my_cpp_engine_manager.start_engine( )
+my_cpp_external_engine = my_cpp_engine_manager.get_external_engine( )
 
 import pyorb_core.pde_problem.parameter_handler as ph
 
@@ -41,16 +42,11 @@ import thermal_block_problem as tbp
 
 my_tbp = tbp.thermal_block_problem( my_parameter_handler )
 
-import pyorb_core.pde_problem.fom_utilities as fom_util
+fom_specifics = {
+        'model'             : 'thermal_block', \
+        'datafile_path'     : './data'}
 
-fom_specifics = fom_util.build_matlab_default_fom_specifics( )
-
-fom_specifics['number_of_elements'] = 20
-fom_specifics['polynomial_degree']  = 'P1'
-fom_specifics['model']              = 'thermal_block'
-
-
-my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
+my_tbp.configure_fom( my_cpp_external_engine, fom_specifics )
 
 
 #%%
@@ -66,7 +62,17 @@ import pyorb_core.rb_library.rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 
-my_rb_manager.build_rb_approximation( 50, 10**(-6) )
+SAVE_OFFLINE = 1
+
+name_str = "thermal_block"
+
+if SAVE_OFFLINE == 1:
+    my_rb_manager.save_offline_structures( "offline_" + name_str + "/snapshots_" + name_str + '.txt', \
+                                           "offline_" + name_str + "/basis_" + name_str + '.txt', \
+                                           "offline_" + name_str + "/rb_affine_components_" + name_str, \
+                                           "offline_" + name_str + "/offline_parameters.data" )
+
+my_rb_manager.build_rb_approximation( 100, 10**(-6) )
 
 #%%
 # printing summary
@@ -76,4 +82,4 @@ avg_error = my_rb_manager.test_rb_solver( 10 )
 
 #%%
 
-my_matlab_engine_manager.quit_engine( )
+my_cpp_engine_manager.quit_engine( )

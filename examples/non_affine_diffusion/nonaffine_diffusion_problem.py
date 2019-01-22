@@ -12,6 +12,19 @@ import pyorb_core.pde_problem.fom_problem as fp
 def ndp_theta_f( _param, _q ):
     return 1.0
 
+class ndp_theta_fs( ):
+    def __init__( self ):
+        return
+    
+    def ndp_theta_f( self, _param, _q ):
+        return self.M_deim.compute_deim_theta_coefficients_q( _param, _q )
+
+    def set_deim( self, _deim ):
+        self.M_deim = _deim
+
+    M_deim = None
+
+
 class ndp_theta_As( ):
     
     def __init__( self ):
@@ -22,7 +35,6 @@ class ndp_theta_As( ):
 
     def set_mdeim( self, _mdeim ):
         self.M_mdeim = _mdeim
-        self.M_theta_a = self.M_mdeim
 
     M_mdeim = None
 
@@ -30,9 +42,12 @@ class ndp_theta_As( ):
 
 class nonaffine_diffusion_problem( fp.fom_problem ):
 
-    def __init__( self, _parameter_handler ):
-        fp.fom_problem.__init__( self, _parameter_handler )
+    def __init__( self, _parameter_handler, _external_engine = None, _fom_specifics = None ):
+        fp.fom_problem.__init__( self, _parameter_handler, _external_engine, _fom_specifics )
         return
+   
+    def set_deim( self, _deim ):
+        self.M_ndp_theta_fs.set_deim( _deim )
    
     def set_mdeim( self, _mdeim ):
         self.M_ndp_theta_As.set_mdeim( _mdeim )
@@ -40,7 +55,11 @@ class nonaffine_diffusion_problem( fp.fom_problem ):
     def define_theta_functions( self ):
         
         self.M_theta_a = self.M_ndp_theta_As.ndp_theta_a
-        self.M_theta_f = ndp_theta_f
+        
+        if self.M_fom_specifics['use_nonhomogeneous_dirichlet'] == 'Y':
+            self.M_theta_f = self.M_ndp_theta_fs.ndp_theta_f
+        else:
+            self.M_theta_f = ndp_theta_f
         
         return
     
@@ -55,4 +74,12 @@ class nonaffine_diffusion_problem( fp.fom_problem ):
                                       + min_mu[2]
     
     M_ndp_theta_As = ndp_theta_As( )
+
+    M_ndp_theta_fs = ndp_theta_fs( )
         
+
+
+
+
+
+

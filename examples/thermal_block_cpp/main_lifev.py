@@ -19,8 +19,9 @@ print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
 # playing around with engine manager 
-my_cpp_engine_manager = mee.external_engine_manager( 'cpp', \
-                                                     '/usr/scratch/dalsanto/EPFL/DeepLearning/LifeV/lifev-env/lifev-epfl-build/rb/liblifevreducedbasis.so' )
+library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/LifeV/lifev-env/lifev-epfl-build/rb/liblifevreducedbasis.so'
+library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/LifeV/lifev-env/pyorb-lifev-api-build/libpyorb-lifev-api.so'
+my_cpp_engine_manager = mee.external_engine_manager( 'cpp', library_path )
 
 my_cpp_engine_manager.start_engine( )
 my_cpp_engine = my_cpp_engine_manager.get_external_engine( )
@@ -53,6 +54,7 @@ fom_specifics = {
 my_tbp.configure_fom( my_cpp_engine, fom_specifics )
 
 import pyorb_core.rb_library.affine_decomposition as ad
+
 
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
