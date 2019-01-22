@@ -28,7 +28,33 @@ class Deim( ):
 
     def build_deim_snapshots( self, _ns ):
         
-        print('You need to code this !! ' )
+        self.M_ns = _ns
+        
+        current_snapshots_number = self.M_snapshots_matrix.shape[1]
+
+        self.M_fom_problem.generate_parameter( )
+
+        self.M_offline_parameters = np.zeros( (_ns, self.M_fom_problem.get_num_parameters( ) ) )
+        
+        for iNs in range( _ns ):
+            
+            random.seed( (iNs + 13) * 1011 )
+            
+            self.M_fom_problem.generate_parameter( )
+            param = self.M_fom_problem.get_parameter( )
+
+            self.M_offline_parameters[iNs, :] = param
+
+            print( 'Deim snapshots computation, parameter %d' % iNs )
+            print( param )
+
+            ff = self.M_fom_problem.assemble_fom_rhs( param )
+    
+            if current_snapshots_number == 0:
+                self.M_snapshots_matrix = np.zeros( ( ff.shape[0], _ns ) )
+
+            self.M_snapshots_matrix[:, iNs] = ff
+            current_snapshots_number = current_snapshots_number + 1
 
         return
 
@@ -42,9 +68,6 @@ class Deim( ):
     
         self.M_N = self.M_basis.shape[1]
 
-#        print( 'MDEIM BASIS' )
-#        print( self.M_basis )
- 
         if self.M_save_offline == True:
             output_file = open( self.M_save_offline_dir + 'mdeim_full_basis_A_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', 'w' )
 
@@ -75,8 +98,24 @@ class Deim( ):
         
         self.build_deim_snapshots( _ns )
 
-        self.build_deim_basis( self, _ns, _tol )
+        self.compute_deim_offline( _ns, _tol )
         
+        return
+
+    def compute_deim_offline( self, _ns, _tol ):
+
+        self.build_deim_basis( _ns, _tol )
+
+        self.identify_reduced_indeces( )
+
+        self.identify_deim_reduced_elements( )
+        
+        return
+
+    def identify_deim_reduced_elements( self ):
+        
+        self.M_reduced_elements = self.M_fom_problem.find_deim_elements_fom_specifics( self.M_reduced_indices )
+
         return
 
     def get_num_basis( self ):
@@ -118,6 +157,26 @@ class Deim( ):
         
         return self.M_basis
 
+    def compute_deim_theta_coefficients( self, _param ):
+        
+        rhs = self.M_fom_problem.assemble_fom_rhs( _param, _elements = self.M_reduced_elements, \
+                                                           _indices  = self.M_reduced_indices )
+
+        self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs[:, 0] )
+        
+        return self.M_current_theta
+    
+    def compute_deim_theta_coefficients_q( self, _param, _q ):
+        
+        if (self.M_current_param != _param).all():
+            print( 'Recomputing deim rhs for new parameter!' )
+            print( _param )
+            self.M_current_param = _param + np.zeros( _param.shape )
+            self.compute_deim_theta_coefficients( _param )
+        
+        return self.M_current_theta[_q]
+        
+
     def set_save_offline( self, _save_offline, _save_offline_dir ):
         self.M_save_offline = _save_offline
         self.M_save_offline_dir = _save_offline_dir
@@ -132,6 +191,7 @@ class Deim( ):
 
     M_interpolation_matrix = np.zeros( ( 0, 0 ) )
     M_reduced_indices = np.zeros( 0 )
+    M_reduced_elements = np.zeros( ( 0, 0 ) )
 
     M_save_file_basis_functions = "deim_basis"
     M_save_offline = False
@@ -139,6 +199,11 @@ class Deim( ):
     
     M_current_theta = np.zeros( 0 )
     M_current_param = np.zeros( 0 )
+
+
+
+
+
 
 
 class Mdeim( Deim ):
@@ -175,7 +240,7 @@ class Mdeim( Deim ):
 
             self.M_offline_parameters[iNs, :] = param
 
-            print( 'Mdeim snapshots compputation, parameter %d' % iNs )
+            print( 'Mdeim snapshots computation, parameter %d' % iNs )
             print( param )
 
             AA = self.M_fom_problem.assemble_fom_matrix( param )
@@ -373,7 +438,6 @@ class Mdeim( Deim ):
     M_col_map = np.zeros( ( 0, 0 ) )
 
     M_reduced_indices_mat = np.zeros( ( 0, 0 ) )
-    M_reduced_elements = np.zeros( ( 0, 0 ) )
 
 
 

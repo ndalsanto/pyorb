@@ -183,7 +183,7 @@ class AffineDecompositionHandler( ):
             print( "Importing FOM affine arrays " )
 
             if len( self.M_feAffineFq ) == 0:
-                print( "I am importing A affine arrays " )
+                print( "I am importing f affine arrays " )
 
                 fff = _fom_problem.retrieve_fom_affine_components( 'f', Qf )
 

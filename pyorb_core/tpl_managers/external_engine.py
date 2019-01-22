@@ -60,6 +60,19 @@ class external_engine( ):
                           please provide specific ones for your specific engine " )
         return
 
+    def assemble_fom_rhs( self, _param, _fom_specifics, _elements, _indices ):
+        
+        em.error_raiser( 'SystemError', 'external_engine::assemble_fom_rhs', "You are using the default assemble_fom_rhs, \
+                          please provide specific ones for your specific engine " )
+        return
+
+    def find_deim_elements_fom_specifics( self, _fom_specifics, _indices ):
+
+        em.error_raiser( 'SystemError', 'external_engine::find_deim_elements_fom_specifics', \
+                         "You are using the default find_deim_elements_fom_specifics, \
+                          please provide specific ones for your specific engine " )
+        return
+
     def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
 
         em.error_raiser( 'SystemError', 'external_engine::find_mdeim_elements_fom_specifics', \

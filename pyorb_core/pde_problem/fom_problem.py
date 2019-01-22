@@ -71,6 +71,9 @@ class fom_problem( ):
     def assemble_fom_matrix( self, _param, _elements=[], _indices=[] ):
         return self.M_external_engine.assemble_fom_matrix( _param, self.M_fom_specifics, _elements, _indices )
 
+    def assemble_fom_rhs( self, _param, _elements=[], _indices=[] ):
+        return self.M_external_engine.assemble_fom_rhs( _param, self.M_fom_specifics, _elements, _indices )
+
     def get_num_parameters( self ):
         return self.M_parameter_handler.get_num_parameters( )
 
@@ -86,6 +89,9 @@ class fom_problem( ):
 
     def find_mdeim_elements_fom_specifics( self, _indices_mat ):
         return self.M_external_engine.find_mdeim_elements_fom_specifics( self.M_fom_specifics, _indices_mat )
+
+    def find_deim_elements_fom_specifics( self, _indices ):
+        return self.M_external_engine.find_deim_elements_fom_specifics( self.M_fom_specifics, _indices )
 
     M_parameter_handler = None
     M_configured_fom = False

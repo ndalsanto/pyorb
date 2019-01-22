@@ -60,6 +60,11 @@ my_mdeim = m_deim.Mdeim( my_ndp )
 my_mdeim.perform_mdeim( 50, 10**(-6) )
 my_ndp.set_mdeim( my_mdeim )
 
+my_deim = m_deim.Deim( my_ndp )
+my_deim.perform_deim( 20, 10**(-6) )
+my_deim.print_reduced_indices( )
+
+
 #%%
 
 import pyorb_core.rb_library.affine_decomposition as ad

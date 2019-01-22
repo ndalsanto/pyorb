@@ -101,9 +101,31 @@ class matlab_external_engine( ee.external_engine ):
             A[:, 0:2] = A[:, 0:2] - 1
             
             return A
+
+    def assemble_fom_rhs( self, _param, _fom_specifics, _elements = [], _indices = []):
         
+        if len( _elements ) == 0:
+            rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), _fom_specifics )
+            ff = np.array( rhs['f'] )
+            ff = np.reshape( ff, (ff.shape[0], ) )
+            return ff
+        else:
+            # if I'd convert elements and indices to int it also retrieve from int values inside the matrx from MATLAB
+            # therefore I convert them to double
+            
+            
+            return A
+        
+    # NB the +1 is needed to convert the python indices over MATLAB
+    def find_deim_elements_fom_specifics( self, _fom_specifics, _indices ):
+
+        return np.array( self.M_engine.find_deim_elements_fom_specifics( _fom_specifics, \
+                                       self.convert_indices( _indices + 1 ) ) ).astype(int)
+
     # NB the +1 is needed to convert the python indices over MATLAB
     def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
 
         return np.array( self.M_engine.find_mdeim_elements_fom_specifics( _fom_specifics, \
                                        self.convert_indices( _indices_mat + 1 ) ) ).astype(int)
+
+
