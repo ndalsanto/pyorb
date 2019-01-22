@@ -64,6 +64,12 @@ class cpp_external_engine( ee.external_engine ):
                                ctypes.c_void_p( MPI._addressof( self.M_comm ) ), \
                                cp_u, cp_A, cp_f )
 
+        print( 'COMM TYPE ' )
+
+        print( MPI._addressof( self.M_comm ) )
+
+        print( type( self.M_comm ) )
+
         compute_only_the_dim = True
         vector_dim = self.M_c_lib.solve_parameter( self.convert_parameter( _param ), c_fom_spec, compute_only_the_dim )
 
@@ -127,8 +133,7 @@ class cpp_external_engine( ee.external_engine ):
         print( 'Building %d matrix affine components' % _num_affine_components )
 
         for iQa in range( _num_affine_components ):
-
-            print( 'Building rhs affine components number %d ' % iQa )
+            print( 'Building matrix affine components number %d ' % iQa )
 
             A = np.zeros( 0 )
             cp_A = A.ctypes.data_as( ctypes.POINTER( ctypes.c_double ) )

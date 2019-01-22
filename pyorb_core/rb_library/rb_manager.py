@@ -153,6 +153,10 @@ class RbManager( ):
             if current_snapshots_number == 0:
                 self.M_snapshots_matrix = np.zeros( ( len(u), _new_snapshots ) )
 
+            norm_of_snapshot = np.linalg.norm( u )
+
+            print( 'Norm of the snapshot is %f ' % norm_of_snapshot )
+
             self.M_snapshots_matrix[:, iS] = u
             current_snapshots_number = current_snapshots_number + 1
 
