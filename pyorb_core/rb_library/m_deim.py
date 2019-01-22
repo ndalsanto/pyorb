@@ -296,17 +296,39 @@ class Mdeim( Deim ):
 
         output_file.close( )
 
+        # saving row map
+        output_file = open( self.M_save_offline_dir + 'mdeim_row_map_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', 'w' )
+
+        for iV in range( self.M_row_map.shape[0] ):
+                output_file.write( "%.10g \n" % self.M_row_map[iV] )
+
+        output_file.close( )
+
+        # saving col map
+        output_file = open( self.M_save_offline_dir + 'mdeim_col_map_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', 'w' )
+
+        for iV in range( self.M_col_map.shape[0] ):
+                output_file.write( "%.10g \n" % self.M_col_map[iV] )
+
+        output_file.close( )
+
+
         return
         
 
     def load_offline( self, _save_offline_dir ):
         
         self.M_save_offline_dir = _save_offline_dir
+        
+        self.M_basis                 = np.loadtxt( self.M_save_offline_dir + 'mdeim_full_basis_A_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt' )
         self.M_reduced_elements      = np.loadtxt( self.M_save_offline_dir + 'mdeim_reduced_elements_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', dtype=int )
         self.M_reduced_indices       = np.loadtxt( self.M_save_offline_dir + 'mdeim_reduced_indices_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', dtype=int )
         self.M_reduced_indices_mat   = np.loadtxt( self.M_save_offline_dir + 'mdeim_reduced_indices_matrix_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', dtype=int )
         self.M_interpolation_matrix  = np.loadtxt( self.M_save_offline_dir + 'mdeim_interpolation_matrix_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt' )
         
+        self.M_row_map               = np.loadtxt( self.M_save_offline_dir + 'mdeim_row_map_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', dtype=int )
+        self.M_col_map               = np.loadtxt( self.M_save_offline_dir + 'mdeim_col_map_' + str(self.M_fom_problem.M_fom_specifics['number_of_elements']) + '.txt', dtype=int )
+
         self.M_reduced_elements      = self.M_reduced_elements.astype( int )
         self.M_reduced_indices       = self.M_reduced_indices.astype( int )
         self.M_reduced_indices_mat   = self.M_reduced_indices_mat.astype( int )
@@ -328,9 +350,9 @@ class Mdeim( Deim ):
     
     def compute_theta_coefficients_q( self, _param, _q ):
         
-        if (self.M_current_param != _param).all():
-            print( 'Recomputing for new parameter!' )
-            print( _param )
+        if (self.M_current_param != _param).any():
+#            print( 'Recomputing for new parameter!' )
+#            print( _param )
             self.M_current_param = _param + np.zeros( _param.shape )
             self.compute_theta_coefficients( _param )
         

@@ -59,7 +59,7 @@ class matlab_external_engine( ee.external_engine ):
     # normally a MATLAB application can directly provide a dictionary with all the affine components 
     def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
 
-        print( 'Building affine components with operator %c' % _operator )
+        print( 'Building affine components for operator %c' % _operator )
         
         affine_components = self.M_engine.build_fom_affine_components( _operator, _fom_specifics )
 

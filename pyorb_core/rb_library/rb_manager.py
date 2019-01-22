@@ -83,7 +83,7 @@ class RbManager( ):
         if self.M_get_test:
             return self.get_test_snapshot( _snapshot_number, _fom_coordinates )
         else:
-            return self.get_snapshot( _snapshot_number, _fom_coordinates )   
+            return self.get_snapshot( _snapshot_number, _fom_coordinates )
         
     def get_snapshot( self, _snapshot_number, _fom_coordinates=np.array([]) ):
         
@@ -316,8 +316,11 @@ class RbManager( ):
         thetas = np.zeros( (_params.shape[0], Qa) )
         
         for iP in range( _params.shape[0] ):
+            mu = _params[iP, :]
             for iQa in range( Qa ):
-                thetas[iP, iQa] = self.M_fom_problem.get_theta_a( _params[iP, :], iQa )
+
+                theta_q = self.M_fom_problem.get_theta_a( mu, iQa )
+                thetas[iP, iQa] = theta_q
         
         return thetas
         
@@ -328,12 +331,19 @@ class RbManager( ):
     def get_rb_affine_vector( self, _q ):
         return self.M_affineDecomposition.get_rb_affine_vector( _q )
 
-    def solve_reduced_problem( self, _param ):
+    def solve_reduced_problem( self, _param, _used_Qa=0, _used_Qf=0 ):
         
         if self.M_verbose == True:
             print( "Solving RB problem for parameter: " )
             print( _param )
+
+        self.M_used_Qa = self.M_affineDecomposition.get_Qa( )
         
+        if _used_Qa > 0:
+            self.M_used_Qa = _used_Qa
+        
+        self.M_used_Qf = self.M_affineDecomposition.get_Qf( )
+
         self.build_reduced_problem( _param )
         
         self.M_un = np.linalg.solve( self.M_An, self.M_fn )
@@ -347,10 +357,10 @@ class RbManager( ):
         self.M_fn = np.zeros( N )
         self.M_un = np.zeros( N )
         
-        for iQa in range( self.M_affineDecomposition.get_Qa( ) ):
+        for iQa in range( self.M_used_Qa ):
             self.M_An = self.M_An + self.M_fom_problem.get_theta_a( _param, iQa ) * self.get_rb_affine_matrix( iQa )
 
-        for iQf in range( self.M_affineDecomposition.get_Qf( ) ):
+        for iQf in range( self.M_used_Qf ):
 
             theta_f = self.M_fom_problem.get_theta_f( _param, iQf )
             Fq = self.get_rb_affine_vector( iQf )
@@ -426,6 +436,8 @@ class RbManager( ):
             self.reconstruct_fem_solution( self.M_un )
             uh = self.M_fom_problem.solve_fom_problem( new_param )
 
+#            print( self.M_un )
+
 #            uh = uh[:, 0]
             error = self.M_utildeh
             error = error - uh
@@ -441,7 +453,8 @@ class RbManager( ):
         
         return avg_error
 
-
+    M_used_Qa = 0
+    M_used_Qf = 0
     M_An = np.zeros( (0, 0) )
     M_fn = np.zeros( 0 )
     M_un = np.zeros( 0 )
