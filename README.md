@@ -5,4 +5,4 @@ Current tests included in the library in the folder examples/ take into account 
 Development
 -------
 
-PyORB is conceived, developed and maintained by [Niccolò Dal Santo](https://www.linkedin.com/in/niccolo-dal-santo/) at [EPFL](https://www.epfl.ch/).
+PyORB is mainly conceived, developed and maintained by [Niccolò Dal Santo](https://www.linkedin.com/in/niccolo-dal-santo/) at [EPFL](https://www.epfl.ch/).
