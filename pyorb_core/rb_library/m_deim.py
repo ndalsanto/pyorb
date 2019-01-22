@@ -94,6 +94,8 @@ class Deim( ):
 
     def perform_deim( self, _ns, _tol ):
         
+        print( "\n\nStarting to perform DEIM with %d snapshots and %f as POD tolerance \n\n" % ( _ns, _tol ) )
+
         self.reset_deim( )
         
         self.build_deim_snapshots( _ns )
@@ -162,7 +164,7 @@ class Deim( ):
         rhs = self.M_fom_problem.assemble_fom_rhs( _param, _elements = self.M_reduced_elements, \
                                                            _indices  = self.M_reduced_indices )
 
-        self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs[:, 0] )
+        self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs )
         
         return self.M_current_theta
     
@@ -180,8 +182,21 @@ class Deim( ):
     def set_save_offline( self, _save_offline, _save_offline_dir ):
         self.M_save_offline = _save_offline
         self.M_save_offline_dir = _save_offline_dir
+    
+    def get_interpolation_matrix( self ):
+        return self.M_interpolation_matrix
+    
+            
+    def get_deim_basis_list( self ):
+
+        l = []
         
-        
+        for iB in range( self.M_N ):
+            l.append( self.M_basis[:, iB] )
+            
+        return l
+
+
     M_fom_problem = None
     M_snapshots_matrix = np.zeros( ( 0, 0 ) )
     M_basis = np.zeros( ( 0, 0 ) )

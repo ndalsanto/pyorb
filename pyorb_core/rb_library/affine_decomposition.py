@@ -202,8 +202,6 @@ class AffineDecompositionHandler( ):
 
         for iQf in range( Qf ):
             self.M_rbAffineFq.append( np.zeros( N ) )
-            print( _basis.size )
-            print( self.M_feAffineFq[iQf] )
             self.M_rbAffineFq[iQf] = _basis.T.dot( self.M_feAffineFq[iQf] )
 
         for iQa in range( Qa ):

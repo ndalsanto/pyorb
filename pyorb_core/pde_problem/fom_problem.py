@@ -18,8 +18,11 @@ def default_theta_function( _param, _q ):
 
 class fom_problem( ):
 
-    def __init__( self, _parameter_handler ):
+    def __init__( self, _parameter_handler, _external_engine = None, _fom_specifics = None ):
 
+        if _external_engine is not None and _fom_specifics is not None:
+            self.configure_fom( _external_engine, _fom_specifics )
+        
         self.define_theta_functions( )
         self.M_parameter_handler = _parameter_handler
 
@@ -66,12 +69,15 @@ class fom_problem( ):
         return product.array
 
     def retrieve_fom_affine_components( self, _operator, _num_affine_components ):
+        self.check_configured_fom( )
         return self.M_external_engine.build_fom_affine_components( _operator, _num_affine_components, self.M_fom_specifics )
 
     def assemble_fom_matrix( self, _param, _elements=[], _indices=[] ):
+        self.check_configured_fom( )
         return self.M_external_engine.assemble_fom_matrix( _param, self.M_fom_specifics, _elements, _indices )
 
     def assemble_fom_rhs( self, _param, _elements=[], _indices=[] ):
+        self.check_configured_fom( )
         return self.M_external_engine.assemble_fom_rhs( _param, self.M_fom_specifics, _elements, _indices )
 
     def get_num_parameters( self ):
@@ -88,9 +94,11 @@ class fom_problem( ):
         return self.M_parameter_handler
 
     def find_mdeim_elements_fom_specifics( self, _indices_mat ):
+        self.check_configured_fom( )
         return self.M_external_engine.find_mdeim_elements_fom_specifics( self.M_fom_specifics, _indices_mat )
 
     def find_deim_elements_fom_specifics( self, _indices ):
+        self.check_configured_fom( )
         return self.M_external_engine.find_deim_elements_fom_specifics( self.M_fom_specifics, _indices )
 
     M_parameter_handler = None
@@ -98,7 +106,7 @@ class fom_problem( ):
 
     # engine used to perform offline computation relying on an external engine
     M_external_engine = None
-    M_fom_specifics = 0
+    M_fom_specifics = None
 
     # theta functions
     M_theta_a = default_theta_function
