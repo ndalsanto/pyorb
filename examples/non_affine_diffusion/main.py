@@ -16,7 +16,7 @@ print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
-matlab_library_path = '/Users/luca/deeplearning_pdes/feamat/'
+matlab_library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat/'
 
 # playing around with engine manager
 my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
@@ -26,9 +26,9 @@ my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
 import pyorb_core.pde_problem.parameter_handler as ph
 
-mu0_min = 0.4; mu0_max = 0.6
-mu1_min = 0.4; mu1_max = 0.6
-mu2_min = 0.25; mu2_max = 0.55
+mu0_min = 0.45; mu0_max = 0.55
+mu1_min = 0.45; mu1_max = 0.55
+mu2_min = 0.25; mu2_max = 0.3
 
 param_min = np.array([mu0_min, mu1_min, mu2_min])
 param_max = np.array([mu0_max, mu1_max, mu2_max])
@@ -47,15 +47,17 @@ fem_size = 20
 fem_size_str = str( fem_size )
 
 fom_specifics = {
-        'number_of_elements': fem_size,
-        'polynomial_degree' : 'P1',
-        'model': 'nonaffine' }
+        'number_of_elements': fem_size, \
+        'polynomial_degree' : 'P1', \
+        'model': 'nonaffine', \
+        'use_nonhomogeneous_dirichlet' : 'Y' \
+        }
 
 my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 
 import pyorb_core.rb_library.m_deim as m_deim
 my_mdeim = m_deim.Mdeim( my_ndp )
-my_mdeim.perform_mdeim( 20, 10**(-6) )
+my_mdeim.perform_mdeim( 50, 10**(-6) )
 my_ndp.set_mdeim( my_mdeim )
 
 #%%

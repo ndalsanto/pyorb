@@ -16,7 +16,7 @@ print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
-cpp_library_folder = '/u/cmcs/pegolott/deeplearning_pdes/lifev-pyorb/build/libpyorb-lifev-api.so'
+cpp_library_folder = '/usr/scratch/dalsanto/EPFL/DeepLearning/LifeV/lifev-env/pyorb-lifev-api-build/libpyorb-lifev-api.so'
 
 # playing around with engine manager
 my_cpp_engine_manager = mee.external_engine_manager( 'cpp', cpp_library_folder )
