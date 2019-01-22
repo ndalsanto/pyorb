@@ -49,7 +49,7 @@ fom_specifics = {
         'number_of_elements': fem_size, \
         'polynomial_degree' : 'P1', \
         'model': 'nonaffine', \
-        'use_nonhomogeneous_dirichlet' : 'Y' \
+        'use_nonhomogeneous_dirichlet' : 'N' \
         }
 
 my_ndp = ndp.nonaffine_diffusion_problem( my_parameter_handler, my_matlab_external_engine, fom_specifics )
@@ -59,14 +59,13 @@ my_mdeim = m_deim.Mdeim( my_ndp )
 my_mdeim.perform_mdeim( 100, 10**(-6) )
 my_ndp.set_mdeim( my_mdeim )
 
-my_deim = m_deim.Deim( my_ndp )
-my_deim.perform_deim( 100, 10**(-6) )
-my_deim.print_reduced_indices( )
-my_ndp.set_deim( my_deim )
-
 num_f_affine_components = 1
 
 if fom_specifics['use_nonhomogeneous_dirichlet'] == 'Y':
+    my_deim = m_deim.Deim( my_ndp )
+    my_deim.perform_deim( 100, 10**(-6) )
+    my_deim.print_reduced_indices( )
+    my_ndp.set_deim( my_deim )
     num_f_affine_components = my_deim.get_num_basis( )
     
 print( 'Number of affine basis for the rhs is %d ' % num_f_affine_components  )
@@ -87,7 +86,9 @@ my_affine_decomposition.set_Q( my_mdeim.get_num_mdeim_basis(), num_f_affine_comp
 
 # we externally set the affine components for A, the ones for f are handled in the solver
 my_affine_decomposition.set_affine_a( my_mdeim.get_basis_list( ) )
-my_affine_decomposition.set_affine_f( my_deim.get_deim_basis_list( ) )
+
+if fom_specifics['use_nonhomogeneous_dirichlet'] == 'Y':
+    my_affine_decomposition.set_affine_f( my_deim.get_deim_basis_list( ) )
 
 import pyorb_core.rb_library.rb_manager as rm
 print( rm.__doc__ )

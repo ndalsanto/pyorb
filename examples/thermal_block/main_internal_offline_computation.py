@@ -15,10 +15,10 @@ print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
-matlab_library_folder = '/Users/luca/deeplearning_pdes/feamat'
+matlab_library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat/'
 
 # playing around with engine manager 
-my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_folder )
+my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
@@ -41,10 +41,14 @@ import thermal_block_problem as tbp
 
 my_tbp = tbp.thermal_block_problem( my_parameter_handler )
 
-fom_specifics = { 
-        'number_of_elements': 20, 
-        'polynomial_degree' : 'P1',
-        'model'             : 'thermal_block' }
+import pyorb_core.pde_problem.fom_utilities as fom_util
+
+fom_specifics = fom_util.build_matlab_default_fom_specifics( )
+
+fom_specifics['number_of_elements'] = 20
+fom_specifics['polynomial_degree']  = 'P1'
+fom_specifics['model']              = 'thermal_block'
+
 
 my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
 
