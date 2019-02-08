@@ -5,7 +5,12 @@ Created on Thu Oct 31 14:31:17 2018
 
 @author: Niccolo' Dal Santo
 @email : niccolo.dalsanto@epfl.ch
+
+An example where the RB method is constructed by solving the fem problem with MATLAB to compute the snapshots and the affine decomposition of FE matrices and vectors 
+
 """
+
+#%%
 
 import numpy as np
 
@@ -16,7 +21,7 @@ print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
-matlab_library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat'
+matlab_library_path = 'path/to/MATLAB/library'
 
 # playing around with engine manager 
 my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
@@ -49,7 +54,9 @@ fem_size_str = str( fem_size )
 fom_specifics = { 
         'number_of_elements': fem_size, 
         'polynomial_degree' : 'P1',
-        'model': 'nonaffine' }
+        'model': 'nonaffine',
+        'use_nonhomogeneous_dirichlet' : 'N',
+        'mesh_name' : 'non_affine_mesh' }
 
 my_ndp.configure_fom( my_matlab_external_engine, fom_specifics )
 

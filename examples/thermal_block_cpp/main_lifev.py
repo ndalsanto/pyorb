@@ -18,9 +18,7 @@ print(sys.path)
 
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
-# playing around with engine manager 
-library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/LifeV/lifev-env/lifev-epfl-build/rb/liblifevreducedbasis.so'
-library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/LifeV/lifev-env/pyorb-lifev-api-build/libpyorb-lifev-api.so'
+library_path = '/path/to/libpyorb-lifev-api.so'
 my_cpp_engine_manager = mee.external_engine_manager( 'cpp', library_path )
 
 my_cpp_engine_manager.start_engine( )
@@ -60,15 +58,12 @@ import pyorb_core.rb_library.affine_decomposition as ad
 my_affine_decomposition = ad.AffineDecompositionHandler( )
 my_affine_decomposition.set_Q( 4, 1 )               # number of affine terms
 
-#my_affine_decomposition.import_affine_matrices( 'AAA_' )
-#my_affine_decomposition.import_affine_vectors(  'fff_' )
-
 # building the RB manager
 import pyorb_core.rb_library.rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
 
-my_rb_manager.build_rb_approximation( 30, 10**(-6) )
+my_rb_manager.build_rb_approximation( 40, 10**(-6) )
 
 
 avg_error = my_rb_manager.test_rb_solver( 10 )

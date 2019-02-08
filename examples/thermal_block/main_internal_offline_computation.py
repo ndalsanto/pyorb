@@ -5,7 +5,14 @@ Created on Thu Oct 25 14:31:17 2018
 
 @author: Niccolo' Dal Santo
 @email : niccolo.dalsanto@epfl.ch
+
+An example where the RB method is constructed by solving the fem problem with MATLAB to compute the snapshots and the affine decomposition of FE matrices and vectors 
+
+The affine decomposition is computed with MDEIM
+
 """
+
+#%%
 
 import numpy as np
 
@@ -15,10 +22,10 @@ print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
-matlab_library_folder = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat'
+matlab_library_path = 'path/to/MATLAB/library'
 
 # playing around with engine manager 
-my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_folder )
+my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
@@ -44,7 +51,8 @@ my_tbp = tbp.thermal_block_problem( my_parameter_handler )
 fom_specifics = { 
         'number_of_elements': 20, 
         'polynomial_degree' : 'P1',
-        'model'             : 'thermal_block' }
+        'model'             : 'thermal_block',
+        'use_nonhomogeneous_dirichlet' : 'N' }
 
 my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
 
