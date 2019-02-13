@@ -9,3 +9,4 @@ __pycache__
 *.m
 *.pyc
 .DS_Store
+*.mat
