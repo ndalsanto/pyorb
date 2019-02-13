@@ -104,20 +104,22 @@ class matlab_external_engine( ee.external_engine ):
 
     def assemble_fom_rhs( self, _param, _fom_specifics, _elements = [], _indices = []):
         
+
+        
         if len( _elements ) == 0:
             rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), _fom_specifics )
             ff = np.array( rhs['f'] )
             ff = np.reshape( ff, (ff.shape[0], ) )
             return ff
         else:
-            # if I'd convert elements and indices to int it also retrieve from int values inside the matrx from MATLAB
+            
+            # if I convert elements and indices to int it would also retrieve from int values inside the matrx from MATLAB
             # therefore I convert them to double
             rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), _fom_specifics, \
                                                   self.convert_parameter( _elements ), \
                                                   self.convert_parameter( _indices + 1 ) )
             
             ff = np.array( rhs['f'] )
-            
             
             return ff
         

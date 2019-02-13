@@ -178,8 +178,6 @@ class Deim( ):
     def compute_deim_theta_coefficients_q( self, _param, _q ):
         
         if (self.M_current_param != _param).all():
-            print( 'Recomputing deim rhs for new parameter!' )
-            print( _param )
             self.M_current_param = _param + np.zeros( _param.shape )
             self.compute_deim_theta_coefficients( _param )
         
@@ -472,9 +470,9 @@ class Mdeim( Deim ):
         return self.M_N
 
     def compute_theta_coefficients( self, _param ):
-        
         rhs = self.M_fom_problem.assemble_fom_matrix( _param, _elements=self.M_reduced_elements, \
                                                       _indices=self.M_reduced_indices_mat )
+
         self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs[:, 2] )
         
         return self.M_current_theta
@@ -482,8 +480,6 @@ class Mdeim( Deim ):
     def compute_theta_coefficients_q( self, _param, _q ):
         
         if (self.M_current_param != _param).any():
-#            print( 'Recomputing for new parameter!' )
-#            print( _param )
             self.M_current_param = _param + np.zeros( _param.shape )
             self.compute_theta_coefficients( _param )
         

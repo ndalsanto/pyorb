@@ -16,6 +16,12 @@ def default_theta_function( _param, _q ):
 
     pass
 
+def default_full_theta_function( _param ):
+
+    em.error_raiser( 'SystemError', 'default_full_theta_function', "You are using the default full theta function, please provide specific ones for your problem " )
+
+    pass
+
 class fom_problem( ):
 
     def __init__( self, _parameter_handler, _external_engine = None, _fom_specifics = None ):
@@ -33,6 +39,12 @@ class fom_problem( ):
 
     def get_theta_f( self, _param, _q ):
         return self.M_theta_f( _param, _q )
+
+    def get_full_theta_a( self, _param ):
+        return self.M_full_theta_a( _param )
+
+    def get_full_theta_f( self, _param ):
+        return self.M_full_theta_f( _param )
 
     def define_theta_functions( self ):
 
@@ -111,4 +123,12 @@ class fom_problem( ):
     # theta functions
     M_theta_a = default_theta_function
     M_theta_f = default_theta_function
+    M_full_theta_a = default_full_theta_function
+    M_full_theta_f = default_full_theta_function
     M_current_parameter = np.zeros( 0 )
+
+
+
+
+
+

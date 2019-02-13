@@ -315,16 +315,23 @@ class RbManager( ):
     def compute_theta_functions( self, _params ):
 
         Qa = self.get_Qa( )
+        Qf = self.get_Qf( )
 
-        thetas = np.zeros( (_params.shape[0], Qa) )
+        theta_as = np.zeros( (_params.shape[0], Qa) )
+        theta_fs = np.zeros( (_params.shape[0], Qf) )
 
         for iP in range( _params.shape[0] ):
             mu = _params[iP, :]
+            
             for iQa in range( Qa ):
                 theta_q = self.M_fom_problem.get_theta_a( mu, iQa )
-                thetas[iP, iQa] = theta_q
+                theta_as[iP, iQa] = theta_q
 
-        return thetas
+            for iQf in range( Qf ):
+                theta_q = self.M_fom_problem.get_theta_f( mu, iQf )
+                theta_fs[iP, iQf] = theta_q
+
+        return theta_as, theta_fs
 
 
     def get_rb_affine_matrix( self, _q ):
@@ -348,7 +355,8 @@ class RbManager( ):
 
         self.build_reduced_problem( _param )
 
-        self.M_un = np.linalg.solve( self.M_An, self.M_fn )
+#        self.M_un = np.linalg.solve( self.M_An, self.M_fn )
+        self.M_un = np.linalg.lstsq( self.M_An, self.M_fn )[0]
 
         return self.M_un
 
@@ -359,16 +367,15 @@ class RbManager( ):
         self.M_fn = np.zeros( N )
         self.M_un = np.zeros( N )
         
+        theta_a = self.M_fom_problem.get_full_theta_a( _param )
+
         for iQa in range( self.M_used_Qa ):
-            self.M_An = self.M_An + self.M_fom_problem.get_theta_a( _param, iQa ) * self.get_rb_affine_matrix( iQa )
+            self.M_An = self.M_An + theta_a[iQa] * self.get_rb_affine_matrix( iQa )
+
+        theta_f = self.M_fom_problem.get_full_theta_f( _param )
 
         for iQf in range( self.M_used_Qf ):
-
-            theta_f = self.M_fom_problem.get_theta_f( _param, iQf )
-            Fq = self.get_rb_affine_vector( iQf )
-
-            for ii in range( N ):
-                self.M_fn[ii] = self.M_fn[ii] + theta_f * Fq[ii]
+            self.M_fn = self.M_fn + theta_f[iQf] * self.get_rb_affine_vector( iQf )
 
 
         return
@@ -420,9 +427,11 @@ class RbManager( ):
 
         return norm_of_error
 
-    def test_rb_solver( self, _n_test ):
+    def test_rb_solver( self, _n_test, _noise=0.0 ):
 
         all_errors = 0.;
+
+        all_errors_simulations = np.zeros( _n_test )
 
         for iP in range( _n_test ):
 
@@ -431,21 +440,25 @@ class RbManager( ):
             new_param = self.M_fom_problem.generate_parameter( )
             new_param = self.M_fom_problem.get_parameter( )
 
-            print( "New parameter %d " %( iP ) )
+            print( "New parameter %d " % ( iP ) )
             print( new_param )
+            
+            new_noised_param = new_param * ( 1 + _noise * np.random.normal( 0, 1, size=new_param.shape ) )
+            
+            print( "New NOISED parameter %d " % ( iP ) )
+            print( new_noised_param )
 
-            self.solve_reduced_problem( new_param )
+            self.solve_reduced_problem( new_noised_param )
             self.reconstruct_fem_solution( self.M_un )
             uh = self.M_fom_problem.solve_fom_problem( new_param )
 
-#            print( self.M_un )
-
-#            uh = uh[:, 0]
             error = self.M_utildeh
             error = error - uh
 
             norm_of_error = np.sqrt( np.sum( error * error ) / np.sum( uh * uh )  )
             all_errors = all_errors + norm_of_error
+
+            all_errors_simulations[iP] = norm_of_error
 
             print( "The error is %e \n\n" % norm_of_error )
 
@@ -453,7 +466,7 @@ class RbManager( ):
 
         print( "The average error is %E" % avg_error )
 
-        return avg_error
+        return avg_error, all_errors_simulations
 
     M_used_Qa = 0
     M_used_Qf = 0
