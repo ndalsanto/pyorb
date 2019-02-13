@@ -47,7 +47,7 @@ my_parameter_handler.assign_parameters_bounds( param_min, param_max )
 import nonaffine_diffusion_problem as ndp
 
 
-fem_size = 20
+fem_size = 10
 fem_size_str = str( fem_size )
 
 

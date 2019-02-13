@@ -8,9 +8,13 @@ Created on Wed Oct 31 18:43:23 2018
 """
 
 import pyorb_core.pde_problem.fom_problem as fp
+import numpy as np
 
 def ndp_theta_f( _param, _q = 0 ):
     return 1.0
+
+def ndp_full_theta_f( _param ):
+    return np.array([1.0])
 
 class ndp_theta_fs( ):
     def __init__( self ):
@@ -68,7 +72,7 @@ class nonaffine_diffusion_problem( fp.fom_problem ):
             self.M_full_theta_f = self.M_ndp_theta_fs.ndp_full_theta_f
         else:
             self.M_theta_f = ndp_theta_f
-            self.M_full_theta_f = self.M_ndp_theta_fs.ndp_full_theta_f
+            self.M_full_theta_f = ndp_full_theta_f
         
         return
     

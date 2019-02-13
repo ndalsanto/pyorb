@@ -53,7 +53,8 @@ fom_specifics = {
         'number_of_elements': 10, 
         'polynomial_degree' : 'P1',
         'model'             : 'thermal_block',
-        'use_nonhomogeneous_dirichlet' : 'N' }
+        'use_nonhomogeneous_dirichlet' : 'N',
+        'mesh_name'                    : 'cube10x10' }
 
 my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
 

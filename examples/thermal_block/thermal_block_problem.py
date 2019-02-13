@@ -23,6 +23,19 @@ def tb_theta_a( _param, _q ):
 def tb_theta_f( _param, _q ):
     return 1.0
 
+def tb_full_theta_f( _param ):
+    return np.array([1.0])
+
+def tb_full_theta_a( _param ):
+    
+    diffusions = np.zeros( len( _param) + 1 )
+    
+    diffusions[0:len( _param)] = _param
+    
+    diffusions[len( _param)] = 1.0
+    
+    return diffusions
+
 
 class thermal_block_problem( fp.fom_problem ):
 
@@ -36,6 +49,9 @@ class thermal_block_problem( fp.fom_problem ):
         self.M_theta_a = tb_theta_a
         self.M_theta_f = tb_theta_f
         
+        self.M_full_theta_a = tb_full_theta_a
+        self.M_full_theta_f = tb_full_theta_f
+
         return
      
 

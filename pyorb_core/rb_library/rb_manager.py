@@ -377,7 +377,6 @@ class RbManager( ):
         for iQf in range( self.M_used_Qf ):
             self.M_fn = self.M_fn + theta_f[iQf] * self.get_rb_affine_vector( iQf )
 
-
         return
 
     def reconstruct_fem_solution( self, _un ):
