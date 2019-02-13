@@ -5,7 +5,14 @@ Created on Thu Oct 25 14:31:17 2018
 
 @author: Niccolo' Dal Santo
 @email : niccolo.dalsanto@epfl.ch
+
+An example where the RB method is constructed by solving the fem problem with MATLAB to compute the snapshots and the affine decomposition of FE matrices and vectors 
+
+The affine decomposition is computed with MDEIM
+
 """
+
+#%%
 
 import numpy as np
 
@@ -41,14 +48,12 @@ import thermal_block_problem as tbp
 
 my_tbp = tbp.thermal_block_problem( my_parameter_handler )
 
-import pyorb_core.pde_problem.fom_utilities as fom_util
 
-fom_specifics = fom_util.build_matlab_default_fom_specifics( )
-
-fom_specifics['number_of_elements'] = 20
-fom_specifics['polynomial_degree']  = 'P1'
-fom_specifics['model']              = 'thermal_block'
-
+fom_specifics = { 
+        'number_of_elements': 10, 
+        'polynomial_degree' : 'P1',
+        'model'             : 'thermal_block',
+        'use_nonhomogeneous_dirichlet' : 'N' }
 
 my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
 

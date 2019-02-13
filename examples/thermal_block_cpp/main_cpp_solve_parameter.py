@@ -18,9 +18,7 @@ print(sys.path)
 
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
-# playing around with engine manager 
-#library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/LifeV/lifev-env/lifev-epfl-build/rb/liblifevreducedbasis.so'
-library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/LifeV/lifev-env/pyorb-lifev-api-build/libpyorb-lifev-api.so'
+library_path = '/usr/scratch/dalsanto/EPFL/test_deep/pyorb-lifev-api-build/libpyorb-lifev-api.so'
 my_cpp_engine_manager = mee.external_engine_manager( 'cpp', library_path )
 
 my_cpp_engine_manager.start_engine( )
@@ -54,8 +52,7 @@ my_tbp.configure_fom( my_cpp_engine_manager, fom_specifics )
 
 my_parameter_handler.generate_parameter( )
 param = param_max
-#u = my_tbp.solve_fom_problem( param )
-
+u = my_tbp.solve_fom_problem( param )
 
 affine_components_mat = my_tbp.M_external_engine.build_fom_matrix_affine_components( 4, fom_specifics )
 
