@@ -21,7 +21,7 @@ import pyorb_core.error_manager as em
 
 class RbManager( ):
 
-    def __init__( self, _affine_decomposition, _fom_problem ):
+    def __init__( self, _fom_problem, _affine_decomposition=None ):
 
         self.set_affine_decomposition_handler( _affine_decomposition )
         self.set_fom_problem( _fom_problem )
@@ -260,12 +260,16 @@ class RbManager( ):
 
         self.perform_pod( _tol )
 
-        self.M_affineDecomposition.build_rb_affine_decompositions( self.M_basis, self.M_fom_problem )
+        self.build_rb_affine_decompositions( )
 
         if self.M_save_offline_structures == True:
             self.M_affineDecomposition.save_rb_affine_decomposition( self.M_save_file_affine_components )
 
         return
+
+    def build_rb_affine_decompositions( self ):
+        self.M_affineDecomposition.build_rb_affine_decompositions( self.M_basis, self.M_fom_problem )
+        return 
 
     # to save the offline structures in the given locations
     def save_offline_structures( self, _snapshot_matrix, _basis_matrix, _affine_components, _offline_parameters ):
@@ -292,6 +296,20 @@ class RbManager( ):
     def get_Qf( self ):
         return self.M_affineDecomposition.get_Qf( )
 
+    def get_rb_functions_dict( self ):
+        
+        rb_functions_dict = { 'range_rb_functions' : self.M_N }
+        
+        for iB in range(self.M_N):
+            rb_functions_dict.update( {'rb_func_' + str(iB) : self.M_basis[:, iB] } )
+        
+        return rb_functions_dict
+
+    def update_fom_specifics( self, _fom_specifics_update ):
+        
+        self.M_fom_problem.M_fom_specifics.update( _fom_specifics_update )
+        
+        return 
 
     M_verbose = False
     M_get_test = False

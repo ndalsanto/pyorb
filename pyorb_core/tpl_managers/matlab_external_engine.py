@@ -48,6 +48,19 @@ class matlab_external_engine( ee.external_engine ):
 
         return matlab.int64(_indices.tolist())
 
+    def convert_types( self, _fom_specifics ):
+        
+        converted_fom_specifics = {}
+        
+        for key in _fom_specifics:
+            
+            if type(_fom_specifics[key]) == np.ndarray:
+                converted_fom_specifics.update( { key : self.convert_double( _fom_specifics[key] ) } )
+            else:
+                converted_fom_specifics.update( { key : _fom_specifics[key] } )
+            
+        return converted_fom_specifics
+
     def solve_parameter( self, _param, _fom_specifics ):
 
         u = self.M_engine.solve_parameter( self.convert_parameter( _param ), _fom_specifics )
@@ -61,7 +74,9 @@ class matlab_external_engine( ee.external_engine ):
 
         print( 'Building affine components for operator %c' % _operator )
         
-        affine_components = self.M_engine.build_fom_affine_components( _operator, _fom_specifics )
+        used_fom_specifics = self.convert_types( _fom_specifics )
+        
+        affine_components = self.M_engine.build_fom_affine_components( _operator, used_fom_specifics )
 
         # rescale the matrix indices so that the counting starts from 0 (and not from 1 as in MATLAB)
         if _operator == 'A':

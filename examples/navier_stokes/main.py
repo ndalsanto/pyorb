@@ -45,31 +45,54 @@ my_parameter_handler.assign_parameters_bounds( param_min, param_max )
 # define the fem problem
 import navier_stokes_problem as ns
 
-fom_specifics = { 
+mesh = 'very_coarse'
+
+fom_specifics = {
         'model': 'navier_stokes',
-        'mesh_name' : '/usr/scratch/dalsanto/EPFL/DeepLearning/DLPDEs/elliptic_example/navier_stokes_2d/bifurcation_very_coarse.msh' }
+        'mesh_name' : '/usr/scratch/dalsanto/EPFL/DeepLearning/DLPDEs/elliptic_example/navier_stokes_2d/bifurcation_' + mesh + '.msh' }
 
 my_ns = ns.navier_stokes_problem( my_parameter_handler, my_matlab_external_engine, fom_specifics )
 
 my_ns.generate_parameter( )
 param = my_ns.get_parameter( )
 
-
-import pyorb_core.rb_library.m_deim as m_deim
-my_mdeim = m_deim.Mdeim( my_ns )
-my_mdeim.perform_mdeim( 100, 10**(-6) )
+do_offline = 0
 
 #%%
-my_ns.set_mdeim( my_mdeim )
+import pyorb_core.rb_library.m_deim as m_deim
+my_mdeim = m_deim.Mdeim( my_ns )
 
-num_f_affine_components = 1
+ns_mdeim = 10
 
+if do_offline == 1:
+    my_mdeim.set_save_offline( True, "offline_" + mesh + '/' )
+#    my_mdeim.perform_mdeim( ns_mdeim, 10**(-6) )
+
+    my_mdeim.build_mdeim_snapshots( 10 ) 
+    my_mdeim.build_deim_basis( 10**(-4) ) 
+else:
+    my_mdeim.load_mdeim_basis( "offline_" + mesh + '/' )
+
+#my_ns.set_mdeim( my_mdeim )
+
+
+
+#%%
 my_deim = m_deim.Deim( my_ns )
-my_deim.perform_deim( 100, 10**(-6) )
-my_deim.print_reduced_indices( )
-my_ns.set_deim( my_deim )
+
+if do_offline == 1:
+    my_deim.set_save_offline( True, "offline_" + mesh + '/' )
+#    my_mdeim.perform_mdeim( ns_mdeim, 10**(-6) )
+
+    my_deim.build_deim_snapshots( 10 ) 
+    my_deim.build_deim_basis( 10**(-4) ) 
+else:
+    my_deim.load_deim_basis( "offline_" + mesh + '/' )
+
 num_f_affine_components = my_deim.get_num_basis( )
-    
+
+#my_ns.set_deim( my_deim )
+
 print( 'Number of affine basis for the rhs is %d ' % num_f_affine_components  )
 
 #mu = param_min
@@ -78,39 +101,52 @@ print( 'Number of affine basis for the rhs is %d ' % num_f_affine_components  )
 #
 #np.linalg.eig( int_mat )
 
-#%%
+import pyorb_core.rb_library.rb_manager as rm
+print( rm.__doc__ )
+my_rb_manager = rm.RbManager( my_ns )
+
+SAVE_OFFLINE = 1
+
+if SAVE_OFFLINE == 1:
+    my_rb_manager.save_offline_structures( "offline_" + mesh + "/snapshots_" + mesh + '.txt', \
+                                           "offline_" + mesh + "/basis_" + mesh + '.txt', \
+                                           "offline_" + mesh + "/rb_affine_components_" + mesh, \
+                                           'offline_' + mesh + '/offline_parameters.data' )
+
+
+if do_offline == 1:
+    my_rb_manager.build_snapshots( 10 )
+else:
+    my_rb_manager.import_snapshots_matrix( "offline_" + mesh + "/snapshots_" + mesh + '.txt' )
+        
+
+my_rb_manager.perform_pod( 10**(-4) )
+
+rb_functions_dict = my_rb_manager.get_rb_functions_dict( )
+my_rb_manager.update_fom_specifics( rb_functions_dict )
 
 import pyorb_core.rb_library.affine_decomposition as ad
 
 # defining the affine decomposition structure
 my_affine_decomposition = ad.AffineDecompositionHandler( )
-my_affine_decomposition.set_Q( my_mdeim.get_num_mdeim_basis(), num_f_affine_components )               # number of affine terms
+my_affine_decomposition.set_Q( my_mdeim.get_num_mdeim_basis()+my_rb_manager.get_number_of_basis()+1, \
+                               num_f_affine_components )               # number of affine terms
 
 # we externally set the affine components for A, the ones for f are handled in the solver
 my_affine_decomposition.set_affine_a( my_mdeim.get_basis_list( ) )
+my_affine_decomposition.set_affine_f( my_deim.get_deim_basis_list( ) )
 
-if fom_specifics['use_nonhomogeneous_dirichlet'] == 'Y':
-    my_affine_decomposition.set_affine_f( my_deim.get_deim_basis_list( ) )
-
-import pyorb_core.rb_library.rb_manager as rm
-print( rm.__doc__ )
-my_rb_manager = rm.RbManager( my_affine_decomposition, my_ns )
-
-SAVE_OFFLINE = 0
-
-if SAVE_OFFLINE == 1:
-    my_rb_manager.save_offline_structures( "offline_" + fem_size_str + "/test_snapshots_" + fem_size_str + '.txt', \
-                                           "offline_" + fem_size_str + "/basis_" + fem_size_str + '.txt', \
-                                           "offline_" + fem_size_str + "/rb_affine_components_" + fem_size_str, \
-                                           'offline_' + fem_size_str + '/test_offline_parameters.data' )
-
-my_rb_manager.build_rb_approximation( 200, 10**(-7) )
-
-# printing summary
-my_rb_manager.print_rb_offline_summary( )
-
-my_rb_manager.test_rb_solver( 20 )
+my_rb_manager.set_affine_decomposition_handler( my_affine_decomposition )
 
 #%%
 
-my_matlab_engine_manager.quit_engine( )
+my_rb_manager.build_rb_affine_decompositions()
+
+# printing summary
+#my_rb_manager.print_rb_offline_summary( )
+
+#my_rb_manager.test_rb_solver( 20 )
+
+#%%
+
+#my_matlab_engine_manager.quit_engine( )
