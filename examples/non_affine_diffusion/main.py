@@ -98,7 +98,7 @@ if fom_specifics['use_nonhomogeneous_dirichlet'] == 'Y':
 
 import pyorb_core.rb_library.rb_manager as rm
 print( rm.__doc__ )
-my_rb_manager = rm.RbManager( my_affine_decomposition, my_ndp )
+my_rb_manager = rm.RbManager( my_ndp, my_affine_decomposition )
 
 SAVE_OFFLINE = 0
 

@@ -70,7 +70,7 @@ my_affine_decomposition.set_Q( 4, 1 )               # number of affine terms
 # building the RB manager
 import pyorb_core.rb_library.rb_manager as rm
 print( rm.__doc__ )
-my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
+my_rb_manager = rm.RbManager( my_tbp, my_affine_decomposition )
 
 my_rb_manager.build_rb_approximation( 50, 10**(-6) )
 

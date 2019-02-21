@@ -55,7 +55,7 @@ my_affine_decomposition.import_affine_matrices( 'exported_offline_data/affine_ma
 my_affine_decomposition.import_affine_vectors(  'exported_offline_data/affine_vector_20_f' )
 
 # building the RB manager
-my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
+my_rb_manager = rm.RbManager( my_tbp, _affine_decomposition=my_affine_decomposition )
 
 # importing snapshots, offline parameters and building RB space
 my_rb_manager.import_snapshots_parameters( 'exported_offline_data/train_parameters.data' )
