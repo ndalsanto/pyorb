@@ -32,7 +32,7 @@ my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 import pyorb_core.pde_problem.parameter_handler as ph
 
 mu0_min = 1.; mu0_max = 10.
-mu1_min = 0.; mu1_max = 0.3
+mu1_min = 0.; mu1_max = 0.4
 
 param_min = np.array([mu0_min, mu1_min])
 param_max = np.array([mu0_max, mu1_max])
@@ -62,14 +62,14 @@ do_offline = 0
 import pyorb_core.rb_library.m_deim as m_deim
 my_mdeim = m_deim.Mdeim( my_ns )
 
-ns_mdeim = 10
+ns_m_deim = 200 
 
 if do_offline == 1:
     my_mdeim.set_save_offline( True, "offline_" + mesh + '/' )
 #    my_mdeim.perform_mdeim( ns_mdeim, 10**(-6) )
 
-    my_mdeim.build_mdeim_snapshots( 10 ) 
-    my_mdeim.build_deim_basis( 10**(-4) ) 
+    my_mdeim.build_mdeim_snapshots( ns_m_deim ) 
+    my_mdeim.build_deim_basis( 10**(-6) ) 
 else:
     my_mdeim.load_mdeim_basis( "offline_" + mesh + '/' )
 
@@ -84,8 +84,8 @@ if do_offline == 1:
     my_deim.set_save_offline( True, "offline_" + mesh + '/' )
 #    my_mdeim.perform_mdeim( ns_mdeim, 10**(-6) )
 
-    my_deim.build_deim_snapshots( 10 ) 
-    my_deim.build_deim_basis( 10**(-4) ) 
+    my_deim.build_deim_snapshots( ns_m_deim ) 
+    my_deim.build_deim_basis( 10**(-6) ) 
 else:
     my_deim.load_deim_basis( "offline_" + mesh + '/' )
 
@@ -94,6 +94,7 @@ num_f_affine_components = my_deim.get_num_basis( )
 #my_ns.set_deim( my_deim )
 
 print( 'Number of affine basis for the rhs is %d ' % num_f_affine_components  )
+#%% 
 
 #mu = param_min
 #my_deim.compute_deim_theta_coefficients( mu )
@@ -113,12 +114,12 @@ if SAVE_OFFLINE == 1:
                                            "offline_" + mesh + "/rb_affine_components_" + mesh, \
                                            'offline_' + mesh + '/offline_parameters.data' )
 
+ns = 200
 
 if do_offline == 1:
-    my_rb_manager.build_snapshots( 10 )
+    my_rb_manager.build_snapshots( ns )
 else:
     my_rb_manager.import_snapshots_matrix( "offline_" + mesh + "/snapshots_" + mesh + '.txt' )
-        
 
 my_rb_manager.perform_pod( 10**(-4) )
 
