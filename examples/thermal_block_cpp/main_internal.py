@@ -16,7 +16,7 @@ print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
-cpp_library_folder = '/u/cmcs/pegolott/deeplearning_pdes/lifev-pyorb/build/libpyorb-lifev-api.so'
+cpp_library_folder = '/usr/scratch/dalsanto/EPFL/DeepLearning/LifeV/lifev-env/pyorb-lifev-api-build/libpyorb-lifev-api.so'
 
 # playing around with engine manager
 my_cpp_engine_manager = mee.external_engine_manager( 'cpp', cpp_library_folder )
@@ -60,7 +60,7 @@ my_affine_decomposition.set_Q( 4, 1 )               # number of affine terms
 # building the RB manager
 import pyorb_core.rb_library.rb_manager as rm
 print( rm.__doc__ )
-my_rb_manager = rm.RbManager( my_affine_decomposition, my_tbp )
+my_rb_manager = rm.RbManager( my_tbp, my_affine_decomposition )
 
 SAVE_OFFLINE = 1
 

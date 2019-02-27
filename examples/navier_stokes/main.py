@@ -45,7 +45,7 @@ my_parameter_handler.assign_parameters_bounds( param_min, param_max )
 # define the fem problem
 import navier_stokes_problem as ns
 
-mesh = 'very_coarse'
+mesh = 'fine'
 
 fom_specifics = {
         'model': 'navier_stokes',
@@ -62,7 +62,7 @@ do_offline = 0
 import pyorb_core.rb_library.m_deim as m_deim
 my_mdeim = m_deim.Mdeim( my_ns )
 
-ns_m_deim = 200 
+ns_m_deim = 500 
 
 if do_offline == 1:
     my_mdeim.set_save_offline( True, "offline_" + mesh + '/' )
@@ -96,12 +96,6 @@ num_f_affine_components = my_deim.get_num_basis( )
 print( 'Number of affine basis for the rhs is %d ' % num_f_affine_components  )
 #%% 
 
-#mu = param_min
-#my_deim.compute_deim_theta_coefficients( mu )
-#int_mat = my_deim.get_interpolation_matrix( )
-#
-#np.linalg.eig( int_mat )
-
 import pyorb_core.rb_library.rb_manager as rm
 print( rm.__doc__ )
 my_rb_manager = rm.RbManager( my_ns )
@@ -114,10 +108,10 @@ if SAVE_OFFLINE == 1:
                                            "offline_" + mesh + "/rb_affine_components_" + mesh, \
                                            'offline_' + mesh + '/offline_parameters.data' )
 
-ns = 200
+n_s = 200
 
 if do_offline == 1:
-    my_rb_manager.build_snapshots( ns )
+    my_rb_manager.build_snapshots( n_s )
 else:
     my_rb_manager.import_snapshots_matrix( "offline_" + mesh + "/snapshots_" + mesh + '.txt' )
 
