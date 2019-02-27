@@ -263,12 +263,16 @@ class RbManager( ):
         self.build_rb_affine_decompositions( )
 
         if self.M_save_offline_structures == True:
-            self.M_affineDecomposition.save_rb_affine_decomposition( self.M_save_file_affine_components )
+            self.save_rb_affine_decomposition( )
 
         return
 
     def build_rb_affine_decompositions( self ):
         self.M_affineDecomposition.build_rb_affine_decompositions( self.M_basis, self.M_fom_problem )
+        return 
+
+    def save_rb_affine_decomposition( self ):
+        self.M_affineDecomposition.save_rb_affine_decomposition( self.M_save_file_affine_components )
         return 
 
     # to save the offline structures in the given locations

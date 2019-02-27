@@ -58,6 +58,8 @@ param = my_ns.get_parameter( )
 
 do_offline = 0
 
+base_foler = base_foler + '/'
+
 #%%
 import pyorb_core.rb_library.m_deim as m_deim
 my_mdeim = m_deim.Mdeim( my_ns )
@@ -65,13 +67,13 @@ my_mdeim = m_deim.Mdeim( my_ns )
 ns_m_deim = 500 
 
 if do_offline == 1:
-    my_mdeim.set_save_offline( True, "offline_" + mesh + '/' )
+    my_mdeim.set_save_offline( True, base_foler + '/' )
 #    my_mdeim.perform_mdeim( ns_mdeim, 10**(-6) )
 
     my_mdeim.build_mdeim_snapshots( ns_m_deim ) 
     my_mdeim.build_deim_basis( 10**(-6) ) 
 else:
-    my_mdeim.load_mdeim_basis( "offline_" + mesh + '/' )
+    my_mdeim.load_mdeim_basis( base_foler + '/' )
 
 #my_ns.set_mdeim( my_mdeim )
 
@@ -81,13 +83,13 @@ else:
 my_deim = m_deim.Deim( my_ns )
 
 if do_offline == 1:
-    my_deim.set_save_offline( True, "offline_" + mesh + '/' )
+    my_deim.set_save_offline( True, base_foler + '/' )
 #    my_mdeim.perform_mdeim( ns_mdeim, 10**(-6) )
 
     my_deim.build_deim_snapshots( ns_m_deim ) 
     my_deim.build_deim_basis( 10**(-6) ) 
 else:
-    my_deim.load_deim_basis( "offline_" + mesh + '/' )
+    my_deim.load_deim_basis( base_foler + '/' )
 
 num_f_affine_components = my_deim.get_num_basis( )
 
@@ -103,17 +105,18 @@ my_rb_manager = rm.RbManager( my_ns )
 SAVE_OFFLINE = 1
 
 if SAVE_OFFLINE == 1:
-    my_rb_manager.save_offline_structures( "offline_" + mesh + "/snapshots_" + mesh + '.txt', \
-                                           "offline_" + mesh + "/basis_" + mesh + '.txt', \
-                                           "offline_" + mesh + "/rb_affine_components_" + mesh, \
-                                           'offline_' + mesh + '/offline_parameters.data' )
+    my_rb_manager.save_offline_structures( base_foler + "snapshots_" + mesh + '.txt', \
+                                           base_foler + "basis_" + mesh + '.txt', \
+                                           base_foler + "rb_affine_components_" + mesh, \
+                                           base_foler + 'offline_parameters.data' )
 
 n_s = 200
 
 if do_offline == 1:
     my_rb_manager.build_snapshots( n_s )
 else:
-    my_rb_manager.import_snapshots_matrix( "offline_" + mesh + "/snapshots_" + mesh + '.txt' )
+    my_rb_manager.import_snapshots_matrix( base_foler + "snapshots_" + mesh + '.txt' )
+    my_rb_manager.import_snapshots_parameters( base_foler + 'offline_parameters.data' )
 
 my_rb_manager.perform_pod( 10**(-4) )
 
@@ -135,12 +138,19 @@ my_rb_manager.set_affine_decomposition_handler( my_affine_decomposition )
 
 #%%
 
-my_rb_manager.build_rb_affine_decompositions()
+if do_offline == 1:
+    my_rb_manager.build_rb_affine_decompositions( )
+    
+    if SAVE_OFFLINE == 1:
+        my_rb_manager.save_rb_affine_decomposition( )
+else:
+    my_affine_decomposition.import_rb_affine_matrices( base_foler + 'rb_affine_components_' + mesh + '_A' )
+    my_affine_decomposition.import_rb_affine_vectors(  base_foler + 'rb_affine_components_' + mesh + '_f' )
 
-# printing summary
-#my_rb_manager.print_rb_offline_summary( )
 
-#my_rb_manager.test_rb_solver( 20 )
+
+
+
 
 #%%
 
