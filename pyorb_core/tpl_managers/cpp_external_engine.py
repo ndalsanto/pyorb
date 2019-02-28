@@ -12,6 +12,7 @@ from mpi4py import MPI
 import numpy as np 
 
 from pyorb_core.tpl_managers import external_engine as ee
+import pyorb_core.error_manager as em
 
 class c_fom_specifics( ctypes.Structure ):
 

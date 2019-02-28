@@ -21,8 +21,12 @@ sys.path.insert(0, '../../')
 print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
+import pyorb_core.error_manager as em
 
 matlab_library_path = 'path/to/MATLAB/library'
+
+if matlab_library_path == 'path/to/MATLAB/library':
+    em.error_raiser( 'SystemError', 'Please specofy the path for your matlab library' )
 
 # playing around with engine manager 
 my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
@@ -48,11 +52,14 @@ import thermal_block_problem as tbp
 
 my_tbp = tbp.thermal_block_problem( my_parameter_handler )
 
+fem_size = 20
+
 fom_specifics = { 
-        'number_of_elements': 20, 
+        'number_of_elements': fem_size, 
         'polynomial_degree' : 'P1',
         'model'             : 'thermal_block',
-        'use_nonhomogeneous_dirichlet' : 'N' }
+        'use_nonhomogeneous_dirichlet' : 'N',
+        'mesh_name'         : str(fem_size) + 'x' + str(fem_size) }
 
 my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
 
