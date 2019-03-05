@@ -6,6 +6,7 @@ Created on Thu Oct 25 14:17:29 2018
 @author: Niccolo' Dal Santo
 @email : niccolo.dalsanto@epfl.ch
 """
+import pyorb_core.error_manager as em
 
 class external_engine( ):
 

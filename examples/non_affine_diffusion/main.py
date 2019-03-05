@@ -24,7 +24,7 @@ import pyorb_core.error_manager as em
 matlab_library_path = 'path/to/MATLAB/library'
 
 if matlab_library_path == 'path/to/MATLAB/library':
-    em.error_raiser( 'SystemError', 'Please specofy the path for your matlab library' )
+    em.error_raiser( 'SystemError', 'Please specify the path for your matlab library' )
 
 # playing around with engine manager 
 my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
