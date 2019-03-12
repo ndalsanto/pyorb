@@ -23,3 +23,12 @@ def save_matrix( _matrix, _file_name ):
                 output_file.write( "\n" )
     
     output_file.close( )
+
+def save_vector( _matrix, _file_name ):
+    
+    output_file = open( _file_name, 'w+' )
+    
+    for iNs in range( _matrix.shape[0] ):
+        output_file.write( "%.10g " % _matrix[iNs] )
+    
+    output_file.close( )
