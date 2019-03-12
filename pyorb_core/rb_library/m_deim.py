@@ -68,6 +68,8 @@ class Deim( ):
     
         self.M_N = self.M_basis.shape[1]
 
+        self.M_snapshots_coefficients = pod.get_snapshots_coefficient( )
+
         if self.M_save_offline == True:
             self.save_basis( )
             
@@ -192,7 +194,7 @@ class Deim( ):
     def save_deim_offline( self ):
             
         # saving interpolation matrix
-        output_file = open( self.M_save_offline_dir + self.M_algorithm + 'interpolation_matrix_' + '.txt', 'w' )
+        output_file = open( self.M_save_offline_dir + self.M_algorithm + 'interpolation_matrix' + '.txt', 'w' )
 
         for iV in range( self.M_interpolation_matrix.shape[0] ):
             for iB in range( self.M_interpolation_matrix.shape[1] ):
@@ -206,7 +208,7 @@ class Deim( ):
         output_file.close( )
 
         # saving reduced indices
-        output_file = open( self.M_save_offline_dir + self.M_algorithm + 'reduced_indices_' + '.txt', 'w' )
+        output_file = open( self.M_save_offline_dir + self.M_algorithm + 'reduced_indices' + '.txt', 'w' )
 
         for iV in range( self.M_reduced_indices.shape[0] ):
                 output_file.write( "%.10g \n" % self.M_reduced_indices[iV] )
@@ -214,7 +216,7 @@ class Deim( ):
         output_file.close( )
 
         # saving reduced elements
-        output_file = open( self.M_save_offline_dir + self.M_algorithm + 'reduced_elements_' '.txt', 'w' )
+        output_file = open( self.M_save_offline_dir + self.M_algorithm + 'reduced_elements' '.txt', 'w' )
 
         for iV in range( self.M_reduced_elements.shape[0] ):
                 output_file.write( "%.10g \n" % self.M_reduced_elements[iV] )
@@ -231,10 +233,13 @@ class Deim( ):
         
         self.M_save_offline_dir = _save_offline_dir
         
-        self.M_basis                 = np.loadtxt( self.M_save_offline_dir + self.M_algorithm + 'full_basis_' + self.M_operator_name + '.txt' )
-        self.M_reduced_elements      = np.loadtxt( self.M_save_offline_dir + self.M_algorithm + 'reduced_elements_' + '.txt', dtype=int )
-        self.M_reduced_indices       = np.loadtxt( self.M_save_offline_dir + self.M_algorithm + 'reduced_indices_' + '.txt', dtype=int )
-        self.M_interpolation_matrix  = np.loadtxt( self.M_save_offline_dir + self.M_algorithm + 'interpolation_matrix_' + '.txt' )
+        # self.M_basis                 = np.loadtxt( self.M_save_offline_dir + self.M_algorithm + 'full_basis_' + self.M_operator_name + '.txt' )
+        
+        self.load_deim_basis( self.M_save_offline_dir )
+
+        self.M_reduced_elements      = np.loadtxt( self.M_save_offline_dir + self.M_algorithm + 'reduced_elements' + '.txt', dtype=int )
+        self.M_reduced_indices       = np.loadtxt( self.M_save_offline_dir + self.M_algorithm + 'reduced_indices' + '.txt', dtype=int )
+        self.M_interpolation_matrix  = np.loadtxt( self.M_save_offline_dir + self.M_algorithm + 'interpolation_matrix' + '.txt' )
         self.M_reduced_elements      = self.M_reduced_elements.astype( int )
         self.M_reduced_indices       = self.M_reduced_indices.astype( int )
         self.M_N = len( self.M_reduced_indices )
@@ -244,7 +249,6 @@ class Deim( ):
     def get_interpolation_matrix( self ):
         return self.M_interpolation_matrix
     
-            
     def get_deim_basis_list( self ):
 
         l = []
@@ -254,6 +258,16 @@ class Deim( ):
             
         return l
 
+    def compute_theta_min_max( self ):
+
+        theta_max = np.zeros( (self.M_N ) )
+        theta_min = np.zeros( (self.M_N ) )
+        
+        for ii in range( self.M_N ):
+            theta_min[ii] = np.min( self.M_snapshots_coefficients[ii, :] )
+            theta_max[ii] = np.max( self.M_snapshots_coefficients[ii, :] )
+        
+        return theta_min, theta_max
 
     M_fom_problem = None
     M_snapshots_matrix = np.zeros( ( 0, 0 ) )
@@ -274,7 +288,9 @@ class Deim( ):
     M_current_param = np.zeros( 0 )
 
     M_algorithm = 'deim_'
-    M_operator_name = 'f_'
+    M_operator_name = 'f'
+    
+    M_snapshots_coefficients= None
 
 
 
@@ -286,7 +302,7 @@ class Mdeim( Deim ):
         Deim.__init__( self, _fom_problem )
         self.M_save_file_basis_functions = "mdeim_basis"
         self.M_algorithm = 'mdeim_'
-        self.M_operator_name = 'A_'
+        self.M_operator_name = 'A'
 
         return
 
@@ -444,7 +460,7 @@ class Mdeim( Deim ):
         self.save_deim_offline( )
 
         # saving reduced indices of matrix
-        output_file = open( self.M_save_offline_dir + 'mdeim_reduced_indices_matrix_' + '.txt', 'w' )
+        output_file = open( self.M_save_offline_dir + 'mdeim_reduced_indices_matrix' + '.txt', 'w' )
 
         for iV in range( self.M_reduced_indices_mat.shape[0] ):
             for iB in range( self.M_reduced_indices_mat.shape[1] ):
@@ -459,7 +475,13 @@ class Mdeim( Deim ):
 
         return
         
-    def load_offline( self, _save_offline_dir ):
+    def load_mdeim_offline( self, _save_offline_dir ):
+        
+        print('Loading offline structures of MDEIM from folder %s ' % _save_offline_dir )
+        
+        self.M_save_offline_dir = _save_offline_dir
+
+        self.load_deim_offline( _save_offline_dir )
         
         self.load_mdeim_basis( _save_offline_dir )
         
@@ -471,10 +493,8 @@ class Mdeim( Deim ):
 
     def load_mdeim_basis( self, _save_offline_dir ):
         
-        self.load_deim_basis( _save_offline_dir )
-        
-        self.M_row_map               = np.loadtxt( self.M_save_offline_dir + 'mdeim_row_map' + '.txt', dtype=int )
-        self.M_col_map               = np.loadtxt( self.M_save_offline_dir + 'mdeim_col_map' + '.txt', dtype=int )
+        self.M_row_map = np.loadtxt( self.M_save_offline_dir + 'mdeim_row_map' + '.txt', dtype=int )
+        self.M_col_map = np.loadtxt( self.M_save_offline_dir + 'mdeim_col_map' + '.txt', dtype=int )
 
         return
 
@@ -483,21 +503,33 @@ class Mdeim( Deim ):
         return self.M_N
 
     def compute_theta_coefficients( self, _param ):
+
+#        print( 'compute_theta_coefficients ' )
+#        print( self.M_reduced_indices_mat )
+
         rhs = self.M_fom_problem.assemble_fom_matrix( _param, _elements=self.M_reduced_elements, \
                                                       _indices=self.M_reduced_indices_mat )
 
         self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs[:, 2] )
-        
+#        print( 'Computing theta coefficients ' )
+#        print( _param )
+
         return self.M_current_theta
     
     def compute_theta_coefficients_q( self, _param, _q ):
+
+        print( 'Computing theta coefficients parameter %d' % _q )
+        print( _param )
+        print( self.M_current_theta )
+        print( 'Current parameter ' )
+        print( self.M_current_param )
         
-        if (self.M_current_param != _param).any():
+        if (self.M_current_param != _param).all():
             self.M_current_param = _param + np.zeros( _param.shape )
             self.compute_theta_coefficients( _param )
         
         return self.M_current_theta[_q]
-        
+    
     
     def compute_theta_bounds( self, _n_tests ):
         
