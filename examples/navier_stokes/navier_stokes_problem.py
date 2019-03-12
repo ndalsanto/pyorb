@@ -38,10 +38,24 @@ class ns_theta_As( ):
         return
     
     def ns_theta_a( self, _param, _q ):
-        return self.M_mdeim.compute_theta_coefficients_q( _param, _q )
+        
+        n_m_deim = self.M_mdeim.get_num_mdeim_basis( )
+        
+        if _q >= 0 and _q < n_m_deim:
+            return self.M_mdeim.compute_theta_coefficients_q( _param, _q )
+
+        # diffusion affine component
+        if _q == n_m_deim:
+            return _param[0]
+        
 
     def ns_full_theta_a( self, _param ):
-        return self.M_mdeim.compute_theta_coefficients( _param )
+        
+        n_m_deim = self.M_mdeim.get_num_mdeim_basis( )
+        thetas = np.zeros( n_m_deim + 1 )
+        
+        thetas[0:n_m_deim] = self.M_mdeim.compute_theta_coefficients( _param )
+        thetas[n_m_deim] = _param[0]
 
     def set_mdeim( self, _mdeim ):
         self.M_mdeim = _mdeim
@@ -64,15 +78,11 @@ class navier_stokes_problem( fp.fom_problem ):
 
     def define_theta_functions( self ):
         
-#        self.M_theta_a = self.M_ns_theta_As.ns_theta_a
-#        self.M_full_theta_a = self.M_ns_theta_As.ns_full_theta_a
-#        
-#        if self.M_fom_specifics['use_nonhomogeneous_dirichlet'] == 'Y':
-#            self.M_theta_f = self.M_ns_theta_fs.ns_theta_f
-#            self.M_full_theta_f = self.M_ns_theta_fs.ns_full_theta_f
-#        else:
-#            self.M_theta_f = ns_theta_f
-#            self.M_full_theta_f = ns_full_theta_f
+        self.M_theta_a = self.M_ns_theta_As.ns_theta_a
+        self.M_full_theta_a = self.M_ns_theta_As.ns_full_theta_a
+        
+        self.M_theta_f = ns_theta_f
+        self.M_full_theta_f = ns_full_theta_f
         
         return
     
