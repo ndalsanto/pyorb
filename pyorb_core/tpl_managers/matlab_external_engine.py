@@ -63,7 +63,9 @@ class matlab_external_engine( ee.external_engine ):
 
     def solve_parameter( self, _param, _fom_specifics ):
 
-        u = self.M_engine.solve_parameter( self.convert_parameter( _param ), _fom_specifics )
+        _injected_param = self.convert_parameter( _param )
+                
+        u = self.M_engine.solve_parameter( _injected_param, _fom_specifics )
 
         sol = np.array( u['u'] )
 
@@ -100,17 +102,26 @@ class matlab_external_engine( ee.external_engine ):
 
     def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):
         
+        _injected_param = self.convert_parameter( _param )
+
         if len( _elements ) == 0:
-            matrix = self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics )
+            matrix = self.M_engine.assemble_fom_matrix( _injected_param, _fom_specifics )
             A = np.array( matrix['A'] )
             A[:, 0:2] = A[:, 0:2] - 1
             return A
         else:
             # if I'd convert elements and indices to int it also retrieve from int values inside the matrx from MATLAB
             # therefore I convert them to double
-            matrix = self.M_engine.assemble_fom_matrix( self.convert_parameter( _param ), _fom_specifics, \
-                                                        self.convert_parameter( _elements ), \
-                                                        self.convert_parameter( _indices + 1 ) )
+            matlab_elements = self.convert_parameter( _elements )
+            matlab_indices  = self.convert_parameter( _indices + 1 )
+#            print( 'matlab_elements' )
+#            print( matlab_elements )
+#            print( 'matlab_indices' )
+#            print( matlab_indices )
+            
+            matrix = self.M_engine.assemble_fom_matrix( _injected_param, _fom_specifics, \
+                                                        matlab_elements, \
+                                                        matlab_indices )
             
             A = np.array( matrix['A'] )
             A[:, 0:2] = A[:, 0:2] - 1
