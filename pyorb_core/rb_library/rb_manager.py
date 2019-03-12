@@ -334,27 +334,38 @@ class RbManager( ):
     M_save_file_basis_functions = "basis.txt"
     M_save_file_offline_parameters = "offline_parameters.data"
 
-    def compute_theta_functions( self, _params ):
+    def compute_theta_functions( self, _params, _Qa_range_min=0, _Qa_range_max=None, _Qf_range_min=0, _Qf_range_max=None ):
 
         Qa = self.get_Qa( )
         Qf = self.get_Qf( )
 
-        theta_as = np.zeros( (_params.shape[0], Qa) )
-        theta_fs = np.zeros( (_params.shape[0], Qf) )
+        if _Qa_range_max != None:
+            Qa = _Qa_range_max
+
+        if _Qf_range_max != None:
+            Qf = _Qf_range_max
+
+        theta_as = np.zeros( (_params.shape[0], Qa-_Qa_range_min) )
+        theta_fs = np.zeros( (_params.shape[0], Qf-_Qf_range_min) )
 
         for iP in range( _params.shape[0] ):
             mu = _params[iP, :]
             
-            for iQa in range( Qa ):
-                theta_q = self.M_fom_problem.get_theta_a( mu, iQa )
-                theta_as[iP, iQa] = theta_q
+#            for iQa in range( _Qa_range_min, Qa ):
+#                theta_q = self.M_fom_problem.get_theta_a( mu, iQa )
+#                theta_as[iP, iQa-_Qa_range_min] = theta_q
+#
+#            for iQf in range( _Qf_range_min, Qf ):
+#                theta_q = self.M_fom_problem.get_theta_f( mu, iQf )
+#                theta_fs[iP, iQf-_Qf_range_min] = theta_q
 
-            for iQf in range( Qf ):
-                theta_q = self.M_fom_problem.get_theta_f( mu, iQf )
-                theta_fs[iP, iQf] = theta_q
+            full_theta_as = self.M_fom_problem.get_full_theta_a( mu )
+            theta_as[iP, :] = full_theta_as[_Qa_range_min:Qa]
+            full_theta_fs = self.M_fom_problem.get_full_theta_f( mu )
+            theta_fs[iP, :] = full_theta_fs[_Qf_range_min:Qf]
+
 
         return theta_as, theta_fs
-
 
     def get_rb_affine_matrix( self, _q ):
         return self.M_affineDecomposition.get_rb_affine_matrix( _q )
