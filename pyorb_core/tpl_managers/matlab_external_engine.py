@@ -63,9 +63,11 @@ class matlab_external_engine( ee.external_engine ):
 
     def solve_parameter( self, _param, _fom_specifics ):
 
+        converted_fom_specifics = self.convert_types( _fom_specifics )
+
         _injected_param = self.convert_parameter( _param )
         
-        u = self.M_engine.solve_parameter( _injected_param, _fom_specifics )
+        u = self.M_engine.solve_parameter( _injected_param, converted_fom_specifics )
 
         sol = np.array( u['u'] )
 
@@ -76,9 +78,9 @@ class matlab_external_engine( ee.external_engine ):
 
         print( 'Building affine components for operator %c' % _operator )
         
-        used_fom_specifics = self.convert_types( _fom_specifics )
+        converted_fom_specifics = self.convert_types( _fom_specifics )
         
-        affine_components = self.M_engine.build_fom_affine_components( _operator, used_fom_specifics )
+        affine_components = self.M_engine.build_fom_affine_components( _operator, converted_fom_specifics )
 
         # rescale the matrix indices so that the counting starts from 0 (and not from 1 as in MATLAB)
         if _operator == 'A':
@@ -104,8 +106,10 @@ class matlab_external_engine( ee.external_engine ):
         
         _injected_param = self.convert_parameter( _param )
 
+        converted_fom_specifics = self.convert_types( _fom_specifics )
+
         if len( _elements ) == 0:
-            matrix = self.M_engine.assemble_fom_matrix( _injected_param, _fom_specifics )
+            matrix = self.M_engine.assemble_fom_matrix( _injected_param, converted_fom_specifics )
             A = np.array( matrix['A'] )
             A[:, 0:2] = A[:, 0:2] - 1
             return A
@@ -115,23 +119,25 @@ class matlab_external_engine( ee.external_engine ):
             matlab_elements = self.convert_parameter( _elements )
             matlab_indices  = self.convert_parameter( _indices + 1 )
             
-            matrix = self.M_engine.assemble_fom_matrix( _injected_param, _fom_specifics, \
+            matrix = self.M_engine.assemble_fom_matrix( _injected_param, converted_fom_specifics, \
                                                         matlab_elements, matlab_indices )
             A = np.array( matrix['A'] )
             A[:, 0:2] = A[:, 0:2] - 1
             return A
 
     def assemble_fom_rhs( self, _param, _fom_specifics, _elements = [], _indices = []):
+
+        converted_fom_specifics = self.convert_types( _fom_specifics )
         
         if len( _elements ) == 0:
-            rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), _fom_specifics )
+            rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), converted_fom_specifics )
             ff = np.array( rhs['f'] )
             ff = np.reshape( ff, (ff.shape[0], ) )
             return ff
         else:
             # if I convert elements and indices to int it would also retrieve from int values inside the matrx from MATLAB
             # therefore I convert them to double
-            rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), _fom_specifics, \
+            rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), converted_fom_specifics, \
                                                   self.convert_parameter( _elements ), \
                                                   self.convert_parameter( _indices + 1 ) )
             
@@ -142,13 +148,17 @@ class matlab_external_engine( ee.external_engine ):
     # NB the +1 is needed to convert the python indices over MATLAB
     def find_deim_elements_fom_specifics( self, _fom_specifics, _indices ):
 
-        return np.array( self.M_engine.find_elements_for_deim_fom_specifics( _fom_specifics, \
+        converted_fom_specifics = self.convert_types( _fom_specifics )
+
+        return np.array( self.M_engine.find_elements_for_deim_fom_specifics( converted_fom_specifics, \
                                        self.convert_indices( _indices + 1 ) ) ).astype(int)
 
     # NB the +1 is needed to convert the python indices over MATLAB
     def find_mdeim_elements_fom_specifics( self, _fom_specifics, _indices_mat ):
 
-        return np.array( self.M_engine.find_mdeim_elements_fom_specifics( _fom_specifics, \
+        converted_fom_specifics = self.convert_types( _fom_specifics )
+
+        return np.array( self.M_engine.find_mdeim_elements_fom_specifics( converted_fom_specifics, \
                                        self.convert_indices( _indices_mat + 1 ) ) ).astype(int)
 
 
