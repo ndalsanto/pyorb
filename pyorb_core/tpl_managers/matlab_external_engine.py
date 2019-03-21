@@ -42,7 +42,7 @@ class matlab_external_engine( ee.external_engine ):
 
     def convert_double( self, _np_array ):
 
-        return matlab.double( _np_array.tolist() )
+        return matlab.double( _np_array.astype(float).tolist() )
 
     def convert_indices( self, _indices ):
 
@@ -64,14 +64,14 @@ class matlab_external_engine( ee.external_engine ):
     def solve_parameter( self, _param, _fom_specifics ):
 
         _injected_param = self.convert_parameter( _param )
-                
+        
         u = self.M_engine.solve_parameter( _injected_param, _fom_specifics )
 
         sol = np.array( u['u'] )
 
         return sol[:, 0]
 
-    # normally a MATLAB application can directly provide a dictionary with all the affine components 
+    # normally a MATLAB application can directly provide a dictionary with all the affine components
     def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
 
         print( 'Building affine components for operator %c' % _operator )

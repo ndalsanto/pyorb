@@ -26,7 +26,7 @@ class Deim( ):
         
         return
 
-    def build_deim_snapshots( self, _ns ):
+    def build_deim_snapshots( self, _ns, seed=0 ):
         
         self.M_ns = _ns
         
@@ -38,7 +38,7 @@ class Deim( ):
         
         for iNs in range( _ns ):
             
-            random.seed( (iNs + 13) * 1011 )
+            random.seed( 201 * (iNs + 1) + iNs + seed )
             
             self.M_fom_problem.generate_parameter( )
             param = self.M_fom_problem.get_parameter( )
@@ -49,6 +49,9 @@ class Deim( ):
             print( param )
 
             ff = self.M_fom_problem.assemble_fom_rhs( param )
+    
+            norm_f = np.linalg.norm( ff )
+            print( 'The norm of this rhs is %f ' % norm_f )
     
             if current_snapshots_number == 0:
                 self.M_snapshots_matrix = np.zeros( ( ff.shape[0], _ns ) )
@@ -143,21 +146,22 @@ class Deim( ):
         
         self.M_reduced_indices[0] = np.argmax( np.abs( self.M_basis[:, 0] ) )
         
-        res = self.M_basis[ self.M_reduced_indices[0].astype(int), 1] \
-            / self.M_basis[ self.M_reduced_indices[0].astype(int), 0 ]
-        
-        r = self.M_basis[:, 1] - self.M_basis[:, 0].dot( res )
-
-        self.M_reduced_indices[1] = np.argmax( abs( r ) ).astype( int )
-
-        for iB in range(2, self.M_N):
+        if self.M_N > 1:
+            res = self.M_basis[ self.M_reduced_indices[0].astype(int), 1] \
+                / self.M_basis[ self.M_reduced_indices[0].astype(int), 0 ]
             
-            res = np.linalg.solve( self.M_basis[ self.M_reduced_indices[0:iB].astype(int), 0:iB ], 
-                                   self.M_basis[ self.M_reduced_indices[0:iB].astype(int), iB])
-            
-            r = self.M_basis[:, iB] - self.M_basis[:, 0:iB].dot( res.T )
-            
-            self.M_reduced_indices[iB] = np.argmax( np.abs( r ) )
+            r = self.M_basis[:, 1] - self.M_basis[:, 0].dot( res )
+    
+            self.M_reduced_indices[1] = np.argmax( abs( r ) ).astype( int )
+    
+            for iB in range(2, self.M_N):
+                
+                res = np.linalg.solve( self.M_basis[ self.M_reduced_indices[0:iB].astype(int), 0:iB ], 
+                                       self.M_basis[ self.M_reduced_indices[0:iB].astype(int), iB])
+                
+                r = self.M_basis[:, iB] - self.M_basis[:, 0:iB].dot( res.T )
+                
+                self.M_reduced_indices[iB] = np.argmax( np.abs( r ) )
     
         self.M_reduced_indices = self.M_reduced_indices.astype( int )
     
@@ -185,7 +189,6 @@ class Deim( ):
             self.compute_deim_theta_coefficients( _param )
         
         return self.M_current_theta[_q]
-        
 
     def set_save_offline( self, _save_offline, _save_offline_dir ):
         self.M_save_offline = _save_offline
@@ -217,6 +220,9 @@ class Deim( ):
 
         # saving reduced elements
         output_file = open( self.M_save_offline_dir + self.M_algorithm + 'reduced_elements' '.txt', 'w' )
+
+        if self.M_reduced_elements.shape == ():
+            self.M_reduced_elements = self.M_reduced_elements.reshape( (1,) )
 
         for iV in range( self.M_reduced_elements.shape[0] ):
                 output_file.write( "%.10g \n" % self.M_reduced_elements[iV] )
@@ -361,7 +367,7 @@ class Mdeim( Deim ):
 
         return 
     
-    def build_mdeim_snapshots( self, _ns ):
+    def build_mdeim_snapshots( self, _ns, seed=0 ):
         
         self.M_ns = _ns
         
@@ -373,7 +379,7 @@ class Mdeim( Deim ):
         
         for iNs in range( _ns ):
             
-            random.seed( (iNs + 13) * 1013 )
+            random.seed( 201 * (iNs + 1) + iNs + seed )
             
             self.M_fom_problem.generate_parameter( )
             param = self.M_fom_problem.get_parameter( )

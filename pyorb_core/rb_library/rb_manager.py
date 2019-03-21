@@ -420,7 +420,7 @@ class RbManager( ):
 
         self.M_utildeh = self.M_basis.dot( _un )
 
-        return
+        return self.M_utildeh
 
     def get_utildeh( self ):
         return self.M_utildeh
