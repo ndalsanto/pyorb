@@ -114,23 +114,14 @@ class matlab_external_engine( ee.external_engine ):
             # therefore I convert them to double
             matlab_elements = self.convert_parameter( _elements )
             matlab_indices  = self.convert_parameter( _indices + 1 )
-#            print( 'matlab_elements' )
-#            print( matlab_elements )
-#            print( 'matlab_indices' )
-#            print( matlab_indices )
             
             matrix = self.M_engine.assemble_fom_matrix( _injected_param, _fom_specifics, \
-                                                        matlab_elements, \
-                                                        matlab_indices )
-            
+                                                        matlab_elements, matlab_indices )
             A = np.array( matrix['A'] )
             A[:, 0:2] = A[:, 0:2] - 1
-            
             return A
 
     def assemble_fom_rhs( self, _param, _fom_specifics, _elements = [], _indices = []):
-        
-
         
         if len( _elements ) == 0:
             rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), _fom_specifics )
@@ -138,7 +129,6 @@ class matlab_external_engine( ee.external_engine ):
             ff = np.reshape( ff, (ff.shape[0], ) )
             return ff
         else:
-            
             # if I convert elements and indices to int it would also retrieve from int values inside the matrx from MATLAB
             # therefore I convert them to double
             rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), _fom_specifics, \

@@ -123,10 +123,6 @@ class navier_stokes_problem( fp.fom_problem ):
         
         ns_rb_mat = np.zeros( _rb_affine_decomposition.get_rb_affine_matrix(0).shape )
 
-        print( '_theta_a.shape' )
-        print( _theta_a.shape )
-        print( _theta_a )
-
         for iQa in range( len(_theta_a) ):
             ns_rb_mat = ns_rb_mat + _theta_a[iQa] * _rb_affine_decomposition.get_rb_affine_matrix( iQa )
         

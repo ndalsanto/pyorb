@@ -178,6 +178,9 @@ class Deim( ):
         rhs = self.M_fom_problem.assemble_fom_rhs( _param, _elements = self.M_reduced_elements, \
                                                            _indices  = self.M_reduced_indices )
 
+        print('rhs.shape')
+        print(rhs.shape)
+
         self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs )
         
         return self.M_current_theta
@@ -238,8 +241,6 @@ class Deim( ):
     def load_deim_offline( self, _save_offline_dir ):
         
         self.M_save_offline_dir = _save_offline_dir
-        
-        # self.M_basis                 = np.loadtxt( self.M_save_offline_dir + self.M_algorithm + 'full_basis_' + self.M_operator_name + '.txt' )
         
         self.load_deim_basis( self.M_save_offline_dir )
 
@@ -510,15 +511,13 @@ class Mdeim( Deim ):
 
     def compute_theta_coefficients( self, _param ):
 
-#        print( 'compute_theta_coefficients ' )
-#        print( self.M_reduced_indices_mat )
-
         rhs = self.M_fom_problem.assemble_fom_matrix( _param, _elements=self.M_reduced_elements, \
                                                       _indices=self.M_reduced_indices_mat )
 
+#        print( self.M_interpolation_matrix )
+        print( rhs[:, 2].shape )
+
         self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs[:, 2] )
-#        print( 'Computing theta coefficients ' )
-#        print( _param )
 
         return self.M_current_theta
     
