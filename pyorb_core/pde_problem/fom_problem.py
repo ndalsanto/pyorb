@@ -84,6 +84,11 @@ class fom_problem( ):
 
         return
 
+    def compute_natural_norm( self, _solution ):
+        self.check_configured_fom( )
+        sol = self.M_external_engine.compute_natural_norm( _solution, self.M_fom_specifics )
+        
+        return sol
 
     def solve_fom_problem( self, _param ):
         self.check_configured_fom( )

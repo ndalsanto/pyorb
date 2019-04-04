@@ -7,6 +7,8 @@ Created on Thu Oct 25 14:17:29 2018
 @email : niccolo.dalsanto@epfl.ch
 """
 
+import pyorb_core.error_manager as em
+
 class external_engine( ):
 
     def __init__( self, _engine_type, _library_path ):
@@ -80,6 +82,14 @@ class external_engine( ):
                           please provide specific ones for your specific engine " )
         return
 
+    def compute_natural_norm( _solution, _fom_specifics ):
+        
+        em.error_raiser( 'SystemError', 'external_engine::find_mdeim_elements_fom_specifics', \
+                 "You are using the default find_mdeim_elements_fom_specifics, \
+                  please provide specific ones for your specific engine " )
+
+        return
+        
 
     M_engine_type = ""
     M_library_path = ""

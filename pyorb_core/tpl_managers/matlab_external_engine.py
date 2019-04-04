@@ -76,7 +76,7 @@ class matlab_external_engine( ee.external_engine ):
     # normally a MATLAB application can directly provide a dictionary with all the affine components
     def build_fom_affine_components( self, _operator, _num_affine_components, _fom_specifics ):
 
-        print( 'Building affine components for operator %c' % _operator )
+        print( 'Building affine components for operator %s' % _operator )
         
         converted_fom_specifics = self.convert_types( _fom_specifics )
         
@@ -100,6 +100,8 @@ class matlab_external_engine( ee.external_engine ):
                                                          rhs_affine['f' + str(iQf)].shape[0] )
             affine_components = rhs_affine
         
+        print('Returning affine components for operator %s' % _operator )
+
         return affine_components
 
     def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):
@@ -160,5 +162,24 @@ class matlab_external_engine( ee.external_engine ):
 
         return np.array( self.M_engine.find_mdeim_elements_fom_specifics( converted_fom_specifics, \
                                        self.convert_indices( _indices_mat + 1 ) ) ).astype(int)
+
+
+    def compute_natural_norm( self, _solution, _fom_specifics ):
+        
+        converted_fom_specifics = self.convert_types( _fom_specifics )
+
+        return self.M_engine.compute_natural_norm( self.convert_double( _solution ), converted_fom_specifics )
+
+    def assemble_fom_natural_norm_matrix( self, _fom_specifics ):
+        
+        converted_fom_specifics = self.convert_types( _fom_specifics )
+
+        matrix = self.M_engine.assemble_fom_natural_norm_matrix( converted_fom_specifics )
+        A = np.array( matrix['A'] )
+        A[:, 0:2] = A[:, 0:2] - 1
+        return A
+
+
+
 
 

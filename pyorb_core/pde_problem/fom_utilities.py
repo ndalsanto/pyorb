@@ -14,6 +14,8 @@ def build_matlab_default_fom_specifics( ):
                 'polynomial_degree' : 'P1', \
                 'model'             : 'undefined_model', \
                 'use_nonhomogeneous_dirichlet' : 'N', \
-                'mesh_name' : '' }
+                'mesh_name' : '', \
+                'full_path' : '',
+                'simulation_name' : '' }
     
     return fom_specifics
