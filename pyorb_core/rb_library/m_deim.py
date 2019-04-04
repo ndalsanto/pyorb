@@ -514,8 +514,8 @@ class Mdeim( Deim ):
         rhs = self.M_fom_problem.assemble_fom_matrix( _param, _elements=self.M_reduced_elements, \
                                                       _indices=self.M_reduced_indices_mat )
 
-#        print( self.M_interpolation_matrix )
-        print( rhs[:, 2].shape )
+        print('rhs[:, 2]')
+        print(rhs[:, 2])
 
         self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs[:, 2] )
 

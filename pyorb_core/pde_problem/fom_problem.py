@@ -56,10 +56,26 @@ class fom_problem( ):
     def configure_fom( self, _external_engine, _fom_specifics ):
 
         self.M_external_engine = _external_engine
-        self.M_fom_specifics  = _fom_specifics
-        self.M_configured_fom = True
+        self.set_fom_specifics( _fom_specifics )
+        self.M_configured_fom  = True
 
         return
+
+    def set_fom_specifics( self, _fom_specifics ):
+
+        self.M_fom_specifics = _fom_specifics
+
+        return
+
+    def update_fom_specifics( self, _fom_specifics_update ):
+        
+#        self.M_fom_specifics.update( _fom_specifics_update )
+        print( "Updating the fom specifics dictionary" )
+
+        for key in _fom_specifics_update:
+            self.M_fom_specifics[key] = _fom_specifics_update[key]
+        
+        return 
 
     def check_configured_fom( self ):
 
@@ -67,6 +83,7 @@ class fom_problem( ):
             em.error_raiser( 'SystemError', 'fom_problem::retrieve_fom_data', "The fom problem has not been configured." )
 
         return
+
 
     def solve_fom_problem( self, _param ):
         self.check_configured_fom( )
@@ -86,6 +103,7 @@ class fom_problem( ):
 
     def assemble_fom_matrix( self, _param, _elements=[], _indices=[] ):
         self.check_configured_fom( )
+
         return self.M_external_engine.assemble_fom_matrix( _param, self.M_fom_specifics, _elements, _indices )
 
     def assemble_fom_rhs( self, _param, _elements=[], _indices=[] ):

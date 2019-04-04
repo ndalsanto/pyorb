@@ -22,21 +22,29 @@ class ns_theta_fs( ):
     
     def ns_theta_f( self, _param, _q ):
 
-        n_deim = self.M_deim.get_num_mdeim_basis( )
+        n_deim = self.M_deim.get_num_basis( )
 
         if _q >= 0 and _q < n_deim:
             return self.M_deim.compute_deim_theta_coefficients_q( _param, _q )
-        
-        if _q == n_deim + 1:
-            return 1.0
 
         # diffusion affine component
         if _q == n_deim:
             return 0.01 * _param[0]
+        
+        if _q == n_deim + 1:
+            return 1.0
     
     
     def ns_full_theta_f( self, _param ):
-        return self.M_deim.compute_deim_theta_coefficients( _param )
+
+        n_deim = self.M_deim.get_num_basis( )
+        
+        theta_f = np.zeros( (n_deim + 2, 1) )
+        theta_f[0:n_deim] = self.M_deim.compute_deim_theta_coefficients( _param )
+        theta_f[n_deim] = 0.01 * _param[0]
+        theta_f[n_deim+1] = 1.0
+
+        return theta_f
 
     def set_deim( self, _deim ):
         self.M_deim = _deim
@@ -63,16 +71,17 @@ class ns_theta_As( ):
         if _q == n_m_deim + 1:
             return 0.01 * _param[0]
 
-        
-
     def ns_full_theta_a( self, _param ):
         
         n_m_deim = self.M_mdeim.get_num_mdeim_basis( )
-        thetas = np.zeros( n_m_deim + 2 )
-        
-        thetas[0:n_m_deim] = self.M_mdeim.compute_theta_coefficients( _param )
-        thetas[n_m_deim] = _param[0]
-        thetas[n_m_deim+1] = 1.0
+        theta_a = np.zeros( n_m_deim + 2 )
+        theta_a[0:n_m_deim] = self.M_mdeim.compute_theta_coefficients( _param )
+        print(theta_a)
+        theta_a[n_m_deim] = 1.0
+        theta_a[n_m_deim+1] = 0.01 * _param[0]
+
+
+        return theta_a
 
     def set_mdeim( self, _mdeim ):
         self.M_mdeim = _mdeim
@@ -99,7 +108,7 @@ class navier_stokes_problem( fp.fom_problem ):
         self.M_full_theta_a = self.M_ns_theta_As.ns_full_theta_a
         
         self.M_theta_f = ns_theta_f
-        self.M_full_theta_f = ns_full_theta_f
+        self.M_full_theta_f = self.M_ns_theta_fs.ns_full_theta_f
         
         return
     
@@ -149,8 +158,32 @@ class navier_stokes_problem( fp.fom_problem ):
         
         return res
     
-    
-    
+    def solve_rb_ns_problem( self, _param, _affine_decomposition ):
+        
+        th_a = self.get_full_theta_a( _param )
+        th_f = self.get_full_theta_f( _param )
+        
+        print(th_a)
+        print(th_f)
+        
+#        thth_a = np.zeros( len(th_a) )
+#        thth_a[-2] = th_a[-2]
+#        thth_a[-1] = th_a[-1]
+#    
+#        print(thth_a)
+
+        def nsns_fixed_residual( _un ):
+            return self.rb_residual( _un, _affine_decomposition, th_f, th_a )
+        
+        def nsns_fixed_jacobian( _un ):
+            return self.build_ns_rb_jacobian( _un, _affine_decomposition, th_a )
+
+        import pyorb_core.algorithms.newton_solver as new_sol
+        un = new_sol.newton_solver( nsns_fixed_jacobian, nsns_fixed_residual, np.zeros( _affine_decomposition.get_rb_affine_matrix(0).shape[0] ), \
+                                    _tol=1.e-14, _n_max=20 )
+
+        return un
+
     
     M_ns_theta_As = ns_theta_As( )
     M_ns_theta_fs = ns_theta_fs( )

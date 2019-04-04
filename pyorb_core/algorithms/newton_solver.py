@@ -16,6 +16,10 @@ def newton_solver( _jacobian, _residual, _u0, _tol, _n_max ):
         u_n_1 = 1.* u_n
         u_n = u_n_1 - np.linalg.solve( _jacobian(u_n_1), _residual(u_n_1) )
         res = _residual( u_n )
+
+#        print( 'Residual is' )
+#        print( res )
+
         res_norm = np.linalg.norm( res )
         print( 'Iteration %d residual norm is %e' % (it, res_norm) )
     

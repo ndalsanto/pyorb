@@ -309,12 +309,6 @@ class RbManager( ):
         
         return rb_functions_dict
 
-    def update_fom_specifics( self, _fom_specifics_update ):
-        
-        self.M_fom_problem.M_fom_specifics.update( _fom_specifics_update )
-        
-        return 
-
     M_verbose = False
     M_get_test = False
 
