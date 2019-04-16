@@ -179,14 +179,7 @@ class Deim( ):
         rhs = self.M_fom_problem.assemble_fom_rhs( _param, _elements = self.M_reduced_elements, \
                                                            _indices  = self.M_reduced_indices )
         
-        start = time.time()
-        
         self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs )
-        
-        end = time.time()
-        print( 'Time to solve DEIM interpolation problem ' )
-        print( end - start )
-
         return self.M_current_theta
     
     def compute_deim_theta_coefficients_q( self, _param, _q ):

@@ -133,7 +133,10 @@ class matlab_external_engine( ee.external_engine ):
     def assemble_fom_rhs( self, _param, _fom_specifics, _elements = [], _indices = []):
 
         converted_fom_specifics = self.convert_types( _fom_specifics )
-        
+        converted_params = self.convert_parameter( _param )
+        converted_elements = self.convert_parameter( _elements )
+        converted_indices = self.convert_parameter( _indices + 1 )
+
         if len( _elements ) == 0:
             rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), converted_fom_specifics )
             ff = np.array( rhs['f'] )
@@ -145,24 +148,17 @@ class matlab_external_engine( ee.external_engine ):
 
             # if I convert elements and indices to int it would also retrieve from int values inside the matrx from MATLAB
             # therefore I convert them to double
-            rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), converted_fom_specifics, \
-                                                  self.convert_parameter( _elements ), \
-                                                  self.convert_parameter( _indices + 1 ) )
+            rhs = self.M_engine.assemble_fom_rhs( converted_params, converted_fom_specifics, \
+                                                  converted_elements, \
+                                                  converted_indices )
 
             end = time.time()
             print( 'Time to call rhs assembler from matlab' )
             print( end - start )
 
-#            ff = np.array( rhs['f'] )
-            
-            start = time.time()
-
-            self.M_engine.workspace["rhs_ptr"] = rhs   # rhs['f']
-            ff = np.array( self.M_engine.eval("rhs_ptr.Value") )
-
-            end = time.time()
-            print( 'Time to convert rhs from matlab' )
-            print( end - start )
+            ff = np.array( rhs['f'] )
+#            self.M_engine.workspace["rhs_ptr"] = rhs['f']
+#            ff = np.array( self.M_engine.eval("rhs_ptr.Value") )
 
             return ff
         
