@@ -10,6 +10,7 @@ Created on Thu Nov  8 18:21:34 2018
 import numpy as np
 import pyorb_core.rb_library.proper_orthogonal_decomposition as podec
 import random
+import time 
 
 class Deim( ):
     
@@ -177,12 +178,15 @@ class Deim( ):
         
         rhs = self.M_fom_problem.assemble_fom_rhs( _param, _elements = self.M_reduced_elements, \
                                                            _indices  = self.M_reduced_indices )
-
-        print('rhs.shape')
-        print(rhs.shape)
-
+        
+        start = time.time()
+        
         self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs )
         
+        end = time.time()
+        print( 'Time to solve DEIM interpolation problem ' )
+        print( end - start )
+
         return self.M_current_theta
     
     def compute_deim_theta_coefficients_q( self, _param, _q ):
@@ -514,20 +518,17 @@ class Mdeim( Deim ):
         rhs = self.M_fom_problem.assemble_fom_matrix( _param, _elements=self.M_reduced_elements, \
                                                       _indices=self.M_reduced_indices_mat )
 
-        print('rhs[:, 2]')
-        print(rhs[:, 2])
-
         self.M_current_theta = np.linalg.solve( self.M_interpolation_matrix, rhs[:, 2] )
 
         return self.M_current_theta
     
     def compute_theta_coefficients_q( self, _param, _q ):
 
-        print( 'Computing theta coefficients parameter %d' % _q )
-        print( _param )
-        print( self.M_current_theta )
-        print( 'Current parameter ' )
-        print( self.M_current_param )
+#        print( 'Computing theta coefficients parameter %d' % _q )
+#        print( _param )
+#        print( self.M_current_theta )
+#        print( 'Current parameter ' )
+#        print( self.M_current_param )
         
         if (self.M_current_param != _param).all():
             self.M_current_param = _param + np.zeros( _param.shape )
@@ -572,10 +573,5 @@ class Mdeim( Deim ):
     M_col_map = np.zeros( ( 0, 0 ) )
 
     M_reduced_indices_mat = np.zeros( ( 0, 0 ) )
-
-
-
-
-
 
 

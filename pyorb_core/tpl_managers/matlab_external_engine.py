@@ -10,6 +10,7 @@ Created on Thu Nov 22 13:51:49 2018
 import matlab.engine
 import numpy as np
 from pyorb_core.tpl_managers import external_engine as ee
+import time
 
 class matlab_external_engine( ee.external_engine ):
     
@@ -82,6 +83,8 @@ class matlab_external_engine( ee.external_engine ):
         
         affine_components = self.M_engine.build_fom_affine_components( _operator, converted_fom_specifics )
 
+        print( 'Finished to build affine components for operator %s ' % _operator )
+
         # rescale the matrix indices so that the counting starts from 0 (and not from 1 as in MATLAB)
         if _operator == 'A':
             matrix_affine = { }
@@ -137,14 +140,30 @@ class matlab_external_engine( ee.external_engine ):
             ff = np.reshape( ff, (ff.shape[0], ) )
             return ff
         else:
+            
+            start = time.time()
+
             # if I convert elements and indices to int it would also retrieve from int values inside the matrx from MATLAB
             # therefore I convert them to double
             rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), converted_fom_specifics, \
                                                   self.convert_parameter( _elements ), \
                                                   self.convert_parameter( _indices + 1 ) )
+
+            end = time.time()
+            print( 'Time to call rhs assembler from matlab' )
+            print( end - start )
+
+#            ff = np.array( rhs['f'] )
             
-            ff = np.array( rhs['f'] )
-            
+            start = time.time()
+
+            self.M_engine.workspace["rhs_ptr"] = rhs   # rhs['f']
+            ff = np.array( self.M_engine.eval("rhs_ptr.Value") )
+
+            end = time.time()
+            print( 'Time to convert rhs from matlab' )
+            print( end - start )
+
             return ff
         
     # NB the +1 is needed to convert the python indices over MATLAB

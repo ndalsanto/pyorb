@@ -58,6 +58,8 @@ class fom_problem( ):
         self.M_external_engine = _external_engine
         self.set_fom_specifics( _fom_specifics )
         self.M_configured_fom  = True
+        
+        self.assemble_fom_natural_norm_matrix( self.M_fom_specifics )
 
         return
 
@@ -89,6 +91,11 @@ class fom_problem( ):
         sol = self.M_external_engine.compute_natural_norm( _solution, self.M_fom_specifics )
         
         return sol
+
+    def assemble_fom_natural_norm_matrix( self, _fom_specifics ):
+        
+        self.check_configured_fom( )
+        self.M_natural_norm_matrix = self.M_external_engine.assemble_fom_natural_norm_matrix( self.M_fom_specifics )
 
     def solve_fom_problem( self, _param ):
         self.check_configured_fom( )
@@ -143,13 +150,15 @@ class fom_problem( ):
     M_external_engine = None
     M_fom_specifics = None
 
+    M_natural_norm_matrix = None
+
     # theta functions
     M_theta_a = default_theta_function
     M_theta_f = default_theta_function
     M_full_theta_a = default_full_theta_function
     M_full_theta_f = default_full_theta_function
     M_current_parameter = np.zeros( 0 )
-
+    
 
 
 

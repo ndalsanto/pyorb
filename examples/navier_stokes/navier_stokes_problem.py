@@ -76,10 +76,9 @@ class ns_theta_As( ):
         n_m_deim = self.M_mdeim.get_num_mdeim_basis( )
         theta_a = np.zeros( n_m_deim + 2 )
         theta_a[0:n_m_deim] = self.M_mdeim.compute_theta_coefficients( _param )
-        print(theta_a)
+#        print(theta_a)
         theta_a[n_m_deim] = 1.0
         theta_a[n_m_deim+1] = 0.01 * _param[0]
-
 
         return theta_a
 
@@ -160,17 +159,19 @@ class navier_stokes_problem( fp.fom_problem ):
     
     def solve_rb_ns_problem( self, _param, _affine_decomposition ):
         
-        th_a = self.get_full_theta_a( _param )
+        import time
+
+        start = time.time()
         th_f = self.get_full_theta_f( _param )
-        
-        print(th_a)
-        print(th_f)
-        
-#        thth_a = np.zeros( len(th_a) )
-#        thth_a[-2] = th_a[-2]
-#        thth_a[-1] = th_a[-1]
-#    
-#        print(thth_a)
+        end = time.time()
+        print( 'Time to compute theta F' )
+        print(end - start)
+
+        start = time.time()
+        th_a = self.get_full_theta_a( _param )
+        end = time.time()
+        print( 'Time to compute theta A' )
+        print(end - start)
 
         def nsns_fixed_residual( _un ):
             return self.rb_residual( _un, _affine_decomposition, th_f, th_a )
