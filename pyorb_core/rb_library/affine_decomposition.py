@@ -8,21 +8,7 @@ Created on Wed Oct 10 14:41:45 2018
 """
 
 import numpy as np
-
-# mat is a matrix in COO format, vec is a vector, such that the results is Av = mat * vec
-
-def sparse_matrix_vector_mul( mat, vec ):
-
-    Av = np.zeros( vec.shape  )
-
-    nnz = mat.shape[0]
-
-    for i in range( nnz ):
-#        Av[ int(mat[i, 0])-1, :] = Av[ int(mat[i, 0])-1, :] + mat[i, 2] * vec[ int(mat[i, 1])-1, : ]
-        Av[ int(mat[i, 0]), :] = Av[ int(mat[i, 0]), :] + mat[i, 2] * vec[ int(mat[i, 1]), : ]
-
-    return Av
-
+import pyorb_core.algebraic_utils as alg_ut
 
 class AffineDecomposition( ):
 
@@ -209,7 +195,7 @@ class AffineDecompositionHandler( ):
             self.M_rbAffineFq[iQf] = _basis.T.dot( self.M_feAffineFq[iQf] )
 
         for iQa in range( Qa ):
-            Av = sparse_matrix_vector_mul( self.M_feAffineAq[iQa], _basis )
+            Av = alg_ut.sparse_matrix_vector_mul( self.M_feAffineAq[iQa], _basis )
             self.M_rbAffineAq.append( np.zeros( (N, N) ) )
             self.M_rbAffineAq[iQa] = _basis.T.dot( Av )
 
