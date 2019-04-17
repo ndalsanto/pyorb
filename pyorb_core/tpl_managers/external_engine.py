@@ -11,10 +11,11 @@ import pyorb_core.error_manager as em
 
 class external_engine( ):
 
-    def __init__( self, _engine_type, _library_path ):
+    def __init__( self, _engine_type, _library_path, _interface_path ):
         
         self.M_engine_type  = _engine_type
         self.M_library_path = _library_path
+        self.M_interface_path = _interface_path
         
         return
 
@@ -82,17 +83,17 @@ class external_engine( ):
                           please provide specific ones for your specific engine " )
         return
 
-    def compute_natural_norm( _solution, _fom_specifics ):
+    def compute_natural_norm( self,_solution, _fom_specifics ):
         
         em.error_raiser( 'SystemError', 'external_engine::find_mdeim_elements_fom_specifics', \
                  "You are using the default find_mdeim_elements_fom_specifics, \
                   please provide specific ones for your specific engine " )
 
         return
-        
 
     M_engine_type = ""
     M_library_path = ""
+    M_interface_path = ""
     M_engine = None
 
 

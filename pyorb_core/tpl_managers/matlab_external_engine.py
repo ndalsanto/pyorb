@@ -14,17 +14,18 @@ import time
 
 class matlab_external_engine( ee.external_engine ):
     
-    def __init__( self, _engine_type, _library_path ):
+    def __init__( self, _engine_type, _library_path, _interface_path='' ):
         
-        ee.external_engine.__init__( self, _engine_type, _library_path )
+        ee.external_engine.__init__( self, _engine_type, _library_path, _interface_path )
         
         return
 
     def start_specific_engine( self ):
         
         self.M_engine = matlab.engine.start_matlab( )
+        self.M_engine.addpath( self.M_engine.genpath( self.M_interface_path ) )
+        print( 'Successfully added matlab pyorb interface %s ' % self.M_interface_path )
         self.M_engine.addpath( self.M_engine.genpath( self.M_library_path ) )
-
         print( 'Successfully started matlab engine and corresponding FOM library %s ' % self.M_library_path )
 
         return
@@ -32,7 +33,6 @@ class matlab_external_engine( ee.external_engine ):
     def quit_specific_engine( self ):
 
         self.M_engine.quit( )
-
         print( 'Successfully quitted matlab engine' )
 
         return
@@ -194,7 +194,7 @@ class matlab_external_engine( ee.external_engine ):
         A[:, 0:2] = A[:, 0:2] - 1
         return A
 
-
+    M_fom_probem_instance = None
 
 
 

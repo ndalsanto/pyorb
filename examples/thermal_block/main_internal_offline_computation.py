@@ -23,9 +23,9 @@ print(sys.path)
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
 matlab_library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat/'
+matlab_pyorb_interface = '/usr/scratch/dalsanto/EPFL/DeepLearning/pyorb-matlab-api/'
 
-# playing around with engine manager 
-my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
+my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path, matlab_pyorb_interface )
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
@@ -48,13 +48,16 @@ import thermal_block_problem as tbp
 
 my_tbp = tbp.thermal_block_problem( my_parameter_handler )
 
+Nh = 10
 
 fom_specifics = { 
-        'number_of_elements': 10, 
+        'number_of_elements': Nh, 
         'polynomial_degree' : 'P1',
         'model'             : 'thermal_block',
-        'use_nonhomogeneous_dirichlet' : 'N',
-        'mesh_name'                    : 'cube10x10' }
+        'simulation_name'   : 'thermal_block_' + str(Nh),\
+        'mesh_name'         : 'square10x10',\
+        'full_path'         : '/usr/scratch/dalsanto/EPFL/DeepLearning/pyorb_development/examples/thermal_block/', \
+        'use_nonhomogeneous_dirichlet' : 'N' }
 
 my_tbp.configure_fom( my_matlab_external_engine, fom_specifics )
 

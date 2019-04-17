@@ -58,8 +58,8 @@ class fom_problem( ):
         self.M_external_engine = _external_engine
         self.set_fom_specifics( _fom_specifics )
         self.M_configured_fom  = True
-        
-        self.assemble_fom_natural_norm_matrix( self.M_fom_specifics )
+
+#        self.assemble_fom_natural_norm_matrix( self.M_fom_specifics )
 
         return
 
