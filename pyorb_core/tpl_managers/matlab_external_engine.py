@@ -134,8 +134,6 @@ class matlab_external_engine( ee.external_engine ):
 
         converted_fom_specifics = self.convert_types( _fom_specifics )
         converted_params = self.convert_parameter( _param )
-        converted_elements = self.convert_parameter( _elements )
-        converted_indices = self.convert_parameter( _indices + 1 )
 
         if len( _elements ) == 0:
             rhs = self.M_engine.assemble_fom_rhs( self.convert_parameter( _param ), converted_fom_specifics )
@@ -143,6 +141,9 @@ class matlab_external_engine( ee.external_engine ):
             ff = np.reshape( ff, (ff.shape[0], ) )
             return ff
         else:
+
+            converted_elements = self.convert_parameter( _elements )
+            converted_indices = self.convert_parameter( _indices + 1 )
             
             start = time.time()
 
