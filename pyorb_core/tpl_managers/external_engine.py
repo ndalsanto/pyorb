@@ -91,6 +91,15 @@ class external_engine( ):
 
         return
 
+    def initialize_fom_simulation( self, _fom_specifics ):
+        
+        em.error_raiser( 'SystemError', 'external_engine::initialize_fom_simulation', \
+                 "You are using the default find_mdeim_elements_fom_specifics, \
+                  please provide specific ones for your specific engine " )
+        
+        return
+
+
     M_engine_type = ""
     M_library_path = ""
     M_interface_path = ""

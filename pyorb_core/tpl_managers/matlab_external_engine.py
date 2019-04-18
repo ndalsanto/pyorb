@@ -37,6 +37,12 @@ class matlab_external_engine( ee.external_engine ):
 
         return
 
+    def initialize_fom_simulation( self, _fom_specifics ):
+        
+        self.M_engine.initialize_fom_simulation( _fom_specifics, nargout=0 )
+        
+        return
+
     def convert_parameter( self, _param ):
 
         return self.convert_double( _param )

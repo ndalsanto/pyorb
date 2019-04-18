@@ -47,9 +47,7 @@ class fom_problem( ):
         return self.M_full_theta_f( _param )
 
     def define_theta_functions( self ):
-
         em.error_raiser( 'SystemError', 'fom_problem::define_theta_functions', "You should define the theta function specific for your problem in the inherited class." )
-
         return
 
     # initialize anything which needs to be specified for using the external engine
@@ -57,11 +55,16 @@ class fom_problem( ):
 
         self.M_external_engine = _external_engine
         self.set_fom_specifics( _fom_specifics )
-        self.M_configured_fom  = True
-
-#        self.assemble_fom_natural_norm_matrix( self.M_fom_specifics )
+        self.M_external_engine.initialize_fom_simulation( _fom_specifics )
+        self.assemble_fom_natural_norm_matrix( self.M_fom_specifics )
+        self.M_configured_fom = True
 
         return
+
+    def assemble_fom_natural_norm_matrix( self, _fom_specifics ):
+        
+        self.check_configured_fom( )
+        self.M_natural_norm_matrix = self.M_external_engine.assemble_fom_natural_norm_matrix( self.M_fom_specifics )
 
     def set_fom_specifics( self, _fom_specifics ):
 
@@ -79,6 +82,15 @@ class fom_problem( ):
         
         return 
 
+    def clear_fom_specifics( self, _fom_specifics_update ):
+        
+        print( "Clearing the fom specifics dictionary" )
+
+        for key in _fom_specifics_update:
+            self.M_fom_specifics.pop( key )
+        
+        return 
+
     def check_configured_fom( self ):
 
         if self.M_configured_fom == False:
@@ -91,11 +103,6 @@ class fom_problem( ):
         sol = self.M_external_engine.compute_natural_norm( _solution, self.M_fom_specifics )
         
         return sol
-
-    def assemble_fom_natural_norm_matrix( self, _fom_specifics ):
-        
-        self.check_configured_fom( )
-        self.M_natural_norm_matrix = self.M_external_engine.assemble_fom_natural_norm_matrix( self.M_fom_specifics )
 
     def solve_fom_problem( self, _param ):
         self.check_configured_fom( )
