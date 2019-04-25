@@ -92,9 +92,9 @@ class matlab_external_engine( ee.external_engine ):
         print( 'Finished to build affine components for operator %s ' % _operator )
 
         # rescale the matrix indices so that the counting starts from 0 (and not from 1 as in MATLAB)
-        if _operator == 'A':
-            matrix_affine = { }
-            for iQa in range( _num_affine_components ):
+        if _operator == 'A' or _operator == 'Aj':
+            matrix_affine = {}
+            for iQa in range( len( affine_components ) ):
                 matrix_affine['A' + str(iQa)] = np.array( affine_components['A' + str(iQa)] )
                 matrix_affine['A' + str(iQa)][:, 0:2] = matrix_affine['A' + str(iQa)][:, 0:2] - 1
                 
@@ -112,6 +112,19 @@ class matlab_external_engine( ee.external_engine ):
         print('Returning affine components for operator %s' % _operator )
 
         return affine_components
+
+    def build_rb_affine_components( self, _operator, _fom_specifics ):
+
+        print( 'Building RB affine components for operator %s' % _operator )
+
+        converted_fom_specifics = self.convert_types( _fom_specifics )
+
+        affine_components = self.M_engine.build_rb_affine_components( _operator, converted_fom_specifics )
+
+        print( 'Finished to build MATLAB RB affine components for operator %s ' % _operator )
+
+        return affine_components
+
 
     def assemble_fom_matrix( self, _param, _fom_specifics, _elements = [], _indices = []):
         

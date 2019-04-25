@@ -157,47 +157,80 @@ class AffineDecompositionHandler( ):
         self.M_feAffineFq = _feAffineFq
 
 
-    def build_rb_affine_decompositions( self, _basis, _fom_problem ):
+    def build_rb_affine_decompositions( self, _basis, _fom_problem, _build_rb_tpl=False ):
 
         N = _basis.shape[1]
 
         Qf = self.get_Qf( )
         Qa = self.get_Qa( )
 
-        if self.check_set_fom_arrays( ) == False:
+        if _build_rb_tpl is not True:
+          if self.check_set_fom_arrays( ) == False:
 
-            print( "Importing FOM affine arrays " )
+              print( "Importing FOM affine arrays " )
 
-            if len( self.M_feAffineFq ) < Qf:
-                print( "I am importing f affine arrays " )
+              if len( self.M_feAffineFq ) < Qf:
+                  print( "I am importing f affine arrays " )
 
-                fff = _fom_problem.retrieve_fom_affine_components( 'f', Qf - len( self.M_feAffineFq ) )
-                starting_Qf = len( self.M_feAffineFq )
+                  fff = _fom_problem.retrieve_fom_affine_components( 'f', Qf - len( self.M_feAffineFq ) )
+                  starting_Qf = len( self.M_feAffineFq )
 
-                for iQf in range( Qf - starting_Qf ):
+                  for iQf in range( Qf - starting_Qf ):
                     self.M_feAffineFq.append( np.array( fff['f' + str(iQf)] ) )
 
-            if len( self.M_feAffineAq ) < Qa:
-                print( "I am importing A affine arrays starting from %d and to %d " % (len( self.M_feAffineAq ), Qa) )
+              if len( self.M_feAffineAq ) < Qa:
+                  print( "I am importing A affine arrays starting from %d and to %d " % (len( self.M_feAffineAq ), Qa) )
 
-                AAA = _fom_problem.retrieve_fom_affine_components( 'A', Qa - len( self.M_feAffineAq ) )
-                starting_Qa = len( self.M_feAffineAq )
+                  AAA = _fom_problem.retrieve_fom_affine_components( 'A', Qa - len( self.M_feAffineAq ) )
+                  starting_Qa = len( self.M_feAffineAq )
 
-                for iQa in range( Qa - starting_Qa ):
-                    print( "I am importing A affine array %d " % (iQa + starting_Qa) )
+                  for iQa in range( Qa - starting_Qa ):
+                      print( "I am importing A affine array %d " % (iQa + starting_Qa) )
 
-                    self.M_feAffineAq.append( AAA['A' + str(iQa)] )
-        else:
-            print( "Already set the FOM affine arrays " )
+                      self.M_feAffineAq.append( AAA['A' + str(iQa)] )
 
-        for iQf in range( Qf ):
+              if len( self.M_feAffineAq ) < Qa:
+                  print( "I am importing A - Jacobian affine arrays starting from %d and to %d " % (len( self.M_feAffineAq ), Qa) )
+
+                  AAA = _fom_problem.retrieve_fom_affine_components( 'Aj', Qa - len( self.M_feAffineAq ) )
+                  starting_Qa = len( self.M_feAffineAq )
+
+                  for iQa in range( Qa - starting_Qa ):
+                      print( "I am importing A affine array %d " % (iQa + starting_Qa) )
+
+                      self.M_feAffineAq.append( AAA['A' + str(iQa)] )
+
+          else:
+              print( "Already set the FOM affine arrays " )
+
+          for iQf in range( Qf ):
             self.M_rbAffineFq.append( np.zeros( N ) )
             self.M_rbAffineFq[iQf] = _basis.T.dot( self.M_feAffineFq[iQf] )
 
-        for iQa in range( Qa ):
+          for iQa in range( Qa ):
             Av = alg_ut.sparse_matrix_vector_mul( self.M_feAffineAq[iQa], _basis )
             self.M_rbAffineAq.append( np.zeros( (N, N) ) )
             self.M_rbAffineAq[iQa] = _basis.T.dot( Av )
+
+        elif _build_rb_tpl is True:
+ 
+          print( "Importing directly the RB arrays from TPL " )        
+  
+          rbAffineFq_components = _fom_problem.retrieve_rb_affine_components( 'f' )
+          
+          for iQf in range( len( rbAffineFq_components ) ):
+            self.M_rbAffineFq.append( rbAffineFq_components[iQf] ) 
+
+          rbAffineAq_components = _fom_problem.retrieve_rb_affine_components( 'A' )
+
+          for iQa in range( len( rbAffineAq_components ) ):
+            self.M_rbAffineAq.append( rbAffineAq_components[iQa] )
+
+          if len( self.M_feAffineAq ) < Qa:
+            rbAffineAjq_components = _fom_problem.retrieve_rb_affine_components( 'Aj' )
+
+            for iQaj in range( len( rbAffineAjq_components ) ):
+              self.M_rbAffineAq.append( rbAffineAjq_components[iQaj] )
 
         print( 'Finished to build the RB affine arrays' )
 

@@ -12,6 +12,40 @@ An example where the RB method is constructed by solving the fem problem with MA
 
 #%%
 
+
+def compute_rb_errors( n_tests, my_rb_manager, my_ns ):
+
+  errors = np.zeros( n_tests ) 
+ 
+  for ii in range( n_tests ):
+    print('Parameter %d ' % ii)
+    my_ns.generate_parameter( )
+    param_1 = my_ns.get_parameter( )
+    print( param_1 )
+
+    start = time.time()
+    un = my_ns.solve_rb_ns_problem( param_1, my_rb_manager.M_affineDecomposition )
+    end = time.time()
+    time_to_solve = end - start
+    print( 'Time to solve RB problem %f ' % time_to_solve )
+
+    s1 = my_ns.solve_fom_problem( param_1 )
+    utildeh = my_rb_manager.reconstruct_fem_solution( un )
+    e_h = s1 - utildeh
+    norm_error = np.linalg.norm(e_h) / np.linalg.norm(s1)
+    print( 'Norm of error %f' % norm_error )
+
+    err = my_ns.compute_natural_norm( e_h ) / my_ns.compute_natural_norm( s1 )
+    print( 'Norm of H1 error %f' % err )
+
+    errors[ii] = err
+
+  print('Mean error %f ' % np.mean(errors))
+
+
+
+#%%
+
 import numpy as np
 
 import sys
@@ -31,7 +65,7 @@ my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 import pyorb_core.pde_problem.parameter_handler as ph
 
 mu0_min = 1.; mu0_max = 10.
-mu1_min = 0.; mu1_max = 0.2
+mu1_min = 0.; mu1_max = 0.1
 
 param_min = np.array([mu0_min, mu1_min])
 param_max = np.array([mu0_max, mu1_max])
@@ -40,11 +74,75 @@ num_parameters = param_min.shape[0]
 # preparing the parameter handler
 my_parameter_handler = ph.Parameter_handler( )
 my_parameter_handler.assign_parameters_bounds( param_min, param_max )
+param_range = 'param_03_'
+
+do_offline = 0
+
+if mu1_max <= 0.250001:
+
+    param_range = 'param_025_'
+    ns_m_deim = 500
+    n_s = 750
+    ns_test = 500
+    rb_tol = 10**(-4)
+    do_offline = 0
+
+    # fine
+    param_range = 'param_025_'
+    ns_m_deim = 750
+    n_s = 1500
+    ns_test = 50
+    rb_tol = 5. * 10**(-4)
+    do_offline = 0
+
+
+if mu1_max <= 0.150001:
+
+    param_range = 'param_015_'
+    ns_m_deim = 200
+    n_s = 500
+    ns_test = 10
+    rb_tol = 10**(-5)
+    do_offline = 0
+    
+#    #fine
+#    param_range = 'param_015_'
+#    ns_m_deim = 200
+#    n_s = 750
+#    ns_test = 100
+#    rb_tol = 2.*10**(-4)
+#    do_offline = 0
+
+if mu1_max <= 0.101:
+
+    param_range = 'param_010_'
+    ns_m_deim = 30
+    n_s = 50
+    ns_test = 10
+    rb_tol = 10**(-5)
+    do_offline = 1
+
+if mu1_max < 0.0999:
+    param_range = 'small_param_'
+    ns_m_deim = 10 
+    n_s = 40
+    ns_test = 10
+    rb_tol = 10**(-6)
+    do_offline = 0
+
+if mu1_max < 0.001:
+    param_range = 'affine_param_'
+    ns_m_deim = 3
+    n_s = 300
+    ns_test = 40
+    rb_tol = 10**(-6)
+    do_offline = 0
 
 # define the fem problem
 import navier_stokes_problem as ns
 
 mesh = 'very_coarse'
+# mesh = 'fine'
 
 fom_specifics = {
         'model': 'navier_stokes', \
@@ -55,24 +153,19 @@ fom_specifics = {
 
 my_ns = ns.navier_stokes_problem( my_parameter_handler, my_matlab_external_engine, fom_specifics )
 
-#%%
+##%%
 
 my_ns.generate_parameter( )
 param = my_ns.get_parameter( )
 
-do_offline = 0
+base_folder = 'offline_' + param_range + mesh + '/'
+print(base_folder)
 
-base_folder = 'offline'
-
-base_folder = base_folder + '/'
-
-##%%
+#%%
 import pyorb_core.utils.array_utils as pyorb_array_utils
 import pyorb_core.rb_library.m_deim as m_deim
 my_mdeim = m_deim.Mdeim( my_ns )
 my_deim  = m_deim.Deim(  my_ns )
-
-ns_m_deim = 40
 
 if do_offline == 1:
     my_mdeim.set_save_offline( True, base_folder + '/' )
@@ -136,7 +229,6 @@ if SAVE_OFFLINE == 1:
                                            base_folder + "basis_" + mesh + '.txt', \
                                            base_folder + "rb_affine_components_" + mesh, \
                                            base_folder + 'offline_parameters.data' )
-n_s = 60
 
 if do_offline == 1:
     my_rb_manager.build_snapshots( n_s )
@@ -145,8 +237,6 @@ else:
     my_rb_manager.import_snapshots_parameters( base_folder + 'offline_parameters.data' )
 
 my_rb_manager.perform_pod( 10**(-4) )
-
-
 
 import pyorb_core.rb_library.affine_decomposition as ad
 
@@ -172,7 +262,7 @@ if do_offline == 1:
     rb_functions_dict = my_rb_manager.get_rb_functions_dict( )
     my_ns.update_fom_specifics( rb_functions_dict )
 
-    my_rb_manager.build_rb_affine_decompositions( )
+    my_rb_manager.build_rb_affine_decompositions( _build_rb_tpl=False )
     
     if SAVE_OFFLINE == 1:
         my_rb_manager.save_rb_affine_decomposition( )
@@ -186,7 +276,7 @@ else:
 
 my_rb_manager.print_rb_offline_summary( )
 
-##%%
+#%%
 
 print( 'Solving RB problem ' )
 
@@ -203,15 +293,14 @@ print( 'Time to solve RB problem %f ' % time_to_solve )
 
 s1 = my_rb_manager.M_snapshots_matrix[:, 0]
 utildeh = my_rb_manager.reconstruct_fem_solution( un )
-norm_error = np.linalg.norm(s1 - utildeh) / np.linalg.norm(s1)
+e_h = s1 - utildeh
+norm_error = np.linalg.norm(e_h) / np.linalg.norm(s1)
 print( 'Norm of error %f' % norm_error )
 
+err = my_ns.compute_natural_norm( e_h ) / my_ns.compute_natural_norm( s1 )
+print( err )
 
+compute_rb_errors( 20, my_rb_manager, my_ns )
 
-
-
-
-
-#%%
 
 my_matlab_engine_manager.quit_engine( )

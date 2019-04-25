@@ -17,7 +17,11 @@ def sparse_matrix_vector_mul( mat, vec ):
 
     nnz = mat.shape[0]
 
-    for i in range( nnz ):
-        Av[ int(mat[i, 0]), :] = Av[ int(mat[i, 0]), :] + mat[i, 2] * vec[ int(mat[i, 1]), : ]
+    if len(vec.shape) == 2:
+        for i in range( nnz ):
+            Av[ int(mat[i, 0]), :] = Av[ int(mat[i, 0]), :] + mat[i, 2] * vec[ int(mat[i, 1]), : ]
+    elif len(vec.shape) == 1:
+        for i in range( nnz ):
+            Av[ int(mat[i, 0])] = Av[ int(mat[i, 0])] + mat[i, 2] * vec[ int(mat[i, 1]) ]
 
     return Av

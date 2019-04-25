@@ -9,6 +9,7 @@ Created on Thu Oct 11 12:02:21 2018
 
 import pyorb_core.error_manager as em
 import numpy as np
+import pyorb_core.algebraic_utils as alg_ut
 
 def default_theta_function( _param, _q ):
 
@@ -56,8 +57,8 @@ class fom_problem( ):
         self.M_external_engine = _external_engine
         self.set_fom_specifics( _fom_specifics )
         self.M_external_engine.initialize_fom_simulation( _fom_specifics )
-        self.assemble_fom_natural_norm_matrix( self.M_fom_specifics )
         self.M_configured_fom = True
+        self.assemble_fom_natural_norm_matrix( self.M_fom_specifics )
 
         return
 
@@ -98,11 +99,11 @@ class fom_problem( ):
 
         return
 
-    def compute_natural_norm( self, _solution ):
-        self.check_configured_fom( )
-        sol = self.M_external_engine.compute_natural_norm( _solution, self.M_fom_specifics )
-        
-        return sol
+#    def compute_natural_norm( self, _solution ):
+#        self.check_configured_fom( )
+#        sol = self.M_external_engine.compute_natural_norm( _solution, self.M_fom_specifics )
+#        
+#        return sol
 
     def solve_fom_problem( self, _param ):
         self.check_configured_fom( )
@@ -119,6 +120,10 @@ class fom_problem( ):
     def retrieve_fom_affine_components( self, _operator, _num_affine_components ):
         self.check_configured_fom( )
         return self.M_external_engine.build_fom_affine_components( _operator, _num_affine_components, self.M_fom_specifics )
+
+    def retrieve_rb_affine_components( self, _operator ):
+        self.check_configured_fom( )
+        return self.M_external_engine.build_rb_affine_components( _operator, self.M_fom_specifics )
 
     def assemble_fom_matrix( self, _param, _elements=[], _indices=[] ):
         self.check_configured_fom( )
@@ -149,6 +154,11 @@ class fom_problem( ):
     def find_deim_elements_fom_specifics( self, _indices ):
         self.check_configured_fom( )
         return self.M_external_engine.find_deim_elements_fom_specifics( self.M_fom_specifics, _indices )
+
+    def compute_natural_norm( self, _uh ):
+        Auh = alg_ut.sparse_matrix_vector_mul( self.M_natural_norm_matrix, _uh )
+        uh_norm = _uh.T.dot( Auh )
+        return np.sqrt( uh_norm )
 
     M_parameter_handler = None
     M_configured_fom = False

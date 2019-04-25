@@ -267,8 +267,8 @@ class RbManager( ):
 
         return
 
-    def build_rb_affine_decompositions( self ):
-        self.M_affineDecomposition.build_rb_affine_decompositions( self.M_basis, self.M_fom_problem )
+    def build_rb_affine_decompositions( self, _build_rb_tpl=False ):
+        self.M_affineDecomposition.build_rb_affine_decompositions( self.M_basis, self.M_fom_problem, _build_rb_tpl )
         return 
 
     def save_rb_affine_decomposition( self ):
