@@ -13,7 +13,7 @@ import random
 class Parameter_generator:
     """a class for handling the generation of parameters."""
 
-    def __init__( self, _generation_type, _num_parameters):
+    def __init__( self, _num_parameters):
         
         self.M_num_parameters = _num_parameters
         
@@ -25,9 +25,9 @@ class Parameter_generator:
 class Random_parameter_generator( Parameter_generator ):
     """a class for handling the generation of parameters."""
 
-    def __init__( self, _generation_type, _num_parameters ):
+    def __init__( self, _num_parameters ):
         
-        Parameter_generator( _generation_type, _num_parameters )
+        Parameter_generator( _num_parameters )
 
         return
 
