@@ -18,16 +18,14 @@ import sys
 sys.path.insert(0, '../../')
 print(sys.path)
 
-
 import pyorb_core.tpl_managers.external_engine_manager as mee
 
 matlab_library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat/'
+matlab_pyorb_interface = '/usr/scratch/dalsanto/EPFL/DeepLearning/pyorb-matlab-api/'
 
-# playing around with engine manager
-my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
+my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path, matlab_pyorb_interface )
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
-
 
 import pyorb_core.pde_problem.parameter_handler as ph
 
@@ -46,17 +44,17 @@ my_parameter_handler.assign_parameters_bounds( param_min, param_max )
 # define the fem problem
 import nonaffine_diffusion_problem as ndp
 
-
 fem_size = 10
 fem_size_str = str( fem_size )
 
-
 fom_specifics = { 
-        'number_of_elements': fem_size, 
-        'polynomial_degree' : 'P1',
-        'model': 'nonaffine',
-        'use_nonhomogeneous_dirichlet' : 'N',
-        'mesh_name' : 'non_affine_mesh' }
+        'number_of_elements': fem_size, \
+        'polynomial_degree' : 'P1', \
+        'model': 'nonaffine', \
+        'simulation_name'   : 'nonaffine' + fem_size_str,\
+        'use_nonhomogeneous_dirichlet' : 'Y', \
+        'mesh_name' : fem_size_str + 'x' + fem_size_str, \
+        'full_path'         : '/usr/scratch/dalsanto/EPFL/DeepLearning/pyorb_development/examples/non_affine_diffusion/' }
 
 my_ndp = ndp.nonaffine_diffusion_problem( my_parameter_handler, my_matlab_external_engine, fom_specifics )
 
@@ -75,14 +73,6 @@ if fom_specifics['use_nonhomogeneous_dirichlet'] == 'Y':
     num_f_affine_components = my_deim.get_num_basis( )
     
 print( 'Number of affine basis for the rhs is %d ' % num_f_affine_components  )
-    
-#mu = param_min
-#my_deim.compute_deim_theta_coefficients( mu )
-#int_mat = my_deim.get_interpolation_matrix( )
-#
-#np.linalg.eig( int_mat )
-
-#%%
 
 import pyorb_core.rb_library.affine_decomposition as ad
 
@@ -108,7 +98,7 @@ if SAVE_OFFLINE == 1:
                                            "offline_" + fem_size_str + "/rb_affine_components_" + fem_size_str, \
                                            'offline_' + fem_size_str + '/test_offline_parameters.data' )
 
-my_rb_manager.build_rb_approximation( 200, 10**(-7) )
+my_rb_manager.build_rb_approximation( 100, 10**(-6) )
 
 # printing summary
 my_rb_manager.print_rb_offline_summary( )
