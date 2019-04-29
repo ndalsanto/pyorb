@@ -213,24 +213,37 @@ class AffineDecompositionHandler( ):
             self.M_rbAffineAq[iQa] = _basis.T.dot( Av )
 
         elif _build_rb_tpl is True:
- 
-          print( "Importing directly the RB arrays from TPL " )        
+
+          print( 'Constructing the RB basis from the affine componenets obtained from (M)DEIM at first' )
+
+          for iQf in range( len(self.M_feAffineFq) ):
+            self.M_rbAffineFq.append( np.zeros( N ) )
+            self.M_rbAffineFq[iQf] = _basis.T.dot( self.M_feAffineFq[iQf] )
+
+          for iQa in range( len(self.M_feAffineAq) ):
+            Av = alg_ut.sparse_matrix_vector_mul( self.M_feAffineAq[iQa], _basis )
+            self.M_rbAffineAq.append( np.zeros( (N, N) ) )
+            self.M_rbAffineAq[iQa] = _basis.T.dot( Av )
+
+          print( "Importing directly the truly RB affine arrays from TPL " ) 
   
           rbAffineFq_components = _fom_problem.retrieve_rb_affine_components( 'f' )
           
           for iQf in range( len( rbAffineFq_components ) ):
-            self.M_rbAffineFq.append( rbAffineFq_components[iQf] ) 
+            self.M_rbAffineFq.append( np.array (rbAffineFq_components['fN' + str(iQf)] ) )
 
           rbAffineAq_components = _fom_problem.retrieve_rb_affine_components( 'A' )
 
           for iQa in range( len( rbAffineAq_components ) ):
-            self.M_rbAffineAq.append( rbAffineAq_components[iQa] )
+            self.M_rbAffineAq.append( np.array( rbAffineAq_components['AN' + str(iQa)] ) )
 
+          """
           if len( self.M_feAffineAq ) < Qa:
             rbAffineAjq_components = _fom_problem.retrieve_rb_affine_components( 'Aj' )
 
             for iQaj in range( len( rbAffineAjq_components ) ):
               self.M_rbAffineAq.append( rbAffineAjq_components[iQaj] )
+          """
 
         print( 'Finished to build the RB affine arrays' )
 

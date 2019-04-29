@@ -78,6 +78,8 @@ param_range = 'param_03_'
 
 do_offline = 0
 
+offline_selection = ''
+
 if mu1_max <= 0.250001:
 
     param_range = 'param_025_'
@@ -92,9 +94,11 @@ if mu1_max <= 0.250001:
     ns_m_deim = 750
     n_s = 1500
     ns_test = 50
-    rb_tol = 5. * 10**(-4)
+    rb_tol = 10**(-4)
     do_offline = 0
-
+    mu0_grid = 30
+    mu1_grid = 50
+    offline_selection = 'tensor'
 
 if mu1_max <= 0.150001:
 
@@ -117,9 +121,12 @@ if mu1_max <= 0.101:
 
     param_range = 'param_010_'
     ns_m_deim = 30
-    n_s = 50
+    n_s = 42
+    mu0_grid = 6
+    mu1_grid = 7
+    offline_selection = 'tensor'
     ns_test = 10
-    rb_tol = 10**(-5)
+    rb_tol = 10**(-4)
     do_offline = 1
 
 if mu1_max < 0.0999:
@@ -142,7 +149,7 @@ if mu1_max < 0.001:
 import navier_stokes_problem as ns
 
 mesh = 'very_coarse'
-# mesh = 'fine'
+#mesh = 'fine'
 
 fom_specifics = {
         'model': 'navier_stokes', \
@@ -158,7 +165,7 @@ my_ns = ns.navier_stokes_problem( my_parameter_handler, my_matlab_external_engin
 my_ns.generate_parameter( )
 param = my_ns.get_parameter( )
 
-base_folder = 'offline_' + param_range + mesh + '/'
+base_folder = 'offline_' + param_range + offline_selection + '_' + mesh + '/'
 print(base_folder)
 
 #%%
@@ -236,7 +243,7 @@ else:
     my_rb_manager.import_snapshots_matrix( base_folder + "snapshots_" + mesh + '.txt' )
     my_rb_manager.import_snapshots_parameters( base_folder + 'offline_parameters.data' )
 
-my_rb_manager.perform_pod( 10**(-4) )
+my_rb_manager.perform_pod( rb_tol )
 
 import pyorb_core.rb_library.affine_decomposition as ad
 
@@ -256,13 +263,13 @@ my_affine_decomposition.set_affine_f( my_deim.get_deim_basis_list( ) )
 
 my_rb_manager.set_affine_decomposition_handler( my_affine_decomposition )
 
-do_offline = 1
+#do_offline = 0
 
 if do_offline == 1:
     rb_functions_dict = my_rb_manager.get_rb_functions_dict( )
     my_ns.update_fom_specifics( rb_functions_dict )
 
-    my_rb_manager.build_rb_affine_decompositions( _build_rb_tpl=False )
+    my_rb_manager.build_rb_affine_decompositions( _build_rb_tpl=True )
     
     if SAVE_OFFLINE == 1:
         my_rb_manager.save_rb_affine_decomposition( )
@@ -290,6 +297,8 @@ end = time.time()
 time_to_solve = end - start
 print( 'Time to solve RB problem %f ' % time_to_solve )
 
+print('un is')
+print(un)
 
 s1 = my_rb_manager.M_snapshots_matrix[:, 0]
 utildeh = my_rb_manager.reconstruct_fem_solution( un )
