@@ -8,8 +8,7 @@ Created on Thu Oct 11 11:49:46 2018
 """
 
 import numpy as np
-import random
-
+import parameter_generator as pg
 
 class Parameter_handler:
     """a class for handling the parameters."""
@@ -22,6 +21,7 @@ class Parameter_handler:
         self.M_param_max = _param_max
         self.M_param     = np.zeros( _param_min.shape )
         self.M_num_parameters = _param_min.shape[0]
+        self.M_parameter_generator = pg.Random_parameter_generator( _param_min.shape[0] )
 
     def assign_parameters( self, _param ):
         
@@ -36,10 +36,8 @@ class Parameter_handler:
     def generate_parameter( self ):
         # generate numbers between 0 and 1
         assert self.M_num_parameters > 0
+        self.M_param = self.M_parameter_generator.generate_parameter( )
         
-        for iP in range( self.M_num_parameters ):
-            pRandom = float( random.randint(0,10000) ) / 10000.0
-            self.M_param[iP] = self.M_param_min[iP] + pRandom * ( self.M_param_max[iP] - self.M_param_min[iP] )
         
     def get_parameter( self ):
         return self.M_param
@@ -59,8 +57,12 @@ class Parameter_handler:
     def get_range_parameters( self ):
         return self.M_param_max - self.M_param_min
 
-
+    def set_parameter_generator( self, _parameter_generator ):
+        self.M_parameter_generator = _parameter_generator
+        
     M_param_min = np.zeros( 0 )
     M_param_max = np.zeros( 0 )
     M_param     = np.zeros( 0 )
     M_num_parameters = 0
+    M_parameter_generator = None
+
