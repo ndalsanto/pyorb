@@ -8,12 +8,14 @@ Created on Thu Oct 11 11:49:46 2018
 """
 
 import numpy as np
-import parameter_generator as pg
+import pyorb_core.pde_problem.parameter_generator as pg
 
 class Parameter_handler:
     """a class for handling the parameters."""
 
-    def __init__( self ):
+    def __init__( self, _parameter_generator ):
+
+        self.M_parameter_generator = _parameter_generator
         return
 
     def assign_parameters_bounds( self, _param_min, _param_max ):
@@ -21,7 +23,6 @@ class Parameter_handler:
         self.M_param_max = _param_max
         self.M_param     = np.zeros( _param_min.shape )
         self.M_num_parameters = _param_min.shape[0]
-        self.M_parameter_generator = pg.Random_parameter_generator( _param_min.shape[0] )
 
     def assign_parameters( self, _param ):
         
@@ -36,8 +37,8 @@ class Parameter_handler:
     def generate_parameter( self ):
         # generate numbers between 0 and 1
         assert self.M_num_parameters > 0
-        self.M_param = self.M_parameter_generator.generate_parameter( )
-        
+        self.M_param = self.M_parameter_generator.generate_parameter( self.M_param_min, self.M_param_max )
+        return
         
     def get_parameter( self ):
         return self.M_param

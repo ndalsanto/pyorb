@@ -14,10 +14,7 @@ class Parameter_generator:
     """a class for handling the generation of parameters."""
 
     def __init__( self, _num_parameters):
-        
         self.M_num_parameters = _num_parameters
-        
-        return
         
     M_num_parameters = 0
 
@@ -41,12 +38,12 @@ class Random_parameter_generator( Parameter_generator ):
 
         return new_parameter
 
-class Tensor_parameter_generator:
+class Tensor_parameter_generator( Parameter_generator ):
     """a class for handling the generation of parameters."""
 
-    def __init__( self, _generation_type, _num_parameters, _parameter_steps ):
+    def __init__( self, _num_parameters, _parameter_steps ):
         
-        Parameter_generator( _generation_type, _parameter_grid )
+        Parameter_generator( _num_parameters )
         self.M_counter = np.zeros( self.M_num_parameters )
         self.M_parameter_steps = _parameter_steps
         
@@ -54,23 +51,23 @@ class Tensor_parameter_generator:
 
     def generate_parameter( self, _mu_min, _mu_max ):
         
-        new_parameter = np.zeros( self.M_num_parameters )
-        for iP in range( self.M_num_parameters ):
+#        new_parameter = np.zeros( self.M_num_parameters )
+#        for iP in range( self.M_num_parameters ):
             
 
+        new_parameter = np.array([123., 243.])
             
-            
-        self.update_next_parameter( )
-            
+#        self.update_next_parameter( )
+        return new_parameter
+
     def update_next_parameter( self ):
         
-        
+        return
         
         
         
         
     
-    return new_parameter
 
     M_counter = np.zeros( 0 )
     M_parameter_steps = np.zeros( 0 )
