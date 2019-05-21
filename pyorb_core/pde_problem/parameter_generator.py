@@ -41,39 +41,39 @@ class Random_parameter_generator( Parameter_generator ):
 
         return new_parameter
 
-class Tensor_parameter_generator:
-    """a class for handling the generation of parameters."""
-
-    def __init__( self, _generation_type, _num_parameters, _parameter_steps ):
-        
-        Parameter_generator( _generation_type, _parameter_grid )
-        self.M_counter = np.zeros( self.M_num_parameters )
-        self.M_parameter_steps = _parameter_steps
-        
-        return
-
-    def generate_parameter( self, _mu_min, _mu_max ):
-        
-        new_parameter = np.zeros( self.M_num_parameters )
-        for iP in range( self.M_num_parameters ):
-            
-
-            
-            
-        self.update_next_parameter( )
-            
-    def update_next_parameter( self ):
-        
-        
-        
-        
-        
-        
-    
-    return new_parameter
-
-    M_counter = np.zeros( 0 )
-    M_parameter_steps = np.zeros( 0 )
+#class Tensor_parameter_generator:
+#    """a class for handling the generation of parameters."""
+#
+#    def __init__( self, _generation_type, _num_parameters, _parameter_steps ):
+#        
+#        Parameter_generator( _generation_type, _parameter_grid )
+#        self.M_counter = np.zeros( self.M_num_parameters )
+#        self.M_parameter_steps = _parameter_steps
+#        
+#        return
+#
+#    def generate_parameter( self, _mu_min, _mu_max ):
+#        
+#        new_parameter = np.zeros( self.M_num_parameters )
+#        for iP in range( self.M_num_parameters ):
+#            
+#
+#            
+#            
+#        self.update_next_parameter( )
+#            
+#    def update_next_parameter( self ):
+#           M_counter[0] =  M_counter[0] + 1
+#        
+#        
+#        
+#        
+#        
+#    
+#    return new_parameter
+#
+#    M_counter = np.zeros( 0 )
+#    M_parameter_steps = np.zeros( 0 )
 
 
 

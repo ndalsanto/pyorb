@@ -185,7 +185,6 @@ class navier_stokes_problem( fp.fom_problem ):
 
         return un
 
-    
     M_ns_theta_As = ns_theta_As( )
     M_ns_theta_fs = ns_theta_fs( )
         

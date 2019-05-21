@@ -193,12 +193,15 @@ class RbManager( ):
 
         return
 
-    def perform_pod( self, _tol = 10**(-5) ):
+    def perform_pod( self, _tol = 10**(-5), _metric='euclidean' ):
 
         pod = podec.ProperOrthogonalDecompostion( )
 
-        pod.perform_pod( self.M_snapshots_matrix, _tol )
-
+        if _metric == 'natural':
+            pod.perform_pod_matrix( self.M_snapshots_matrix, _tol, self.M_fom_problem.M_natural_norm_matrix )
+        else:
+            pod.perform_pod( self.M_snapshots_matrix, _tol )
+            
         self.M_basis = pod.get_basis( )
 
         self.M_N = self.M_basis.shape[1]
