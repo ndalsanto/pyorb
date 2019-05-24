@@ -8,7 +8,6 @@ Created on Thu Oct 11 11:49:46 2018
 """
 
 import numpy as np
-import pyorb_core.pde_problem.parameter_generator as pg
 
 class Parameter_handler:
     """a class for handling the parameters."""
@@ -34,8 +33,12 @@ class Parameter_handler:
         print( "The current parameter is: " )
         print( self.M_param )
 
+    def substitute_parameter_generator( self, _parameter_generator ):
+
+        self.M_parameter_generator = _parameter_generator
+        return
+
     def generate_parameter( self ):
-        # generate numbers between 0 and 1
         assert self.M_num_parameters > 0
         self.M_param = self.M_parameter_generator.generate_parameter( self.M_param_min, self.M_param_max )
         return

@@ -12,11 +12,13 @@ An example where the RB method is constructed by solving the fem problem with MA
 
 #%%
 
+import time
 
 def compute_rb_errors( n_tests, my_rb_manager, my_ns ):
 
   errors = np.zeros( n_tests ) 
- 
+  l2_errors = np.zeros( n_tests ) 
+  
   for ii in range( n_tests ):
     print('Parameter %d ' % ii)
     my_ns.generate_parameter( )
@@ -38,9 +40,11 @@ def compute_rb_errors( n_tests, my_rb_manager, my_ns ):
     err = my_ns.compute_natural_norm( e_h ) / my_ns.compute_natural_norm( s1 )
     print( 'Norm of H1 error %f' % err )
 
+    l2_errors[ii] = norm_error
     errors[ii] = err
 
   print('Mean error %f ' % np.mean(errors))
+  return l2_errors, errors
 
 
 
@@ -61,23 +65,17 @@ my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
-import pyorb_core.pde_problem.parameter_handler as ph
 
 mu0_min = 1.; mu0_max = 10.
-mu1_min = 0.; mu1_max = 0.1
+mu1_min = 0.; mu1_max = 0.25
 
 param_min = np.array([mu0_min, mu1_min])
 param_max = np.array([mu0_max, mu1_max])
 num_parameters = param_min.shape[0]
 
-# preparing the parameter handler
-my_parameter_handler = ph.Parameter_handler( )
-my_parameter_handler.assign_parameters_bounds( param_min, param_max )
 param_range = 'param_03_'
-
 do_offline = 0
-
-offline_selection = ''
+offline_selection = 'random'
 
 if mu1_max <= 0.250001:
 
@@ -90,13 +88,13 @@ if mu1_max <= 0.250001:
 
     # fine
     param_range = 'param_025_'
-    ns_m_deim = 750
-    n_s = 1500
+    mu_grid = np.array( [37, 51] )
+    m_deim_mu_grid = np.array( [1, 501] )
+    ns_m_deim = m_deim_mu_grid[0] * m_deim_mu_grid[1]
+    n_s = mu_grid[0] * mu_grid[1]
     ns_test = 50
     rb_tol = 10**(-4)
     do_offline = 0
-    mu0_grid = 30
-    mu1_grid = 50
     offline_selection = 'tensor'
 
 if mu1_max <= 0.150001:
@@ -119,14 +117,13 @@ if mu1_max <= 0.150001:
 if mu1_max <= 0.101:
 
     param_range = 'param_010_'
-    ns_m_deim = 30
-    n_s = 42
-    mu0_grid = 6
-    mu1_grid = 7
+    mu_grid = np.array( [10, 6] )
     offline_selection = 'tensor'
+    n_s = mu_grid[0] * mu_grid[1]
+    ns_m_deim = n_s
     ns_test = 10
     rb_tol = 10**(-4)
-    do_offline = 1
+    do_offline = 0
 
 if mu1_max < 0.0999:
     param_range = 'small_param_'
@@ -144,11 +141,23 @@ if mu1_max < 0.001:
     rb_tol = 10**(-6)
     do_offline = 0
 
+import pyorb_core.pde_problem.parameter_handler as ph
+import pyorb_core.pde_problem.parameter_generator as pg
+
+if offline_selection == 'tensor':
+    my_parameter_generator = pg.Tensor_parameter_generator( 2, mu_grid )
+else:
+    my_parameter_generator = pg.Random_parameter_generator( 2 )
+
+# preparing the parameter handler
+my_parameter_handler = ph.Parameter_handler( my_parameter_generator )
+my_parameter_handler.assign_parameters_bounds( param_min, param_max )
+
 # define the fem problem
 import navier_stokes_problem as ns
 
 mesh = 'very_coarse'
-#mesh = 'fine'
+mesh = 'fine'
 
 fom_specifics = {
         'model': 'navier_stokes', \
@@ -159,21 +168,25 @@ fom_specifics = {
 
 my_ns = ns.navier_stokes_problem( my_parameter_handler, my_matlab_external_engine, fom_specifics )
 
-##%%
-
-my_ns.generate_parameter( )
-param = my_ns.get_parameter( )
+my_parameter_generator.reset_counter( )
 
 base_folder = 'offline_' + param_range + offline_selection + '_' + mesh + '/'
 print(base_folder)
 
 #%%
+
 import pyorb_core.utils.array_utils as pyorb_array_utils
 import pyorb_core.rb_library.m_deim as m_deim
 my_mdeim = m_deim.Mdeim( my_ns )
 my_deim  = m_deim.Deim(  my_ns )
 
+if offline_selection == 'tensor':
+    m_deim_parameter_generator = pg.Tensor_parameter_generator( 2, m_deim_mu_grid )
+    my_parameter_handler.substitute_parameter_generator( m_deim_parameter_generator )
+
 if do_offline == 1:
+
+    my_parameter_generator.reset_counter( )
     my_mdeim.set_save_offline( True, base_folder + '/' )
     my_mdeim.perform_mdeim( ns_m_deim, 10**(-6) )
 
@@ -194,7 +207,12 @@ else:
 my_mdeim.M_snapshots_coefficients
 num_mdeim_affine_components_A = my_mdeim.get_num_mdeim_basis( )
 
+if offline_selection == 'tensor':
+    m_deim_parameter_generator.reset_counter( )
+
 if do_offline == 1:
+
+    my_parameter_generator.reset_counter( )
     my_deim.set_save_offline( True, base_folder + '/' )
     my_deim.perform_deim( ns_m_deim, 10**(-6) )
     theta_deim_min, theta_deim_max = my_deim.compute_theta_min_max( )
@@ -213,7 +231,7 @@ else:
     
 my_deim.M_snapshots_coefficients
 num_deim_affine_components_f = my_deim.get_num_basis( )
-    
+
 my_ns.set_mdeim( my_mdeim )
 my_ns.set_deim( my_deim )
 
@@ -237,6 +255,8 @@ if SAVE_OFFLINE == 1:
                                            base_folder + 'offline_parameters.data' )
 
 if do_offline == 1:
+    my_parameter_generator.reset_counter( )
+    my_parameter_handler.substitute_parameter_generator( my_parameter_generator )
     my_rb_manager.build_snapshots( n_s )
 else:
     my_rb_manager.import_snapshots_matrix( base_folder + "snapshots_" + mesh + '.txt' )
@@ -282,6 +302,9 @@ else:
 
 my_rb_manager.print_rb_offline_summary( )
 
+random_param_gen = pg.Random_parameter_generator( 2 )
+my_parameter_handler.substitute_parameter_generator( random_param_gen )
+
 #%%
 
 print( 'Solving RB problem ' )
@@ -289,7 +312,6 @@ print( 'Solving RB problem ' )
 train_parameters = my_rb_manager.get_offline_parameters( )
 
 param_1 = train_parameters[0, :]
-import time
 start = time.time()
 un = my_ns.solve_rb_ns_problem( param_1, my_rb_manager.M_affineDecomposition )
 end = time.time()
@@ -308,7 +330,6 @@ print( 'Norm of error %f' % norm_error )
 err = my_ns.compute_natural_norm( e_h ) / my_ns.compute_natural_norm( s1 )
 print( err )
 
-compute_rb_errors( 20, my_rb_manager, my_ns )
+l2_errors, errors = compute_rb_errors( 20, my_rb_manager, my_ns )
 
-
-my_matlab_engine_manager.quit_engine( )
+#my_matlab_engine_manager.quit_engine( )

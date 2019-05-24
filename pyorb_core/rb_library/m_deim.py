@@ -371,7 +371,7 @@ class Mdeim( Deim ):
         
         current_snapshots_number = self.M_snapshots_matrix.shape[1]
 
-        self.M_fom_problem.generate_parameter( )
+#        self.M_fom_problem.generate_parameter( )
 
         self.M_offline_parameters = np.zeros( (_ns, self.M_fom_problem.get_num_parameters( ) ) )
         
