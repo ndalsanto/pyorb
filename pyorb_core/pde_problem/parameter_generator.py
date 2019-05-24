@@ -82,9 +82,3 @@ class Tensor_parameter_generator( Parameter_generator ):
     M_counter = np.zeros( 0 )
     M_parameter_steps = np.zeros( 0 )
 
-
-
-
-
-
-
