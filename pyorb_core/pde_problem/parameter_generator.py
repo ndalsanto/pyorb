@@ -55,7 +55,7 @@ class Tensor_parameter_generator( Parameter_generator ):
         
         for iP in range( self.M_num_parameters ):
             new_parameter[iP] = _mu_min[iP] + ( _mu_max[iP] - _mu_min[iP] ) \
-                                            * self.M_counter[iP].astype(float) / ( self.M_parameter_steps[iP].astype(float) - 1)
+                                            * self.M_counter[iP].astype(float) / ( self.M_parameter_steps[iP].astype(float))
 
         self.update_next_parameter( )
         return new_parameter
