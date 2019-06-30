@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
+'''
 Created on Thu Oct 31 14:31:17 2018
 
 @author: Niccolo' Dal Santo
@@ -8,7 +8,7 @@ Created on Thu Oct 31 14:31:17 2018
 
 An example where the RB method is constructed by solving the fem problem with MATLAB to compute the snapshots and the affine decomposition of FE matrices and vectors 
 
-"""
+'''
 
 #%%
 
@@ -19,11 +19,16 @@ sys.path.insert(0, '../../')
 print(sys.path)
 
 import pyorb_core.tpl_managers.external_engine_manager as mee
+import pyorb_core.error_manager as em
 
 matlab_library_path = '/usr/scratch/dalsanto/EPFL/DeepLearning/feamat/'
 matlab_pyorb_interface = '/usr/scratch/dalsanto/EPFL/DeepLearning/pyorb-matlab-api/'
 
-my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path, matlab_pyorb_interface )
+if matlab_library_path == 'path/to/MATLAB/library':
+    em.error_raiser( 'SystemError', 'Please specify the path for your matlab library' )
+
+# playing around with engine manager 
+my_matlab_engine_manager = mee.external_engine_manager( 'matlab', matlab_library_path )
 my_matlab_engine_manager.start_engine( )
 my_matlab_external_engine = my_matlab_engine_manager.get_external_engine( )
 
@@ -93,9 +98,9 @@ my_rb_manager = rm.RbManager( my_ndp, my_affine_decomposition )
 SAVE_OFFLINE = 0
 
 if SAVE_OFFLINE == 1:
-    my_rb_manager.save_offline_structures( "offline_" + fem_size_str + "/test_snapshots_" + fem_size_str + '.txt', \
-                                           "offline_" + fem_size_str + "/basis_" + fem_size_str + '.txt', \
-                                           "offline_" + fem_size_str + "/rb_affine_components_" + fem_size_str, \
+    my_rb_manager.save_offline_structures( 'offline_' + fem_size_str + '/test_snapshots_' + fem_size_str + '.txt', \
+                                           'offline_' + fem_size_str + '/basis_' + fem_size_str + '.txt', \
+                                           'offline_' + fem_size_str + '/rb_affine_components_' + fem_size_str, \
                                            'offline_' + fem_size_str + '/test_offline_parameters.data' )
 
 my_rb_manager.build_rb_approximation( 100, 10**(-6) )

@@ -458,9 +458,11 @@ class RbManager( ):
 
     def test_rb_solver( self, _n_test, _noise=0.0 ):
 
-        all_errors = 0.;
-
         all_errors_simulations = np.zeros( _n_test )
+        all_errors = 0.0
+        all_times = 0.0
+        
+        import time
 
         for iP in range( _n_test ):
 
@@ -477,7 +479,12 @@ class RbManager( ):
             print( "New NOISED parameter %d " % ( iP ) )
             print( new_noised_param )
 
-            self.solve_reduced_problem( new_noised_param )
+            start = time.time()
+            self.solve_reduced_problem( new_param )
+            end = time.time()
+            computational_time = end - start
+            all_times = all_times + computational_time
+            
             self.reconstruct_fem_solution( self.M_un )
             uh = self.M_fom_problem.solve_fom_problem( new_param )
 
@@ -492,9 +499,11 @@ class RbManager( ):
             print( "The error is %e \n\n" % norm_of_error )
 
         avg_error = all_errors / _n_test
+        avg_time  = all_times  / _n_test
 
         print( "The average error is %E" % avg_error )
-
+        print( "The average time  is %f seconds" % avg_time )
+        
         return avg_error, all_errors_simulations
 
     M_used_Qa = 0

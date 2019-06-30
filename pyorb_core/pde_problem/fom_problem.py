@@ -166,9 +166,8 @@ class fom_problem( ):
     # engine used to perform offline computation relying on an external engine
     M_external_engine = None
     M_fom_specifics = None
-
     M_natural_norm_matrix = None
-
+    
     # theta functions
     M_theta_a = default_theta_function
     M_theta_f = default_theta_function
