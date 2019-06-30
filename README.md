@@ -2,11 +2,6 @@ PyORB (Python Optimized Reduced Basis) is a set of Python scripts for the use of
 
 Current tests included in the library in the folder examples/ take into account either the MATLAB TPL [`feamat`](https://github.com/lucapegolotti/feamat) (where you need to select the [`pyorb_wrappers`] branch) or the C++ TPL [`LifeV`](https://www.lifev.org), which uses the [`pyorb-lifev-api`](https://github.com/ndalsanto/pyorb-lifev-api).
 
-Development
--------
-
-PyORB is conceived, developed and maintained by [Niccolò Dal Santo](https://www.linkedin.com/in/niccolo-dal-santo/) at [EPFL](https://www.epfl.ch/).
-
 Installation
 -------
 
@@ -17,4 +12,3 @@ These preliminary steps must be followed in order to use MPI and the MATLAB and 
     cd "matlabroot/extern/engines/python"
     python setup.py install
 ```
-PyORB is mainly conceived, developed and maintained by [Niccolò Dal Santo](https://www.linkedin.com/in/niccolo-dal-santo/) at [EPFL](https://www.epfl.ch/).
